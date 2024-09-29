@@ -1,27 +1,25 @@
-import requests
-import json
 import datetime
 import urllib.parse
-from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from pars import request, minify_lesson_title
 from ask_gpt import ask_gpt
-from users_cookie_db import get_cookie_from_db
+import db
 
 
 def hw(user_id: str | int, index: str | int) -> str | tuple:
-    'Функция для парсинга дз\n-\nindex:\n t - дз на завтра\n0-6 - дз на определенный день недели\nц - дз на неделю'
+    '''Функция для парсинга дз
+    
+| index | функция                        |
+| ----- | ------------------------------ |
+| t     | дз на завтра                   |
+| w     | дз на неделю                   |
+| 0-6   | дз на определенный день недели |'''
 
-    cookie = get_cookie_from_db(user_id)
+    cookie = db.get_cookie(user_id)
     url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
 
-    if cookie == '':
-        return 'Сначала добавь свою учетную запись -> /new'
-
-    headers = {'Cookie':cookie}
-    post = requests.post(url, headers=headers)
-    print(post.text)
-    b = json.loads(post.text)
+    data = request(cookie, url)
 
     inline_keyboard = []
     days = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
@@ -29,17 +27,15 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
     if index == 'w':
         msg_text = ''
         for day in range(7):
-
             if day == 6:
-                msg_text += f"Д/З на {b[day]['date'].replace('-', ' ')} {days[day]} нет!\n\nВОСКРЕСЕНЬЕ!"
-
+                msg_text += f"Д/З на {data[day]['date'].replace('-', ' ')} {days[day]} нет!\n\nВОСКРЕСЕНЬЕ!"
             else:
-                msg_text += f"Д/З на {b[day]['date'].replace('-', ' ')} {days[day]}\n\n"
+                msg_text += f"Д/З на {data[day]['date'].replace('-', ' ')} {days[day]}\n\n"
                 counter = 1
                 i = 0
 
-                for i in b[day]['homeworks']:
-                    subject = i['discipline'].replace('Иностранный язык (английский)', 'Англ. Яз.').replace('Физическая культура', 'Физ-ра').replace('Литература', 'Литер.').replace('Технология', 'Техн.').replace('Информатика', 'Информ.').replace('Обществознание', 'Обществ.').replace('Русский язык', 'Рус. Яз.').replace('Математика', 'Матем.')
+                for i in data[day]['homeworks']:
+                    subject = minify_lesson_title(i['discipline'])
                     p_subject = subject
 
                     while len(p_subject) < 9:
@@ -68,7 +64,7 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
 
         markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
-        return msg_text, markup
+        return f'<pre>{msg_text}</pre>', markup
                 
     else:
         if index == 't':
@@ -77,15 +73,15 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
             day = int(index)
 
         if day == 6:
-            msg_text = f"Д/З на {b[day]['date'].replace('-', ' ')} {days[day]} нет!\n\nВОСКРЕСЕНЬЕ!"
+            msg_text = f"Д/З на {data[day]['date'].replace('-', ' ')} {days[day]} нет!\n\nВОСКРЕСЕНЬЕ!"
 
         else:
-            msg_text = f"Д/З на {b[day]['date'].replace('-', ' ')} {days[day]} \n\n"
+            msg_text = f"Д/З на {data[day]['date'].replace('-', ' ')} {days[day]} \n\n"
             counter = 1
             i = 0
 
-            for i in b[day]['homeworks']:
-                subject = i['discipline'].replace('Иностранный язык (английский)', 'Англ. Яз.').replace('Физическая культура', 'Физ-ра').replace('Литература', 'Литер.').replace('Технология', 'Техн.').replace('Информатика', 'Информ.').replace('Обществознание', 'Обществ.').replace('Русский язык', 'Рус. Яз.').replace('Математика', 'Матем.')
+            for i in data[day]['homeworks']:
+                subject = minify_lesson_title(i['discipline'])
                 p_subject = subject
 
                 while len(p_subject) < 9:
@@ -112,36 +108,23 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
 
             markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
-            return msg_text, markup
+            return f'<pre>{msg_text}</pre>', markup
                 
-        return msg_text, InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Нет дз', callback_data='None')]])
+        return f'<pre>{msg_text}</pre>', InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Нет дз', callback_data='None')]])
     
 
-def chatgpt(user_id: str | int, index: str):
+def chatgpt(user_id: str | int, index: str) -> str:
+    'Функция для формирования запроса к GPT'
 
-    try:
-        day = int(index.split('_')[1])
-        subject_num = int(index.split('_')[2])
+    day = int(index.split('_')[1])
+    subject_num = int(index.split('_')[2])
 
-        cookie = get_cookie_from_db(user_id)
-        url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
+    cookie = db.get_cookie(user_id)
+    url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
 
-        if cookie == '':
-            return 'Сначала добавь свою учетную запись -> /new'
+    data = request(cookie, url)
 
-        headers = {'Cookie':cookie}
-        post = requests.post(url, headers=headers)
-        print(post.text)
-        b = json.loads(post.text)
+    hw = data[day]['homeworks'][subject_num]['homework']
+    subject_name = data[day]['homeworks'][subject_num]['discipline']
 
-        hw = b[day]['homeworks'][subject_num]['homework']
-        subject_name = b[day]['homeworks'][subject_num]['discipline']
-
-        msg_text = ask_gpt(
-            f'Помоги мне с решением домашнего задания по {subject_name}: {hw}'
-        )
-
-        return msg_text
-
-    except Exception as e:
-        return f'Неизвестная ошибка - {e}'
+    return ask_gpt(f'Пожалуйста, отвечай на русском. Помоги мне с решением домашнего задания по {subject_name}: {hw}')

@@ -1,0 +1,15 @@
+# Python
+__pycache__
+venv
+
+# Logs
+*.log
+
+# PARS-DIARI
+.env
+users.json
+stat_img.png
+
+# IDE
+.idea/
+.vscode/

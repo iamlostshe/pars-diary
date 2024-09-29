@@ -1,12 +1,21 @@
-from g4f.client import Client
+from gradio_client import Client
+from loguru import logger
 
-def ask_gpt(ask_text):
+def ask_gpt(prompt: str, system_prompt: str | None = 'You are a helpful assistant.') -> str:
+    logger.debug(prompt)
 
-    print(ask_text)
-
-    client = Client()
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": ask_text}]
+    client = Client("gokaygokay/Gemma-2-llamacpp")
+    result = client.predict(
+            message=prompt,
+            model="2b_it_v2.gguf",
+            system_message=system_prompt,
+            max_tokens=2048,
+            temperature=0.7,
+            top_p=0.95,
+            top_k=40,
+            repeat_penalty=1.1,
+            api_name="/chat"
     )
-    return f'gpt: {response.choices[0].message.content}'
+    
+    logger.debug(result)
+    return result

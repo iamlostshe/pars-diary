@@ -1,42 +1,43 @@
-from config import TOKEN
-from pars import pars
-from hw import hw, chatgpt
-from ask_gpt import ask_gpt
-from users_cookie_db import del_db, new_user_in_db, user_in_db
-from notify import notify_info, notify_swith, update_marks
-
+# Integrated python modules
 import asyncio
 import logging
 import sys
-import urllib.parse
+from os import getenv
 
+# Modules need to be installed
+from dotenv import load_dotenv
+
+# aiogram
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import Message
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile, Message, CallbackQuery
 
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+# Local modules (writed me)
+from pars import Pars
+from hw import hw, chatgpt
+from ask_gpt import ask_gpt
+import db
+import messages
+
+# Get token for telegram bot from .env
+load_dotenv()
+TOKEN = getenv('TOKEN_TG')
+ADMINS_TG = getenv('ADMINS_TG').split(', ')
+
+# Initializating bot
+bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Обработка комманд-приветствий
+# Коммнды /start, /help
 @dp.message(Command(commands=['start', 'help']))
 async def command_start_handler(msg: Message) -> None:
-
-    if user_in_db(msg.from_user.id):
-        await msg.answer(f'''Приветствую, {msg.from_user.full_name}!
-
-/start - начать диалог
-/me - данные о тебе
-/cs - классные часы
-/events - ивенты
-/birtdays - дни рождения
-/marks - оценки
-/i_marks - итоговые оценки
-/hw - дз''')
-        
+    # Если пользователь зарегистрирован
+    if db.get_cookie(msg.from_user.id) != None:
+        # Отвечаем пользователю
+        await msg.answer(messages.start_old_user(msg.from_user.first_name, msg.from_user.language_code))
+    # Если пользователь не зарегистрирован
     else:
+        # Отвечаем пользователю
         markup = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -44,26 +45,48 @@ async def command_start_handler(msg: Message) -> None:
                 ]
             ]
         )
+        await msg.answer(messages.start_new_user(msg.from_user.first_name, msg.from_user.language_code), reply_markup=markup)
+    # Добавляем пользователя в базу данных
+    refer = None
+    if msg.text != '/start':
+        refer = msg.text.replace('/start ', '')
+    db.add_user(msg.from_user.id, refer)
 
-        await msg.answer(f'''Приветствую, {msg.from_user.full_name}!
-                         
-Для использования бота необходимо добавить свою учетную запись -> нажми на кнопку ниже:
-''', reply_markup=markup)
+# Базовые комманы (парсинг + небольшое изменение)
+@dp.message(Command(commands=['me', 'cs', 'events', 'birthdays', 'marks', 'i_marks']))
+async def simple_msg(msg: Message) -> None:
+    try:
+        # Получаем cookie пользователя
+        cookie = db.get_cookie(msg.from_user.id)
 
-# Основные комманды (парсинг + небольшие преобразования)
-@dp.message(Command(commands=['me', 'cs', 'events', 'birtdays', 'marks', 'i_marks']))
-async def simple_msg(msg: Message):
-    send_text = pars(msg)
+        # Создаем объект класса
+        pars = Pars()
 
-    if send_text == 'Сначала добавь свою учетную запись -> /new':
-        await msg.answer(f'{send_text}', 'HTML')
-    else:
-        await msg.answer(f'{send_text}', 'HTML')
+        # Выбираем функцию, в зависимости от комманды
+        if 'me' in msg.text:
+            text = pars.me(cookie)
+        elif 'cs' in msg.text:
+            text = pars.cs(cookie)
+        elif 'events' in msg.text:
+            text = pars.events(cookie)
+        elif 'birthdays' in msg.text:
+            text = pars.birthdays(cookie)
+        elif 'i_marks' in msg.text:
+            text = pars.i_marks(cookie)
+        elif 'marks' in msg.text:
+            text = pars.marks(cookie)
+
+        # Отвечаем пользователю
+        await msg.answer(text, 'HTML')
+
+    # Проверка ошибок
+    except Exception as e:
+        await msg.answer(messages.error(e, msg.from_user.language_code))
 
 
-# дз
-@dp.message(Command(commands=['hw']))
-async def lessons_msg(msg: Message):
+# Комманда /hw
+@dp.message(Command('hw'))
+async def lessons_msg(msg: Message) -> None:
     send_data = hw(msg.from_user.id, 't')
     print(send_data)
     if send_data == 'Сначала добавь свою учетную запись -> /new':
@@ -72,9 +95,9 @@ async def lessons_msg(msg: Message):
         await msg.answer(f'<pre>{send_data[0]}</pre>', 'HTML', reply_markup=send_data[1])
 
 
-# Нейросеть для помощи в учебе
+# Нейронная сеть, для помощи в учебе
 @dp.message(Command(commands=['chatgpt']))
-async def lessons_msg(msg: Message):
+async def lessons_msg(msg: Message) -> None:
     if msg.text == '/chatgpt':
         send_text = 'Комманда работает так - "/chatgpt расскажи о теореме пифагора"'
     else:
@@ -83,13 +106,13 @@ async def lessons_msg(msg: Message):
     await msg.answer(send_text)
 
 
-# Уведомления о новых оценках
+# Настройки для уведомлений
 @dp.message(Command(commands=['notify']))
-async def lessons_msg(msg: Message):
-    if user_in_db(msg.from_user.id):
+async def lessons_msg(msg: Message) -> None:
+    if db.get(msg.from_user.id):
         await msg.answer('Для этого действия необходимо зарегестрироваться -> /start', 'HTML')
     else:
-        if notify_info(msg.from_user.id):
+        if db.get_notify(msg.from_user.id):
             msg_text = 'Сейчас уведомления <strong>включены</strong>, для <strong>отключения</strong> нажми кнопку ниже:'
             markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='notyfi_off')]])
         else:
@@ -99,34 +122,43 @@ async def lessons_msg(msg: Message):
         await msg.answer(msg_text, 'HTML', reply_markup=markup)
 
 
-# Авторизация и выход из учетной записи
-@dp.message(Command(commands=['new', 'del']))
-async def new_msg(msg: Message):
+# Вход в новую учебную запись
+@dp.message(Command(commands=['new']))
+async def new_msg(msg: Message) -> None:
     if msg.text == '/new':
-        msg_text = 'Комманда работает так - "/new sessionid=xxx..."'
-    elif msg.text == '/del':
-        msg_text = del_db(msg.from_user.id)
+        # Отвечаем пользователю
+        await msg.answer('Комманда работает так - "/new sessionid=xxx..."')
     else:
-        msg_text = new_user_in_db(msg)
-
-    await msg.answer(msg_text)
-
-# Кнопки для решения дз (обработчик)
-@dp.callback_query()
-async def callback(call):
-    if call.data == 'notyfi_on':
-        notify_swith(call.from_user.id)
-
-        markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='notyfi_off')]])
+        # Добавляем cookie пользователя в дб и отвечаем пользователю
+        await msg.answer(db.add_user_cookie(msg.from_user.id, msg.text.replace('/new ', '')))
         
+
+# Комманда /admin
+@dp.message(Command(commands=['admin']))
+async def new_msg(msg: Message) -> None:
+    # Если пользователь - админ
+    if str(msg.from_user.id) in ADMINS_TG:
+        await msg.answer_photo(FSInputFile(db.GRAPH_NAME), messages.admin())
+        
+
+# Остальные сообщения
+@dp.message()
+async def any_msg(msg: Message) -> None:
+    msg.answer(messages.start_old_user(msg.from_user.first_name, msg.from_user.language_code))
+
+
+# Хендлеры для кнопок
+@dp.callback_query()
+async def callback(call: CallbackQuery) -> None:
+    if call.data == 'notyfi_on':
+        db.swith_notify(call.from_user.id)
+        markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='notyfi_off')]])
         await call.message.edit_text('Сейчас уведомления <strong>включены</strong>, для <strong>отключения</strong> нажми кнопку ниже:', reply_markup=markup)
 
 
     elif call.data == 'notyfi_off':
-        notify_swith(call.from_user.id)
-        
+        db.swith_notify(call.from_user.id)
         markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='✅ Включить', callback_data='notyfi_on')]])
-
         await call.message.edit_text('Сейчас уведомления <strong>отключены</strong>, для <strong>включения</strong> нажми кнопку ниже:', reply_markup=markup)
 
 
@@ -158,21 +190,7 @@ async def callback(call):
         await call.message.edit_text(send_text)
 
 
-async def scheduled_task():
-    while True:
-        a = update_marks()
-        print('Отправляю сообщение', a[0], a[1])
-
-
-        if a[1] != '':
-            await bot.send_message(a[0], [1])
-
-        # Ожидаем один час
-        await asyncio.sleep(60)
-
-async def on_startup(dp):
-    asyncio.create_task(scheduled_task())
-
+# Starting bot
 async def main() -> None:
     await dp.start_polling(bot)
 

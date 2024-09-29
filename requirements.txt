@@ -1,0 +1,11 @@
+# db.py
+requests
+matplotlib
+
+# ask_gpt.py
+gradio_client==1.3.0
+loguru==0.7.2
+
+# bot.py
+aiogram==3.12.0
+python-dotenv==1.0.1
