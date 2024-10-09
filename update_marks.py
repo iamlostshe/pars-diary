@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 
 from aiogram import Bot
 
-import db
-from db import DB_NAME
-from pars import Pars
+from utils import db
+from utils.db import DB_NAME
+from utils.pars import Pars
 
 # Получаем токен из .env
 load_dotenv()
@@ -17,6 +17,8 @@ TOKEN = getenv('TOKEN_TG')
 
 # Инициализируем бота
 bot = Bot(token=TOKEN)
+
+
 
 
 async def update_marks() -> None:

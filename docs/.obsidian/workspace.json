@@ -13,13 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1. Содержание.md",
+                "file": "5. База данных.md",
                 "mode": "preview",
-                "source": true
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "d8d9cf5dec1a1c6f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+                "mode": "source",
+                "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -85,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "1. Содержание.md",
+                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "1. Содержание.md",
+                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "1. Содержание.md"
+                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md"
               }
             }
           }
@@ -147,23 +160,31 @@
       "audio-recorder:Start/stop recording": false
     }
   },
-  "active": "b63e9022d811928c",
+  "active": "d8d9cf5dec1a1c6f",
   "lastOpenFiles": [
+    "~syncthing~7. Обработка данных.md.tmp",
+    "7. Обработка данных.sync-conflict-20240921-150718-SDY2Z7T.md",
+    "~syncthing~7. Обработка данных.sync-conflict-20240921-150718-SDY2Z7T.md.tmp",
+    "num = 2.py",
+    "список команд.md",
+    "~syncthing~список команд.md.tmp",
+    "4. Выбор платформы для проекта.md",
+    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+    "2. Цель и задачи.md",
     "6. Парсинг внутреннего API текущего дневника.md",
-    "_images/Pasted image 20240831013407.png",
     "7. Обработка данных.md",
+    "1. Содержание.md",
+    "TODO.md",
+    "9. Заключение.md",
+    "8. Уведомления.md",
+    "5. База данных.md",
+    "Untitled.canvas",
+    "2024-09-18.md",
+    "_images/Pasted image 20240831013407.png",
     "import requests.py",
     "_images/Pasted image 20240831013643.png",
     "_images/Pasted image 20240831013512.png",
-    "9. Заключение.md",
-    "5. База данных.md",
-    "4. Выбор платформы для проекта.md",
-    "3. Что не так сейчас.md",
-    "8. Уведомления.md",
-    "2. Цель и задачи.md",
-    "1. Содержание.md",
     "Школа.md",
-    "Untitled.md",
     "Untitled 1.md",
     "Untitled 2.md",
     "Recording 20240801131034.webm",
@@ -185,8 +206,6 @@
     "Парсинг внутреннего API текущего дневника.md",
     "Обработка данных.md",
     "Заключение.md",
-    "Выбор платформы для проекта.md",
-    "_images",
-    "_Содержание.md"
+    "_images"
   ]
 }

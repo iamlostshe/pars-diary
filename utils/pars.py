@@ -2,8 +2,65 @@ import json
 import datetime
 
 import requests
-
 from loguru import logger
+
+from utils.exceptions import *
+
+
+def request(url: str, user_id: str | int | None = None, cookie: str | None = None) -> dict:
+    'Функция для осуществеления запроса по id пользователя и url'
+    from utils import db
+    try:
+        # Получаем cookie по user_id
+        if cookie == None and user_id != None:
+            # Получаем cookie из json базы данных
+            cookie = db.get_cookie(str(user_id))
+
+        # Отпраляем запрос
+        headers = {'cookie': cookie}
+        r = requests.post(url, headers=headers, timeout=20)
+
+        # Выводим лог в консоль
+        logger.debug(r.text)
+
+        # Проверяем какой статус-код вернул сервер
+        if r.status_code != 200:
+            raise UnexpectedStatusCodeError(r.status_code)
+        
+        # Проверяем ответ сервера на наличае ошибок в тексте
+        elif 'Server.UserNotAuthenticated' in r.text:
+            raise UserNotAuthenticated()
+        
+        elif 'Client.ValidationError' in r.text:
+            raise ValidationError()
+
+        # Возвращаем загруженные и десериализованные данные из файла
+        return json.loads(r.text)
+    
+    # На случай долгого ожидания ответа сервера (при нагрузке бывает)
+    except requests.exceptions.Timeout:
+        raise TimeoutError()
+
+    # Обработка других ошибок
+    except Exception as e:
+        raise UnknownError(e)
+
+
+def check_cookie(cookie: str) -> bool | str:
+    'Функция для проверки cookie'
+    # Простые тесты
+    if 'sessionid=' not in cookie:
+        return 'Ваши cookie должны содержать "sessionid="'
+    elif 'sessionid=xxx...' in cookie:
+        return 'Нельзя использовать пример'
+    else:
+        try:
+            # Тест путем запроса к серверу
+            request('https://es.ciur.ru/api/ProfileService/GetPersonData', cookie=cookie)
+            return True
+
+        except UnexpectedStatusCodeError:
+            return 'Не правильно введены cookie, возможно они устарели (сервер выдает неверный ответ)'
 
 
 def minify_lesson_title(title: str) -> str:
@@ -24,38 +81,10 @@ minify_lesson_title('Физическая культура')
     return title
 
 
-def request(cookie: str, url: str) -> dict:
-    'Функция для осуществеления запроса по cookie и url'
-    # Проверяем авторизован ли пользователь
-    if cookie == None:
-        raise Exception({'error': 403, 'message': 'Для выполнения этого действия необходимо авторизоваться в боте.\n\nИнструкция по авторизации доступна по -> /start'})
-
-    # Отпраляем запрос
-    headers = {'cookie': cookie}
-    r = requests.post(url, headers=headers)
-
-    # Выводим лог в консоль
-    logger.debug(r.text)
-
-    # Проверяем какой статус-код вернул сервер
-    if r.status_code != 200:
-        raise Exception({'error': r.status_code, 'message': f'Неизвестная ошибка, сервер вернул неверный статус-код'})
-    
-    # Проверяем ответ сервера на наличае ошибок в тексте
-    elif 'Server.UserNotAuthenticated' in r.text:
-        raise Exception({'error': 403, 'message': 'Для выполнения этого действия необходимо авторизоваться в боте.\n\nИнструкция по авторизации доступна по -> /start'})
-    
-    elif 'Client.ValidationError' in r.text:
-        raise Exception({'error': 403, 'message': 'Для выполнения этого действия необходимо авторизоваться в боте.\n\nИнструкция по авторизации доступна по -> /start'})
-
-    # Возвращаем загруженные и десериализованные данные из файла
-    return json.loads(r.text)
-
-
 class Pars:
-    def me(self, cookie: str) -> str:
+    def me(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/ProfileService/GetPersonData'
-        data = request(cookie, url)
+        data = request(url, user_id)
 
         if data['children_persons'] == []:
             # Logged in on children account
@@ -76,6 +105,7 @@ class Pars:
             # Parent data
             msg_text += f"ФИО (родителя) - {data['user_fullname']}\n"
 
+            # Номера может и не быть
             try:
                 msg_text += f"Номер телефона - +{data['phone']}"
             except:
@@ -96,9 +126,9 @@ class Pars:
             return msg_text
     
 
-    def cs(self, cookie: str) -> str:
+    def cs(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/WidgetService/getClassHours'
-        data = request(cookie, url)
+        data = request(url, user_id)
 
         if data == {}:
             return 'Информация о классных часах отсутсвует'
@@ -111,9 +141,9 @@ class Pars:
 {data['theme']}'''
     
 
-    def events(self, cookie: str) -> str:
+    def events(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/WidgetService/getEvents'
-        data = request(cookie, url)
+        data = request(url, user_id)
     
         if str(data) == '[]':
             return 'Кажется, ивентов не намечается)'
@@ -121,9 +151,9 @@ class Pars:
             return f'{data}'
 
 
-    def birthdays(self, cookie: str) -> str:
+    def birthdays(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/WidgetService/getBirthdays'
-        data = request(cookie, url)
+        data = request(url, user_id)
 
         if str(data) == '[]':
             return 'Кажется, дней рождений не намечается)'
@@ -131,11 +161,14 @@ class Pars:
             return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
 
 
-    def marks(self, cookie: str) -> str:
+    def marks(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/MarkService/GetSummaryMarks?date='+str(datetime.datetime.now().date())
-        data = request(cookie, url)
+        data = request(url, user_id)
 
-        msg_text = 'Оценки:\n\n<pre>\n'
+        msg_text = ''
+        
+        if data['discipline_marks'] == []:
+            return 'Информация об оценках отсутствует\n\nКажется, вам пока не поставили ни одной('
         
         for subject in data['discipline_marks']:
             marks = []
@@ -159,14 +192,17 @@ class Pars:
             msg_text += f"{color_mark} {g}│ {subject['average_mark']} │ {' '.join(marks)}\n"
 
 
-        return f'{msg_text}</pre>'
+        return f'Оценки:\n\n<pre>\n{msg_text}</pre>'
     
 
-    def i_marks(self, cookie: str) -> str:
+    def i_marks(self, user_id: str | int) -> str:
         url = 'https://es.ciur.ru/api/MarkService/GetTotalMarks'
-        data = request(cookie, url)
+        data = request(url, user_id)
     
         msg_text = 'Итоговые оценки:\n\n1-4 - Четвертные оценки\nГ - Годовая\nЭ - Экзаменационная (если есть)\nИ - Итоговая\n\n<pre>\nПредмет   │ 1 │ 2 │ 3 │ 4 │ Г │ Э │ И │\n──────────┼───┼───┼───┼───┼───┼───┼───┤\n'
+
+        if data['discipline_marks'] == []:
+            return 'Информация об итоговых оценках отсутствует\n\nКажется, вам пока не поставили ни одной('
 
         for discipline in data['discipline_marks']:
             list = ['-', '-', '-', '-', '-', '-', '-']
@@ -178,33 +214,32 @@ class Pars:
             msg_text += f"{g} │ "
 
             for period_mark in discipline['period_marks']:
-                if period_mark['subperiod_code'] == '1_1':
-                    list[0] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '1_2':
-                    list[1] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '1_3':
-                    list[2] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '1_4':
-                    list[3] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '4_1':
-                    list[4] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '4_2':
-                    list[5] = (period_mark['mark'])
-                elif period_mark['subperiod_code'] == '4_3':
-                    list[6] = (period_mark['mark'])
+                # Словарь для сопоставления subperiod_code с индексами
+                subperiod_index = {
+                    '1_1': 0, # 1 четверть
+                    '1_2': 1, # 2 четверть
+                    '1_3': 2, # 3 четверть
+                    '1_4': 3, # 4 четверть
+                    '4_1': 4, # Годовая
+                    '4_2': 5, # Экзаменационная (если есть)
+                    '4_3': 6  # Итоговая
+                }
+
+                # Получаем индекс из словаря и присваиваем значение
+                if period_mark['subperiod_code'] in subperiod_index:
+                    list[subperiod_index[period_mark['subperiod_code']]] = period_mark['mark']
 
             msg_text += f"{' │ '.join(list)}"
 
             msg_text += ' │\n'
 
         return f'{msg_text}</pre>'
-
+    
 
 # Тесты
 if __name__ == '__main__':
-
+    
     cookie = ''
-
     pars = Pars()
 
     print(pars.me(cookie))

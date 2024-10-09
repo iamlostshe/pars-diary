@@ -1,4 +1,5 @@
-import db
+from utils import db
+from loguru import logger
 
 def start_old_user(first_name: int | str, lang_code: str | None = 'ru') -> str:
     if lang_code != 'ru':
@@ -44,13 +45,19 @@ def error(e: str, lang_code: str | None = 'ru') -> str:
     if lang_code != 'ru':
         lang_code = 'en'
 
-    return f'''Произошла непредвиденная ошибка:
+    logger.error(e)
+
+    return f'''Произошла непредвиденная ошибка, возможно информация ниже поможет вам понять в чем дело:
     
+<b>Ошибка:</b>
+
+{str(str(type(e).__name__))}
+
+<b>Пояснение:</b>
+
 {e}
 
-Пожалуйста попробуйте выполнить действие снова.
-
-Если предидущий шаг не помог напишите админу @iamlostshe'''
+<b>Если ошибка произошла не по вашей вине напишите админу @iamlostshe</b>'''
 
 def admin(lang_code: None = None) -> str:
     if lang_code != 'ru':

@@ -1,0 +1,186 @@
+{
+  "main": {
+    "id": "ca24f4a59cfb2f4c",
+    "type": "split",
+    "children": [
+      {
+        "id": "0f2e14b55eb465a2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "85ce4436c8c049a1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "6. Парсинг внутреннего API текущего дневника.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "5d28a9e2b315c404",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "_images/screenschot.png"
+              }
+            }
+          },
+          {
+            "id": "10a1a1ccd146a98d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Untitled.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "b1b7e7235ea0c728",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "1. Содержание.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a9f10ebe211a45a3",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "52875ce1590d9035",
+        "type": "leaf",
+        "state": {
+          "type": "file-explorer",
+          "state": {
+            "sortOrder": "alphabetical"
+          }
+        }
+      },
+      {
+        "id": "6aef42477d294bb1",
+        "type": "leaf",
+        "state": {
+          "type": "search",
+          "state": {
+            "query": "",
+            "matchingCase": false,
+            "explainSearch": false,
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical"
+          }
+        }
+      },
+      {
+        "id": "d86a0370095e529f",
+        "type": "leaf",
+        "state": {
+          "type": "tag",
+          "state": {
+            "sortOrder": "frequency",
+            "useHierarchy": true
+          }
+        }
+      },
+      {
+        "id": "e136a227c2ffb6bc",
+        "type": "leaf",
+        "state": {
+          "type": "bookmarks",
+          "state": {}
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "right": {
+    "id": "b5c47c46574bcca2",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "3b059785801dc0f8",
+        "type": "leaf",
+        "state": {
+          "type": "backlink",
+          "state": {
+            "file": "Untitled.md",
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical",
+            "showSearch": false,
+            "searchQuery": "",
+            "backlinkCollapsed": false,
+            "unlinkedCollapsed": true
+          }
+        }
+      },
+      {
+        "id": "09800097635d37eb",
+        "type": "leaf",
+        "state": {
+          "type": "outgoing-link",
+          "state": {
+            "file": "Untitled.md",
+            "linksCollapsed": false,
+            "unlinkedCollapsed": true
+          }
+        }
+      },
+      {
+        "id": "39f2d27524d8053a",
+        "type": "leaf",
+        "state": {
+          "type": "outline",
+          "state": {
+            "file": "Untitled.md"
+          }
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "audio-recorder:Start/stop recording": false
+    }
+  },
+  "active": "10a1a1ccd146a98d",
+  "lastOpenFiles": [
+    "дзп.md",
+    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+    "1. Содержание.md",
+    "8. Уведомления.md",
+    "2. Цель и задачи.md",
+    "Untitled.md",
+    "_images/screenschot.png",
+    "TODO.md",
+    "app-todo.md",
+    "6. Парсинг внутреннего API текущего дневника.md",
+    "7. Обработка данных.md",
+    "список команд.md",
+    "7. Обработка данных.sync-conflict-20240921-150718-SDY2Z7T.md"
+  ]
+}

@@ -8,11 +8,18 @@ import json
 import time
 
 import matplotlib.pyplot as plt
-import requests
 
+from utils.exceptions import *
+from utils.pars import check_cookie
 
 def add_user(user_id: int | str, refer: str | None = None) -> None | dict:
     'Добавляет пользователя в json базу данных'
+    # Получаем реферальные сведения
+    if refer[:7] == '/start ':
+        refer = refer[7:]
+    else:
+        refer = None
+
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
@@ -45,10 +52,10 @@ def add_user(user_id: int | str, refer: str | None = None) -> None | dict:
 
     # Обработчики ошибок
     except FileNotFoundError:
-        raise Exception({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def add_user_cookie(user_id: int | str, cookie: str) -> None | str | dict: 
@@ -57,18 +64,8 @@ def add_user_cookie(user_id: int | str, cookie: str) -> None | str | dict:
     user_id = str(user_id)
 
     try:
-        # Простые тесты
-        if 'sessionid=' not in cookie:
-            return 'Ваши cookie должны содержать "sessionid="'
-        elif 'sessionid=xxx...' in cookie:
-            return 'Нельзя использовать пример'
-        else:
-            # Тест путем запроса к серверу
-            post = requests.post('https://es.ciur.ru/api/ProfileService/GetPersonData', headers={'Cookie': cookie})
-
-            if post.status_code != 200:
-                return 'Не правильно введены cookie, возможно они устарели (сервер выдает неверный ответ)'
-
+        c_c = check_cookie(cookie)
+        if c_c:
             # Открываем файл для чтения и записи
             with open(DB_NAME, "r+", encoding='UTF-8') as f:
                 # Загрузка и десериализация данных из файла
@@ -83,16 +80,18 @@ def add_user_cookie(user_id: int | str, cookie: str) -> None | str | dict:
 
                 # Отправляем сообщение об успешной записи в дб
                 return 'Пользователь успешно добавлен в базу данных'
+        else:
+            return c_c
             
     # Обработчики ошибок
     except KeyError:
-        raise KeyError({'error': '404', 'message': 'Пользователь не найден.'})
+        raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
     
 
 def get_cookie(user_id: str | int) -> None | str | dict:
@@ -111,13 +110,13 @@ def get_cookie(user_id: str | int) -> None | str | dict:
     
     # Обработчики ошибок
     except KeyError:
-        return None
+        return UserNotAuthorizatedError()
     
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def get_notify(user_id: str | int) -> str | dict:
@@ -136,13 +135,13 @@ def get_notify(user_id: str | int) -> str | dict:
     
     # Обработчики ошибок
     except KeyError:
-        raise KeyError({'error': '404', 'message': 'Пользователь не найден.'})
+        raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def swith_notify(user_id: str | int) -> None | dict: 
@@ -168,13 +167,13 @@ def swith_notify(user_id: str | int) -> None | dict:
     
     # Обработчики ошибок
     except KeyError:
-        raise KeyError({'error': '404', 'message': 'Пользователь не найден.'})
+        raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def get_graph() -> None:
@@ -202,10 +201,10 @@ def get_graph() -> None:
     
     # Обработчики ошибок
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def get_stat() -> tuple[int, str]:
@@ -226,10 +225,10 @@ def get_stat() -> tuple[int, str]:
     
     # Обработчики ошибок
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 def get_marks(user_id: str | int) -> dict | str:
@@ -248,13 +247,13 @@ def get_marks(user_id: str | int) -> dict | str:
     
     # Обработчики ошибок
     except KeyError:
-        raise KeyError({'error': '404', 'message': 'Пользователь не найден.'})
+        raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise FileNotFoundError({'error': '404', 'message': f'Файл {DB_NAME} не найден.'})
+        raise DBFilleNotFoundError(DB_NAME)
     
     except Exception as e:
-        raise Exception({'error': '500', 'message': f'Неизвестная ошибка: {e}.'})
+        raise UnknownError(e)
 
 
 # Тесты (все, что вызывает ошибки закомментированно)
