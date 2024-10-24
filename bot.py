@@ -1,23 +1,29 @@
 # Integrated python modules
 import asyncio
-from os import getenv
+import os
 
 # Modules need to be installed
 from dotenv import load_dotenv
 from loguru import logger
 
-# aiogram
+# Aiogram
 from aiogram import Bot, Dispatcher
 
-# Импортируем хендлеры
+# Writed by me modules
 from handlers import routers
-
+from utils.db import DB_NAME
 
 # Starting bot
 async def main() -> None:
+    # Checking for the existence of the users.json file
+    if not os.path.isfile(DB_NAME):
+        # and creating if it does not exist
+        with open(DB_NAME, 'a+', encoding='UTF-8') as f:
+            f.write('{}')
+            
     # Get token for telegram bot from .env
     load_dotenv()
-    TOKEN = getenv('TOKEN_TG')
+    TOKEN = os.getenv('TOKEN_TG')
 
     # Initializating dp and bot
     dp = Dispatcher()
@@ -25,7 +31,7 @@ async def main() -> None:
 
     # Connect hendlers
     for r in routers:
-        logger.info("Include router: {} ...", r.name)
+        logger.info('Include router: {} ...', r.name)
         dp.include_router(r)
 
     # Starting
@@ -33,5 +39,5 @@ async def main() -> None:
     await dp.start_polling(bot)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

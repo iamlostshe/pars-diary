@@ -16,7 +16,9 @@
                 "file": "5. База данных.md",
                 "mode": "preview",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "5. База данных"
             }
           },
           {
@@ -28,7 +30,9 @@
                 "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
                 "mode": "source",
                 "source": false
-              }
+              },
+              "icon": "lucide-file",
+              "title": "3. Что не так сейчас (Раскрываем актуальность проекта)"
             }
           }
         ],
@@ -52,7 +56,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
             }
           },
           {
@@ -67,7 +73,9 @@
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-search",
+              "title": "Search"
             }
           },
           {
@@ -75,7 +83,9 @@
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {}
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
             }
           }
         ]
@@ -98,7 +108,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+                "file": "5. База данных.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,7 +116,9 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 5. База данных"
             }
           },
           {
@@ -115,10 +127,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+                "file": "5. База данных.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 5. База данных"
             }
           },
           {
@@ -129,7 +143,9 @@
               "state": {
                 "sortOrder": "frequency",
                 "useHierarchy": true
-              }
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
             }
           },
           {
@@ -138,8 +154,10 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md"
-              }
+                "file": "5. База данных.md"
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 5. База данных"
             }
           }
         ]
@@ -162,19 +180,23 @@
   },
   "active": "d8d9cf5dec1a1c6f",
   "lastOpenFiles": [
+    "2. Цель и задачи.md",
+    "TODO.md",
+    "4. Выбор платформы для проекта.md",
+    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
+    "Elektronnyy_dnevnik_dlya_roditelya_i_uchenika.pdf",
+    "дзп.md",
+    "app-todo.md",
+    "Untitled.md",
     "~syncthing~7. Обработка данных.md.tmp",
     "7. Обработка данных.sync-conflict-20240921-150718-SDY2Z7T.md",
     "~syncthing~7. Обработка данных.sync-conflict-20240921-150718-SDY2Z7T.md.tmp",
     "num = 2.py",
     "список команд.md",
     "~syncthing~список команд.md.tmp",
-    "4. Выбор платформы для проекта.md",
-    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
-    "2. Цель и задачи.md",
     "6. Парсинг внутреннего API текущего дневника.md",
     "7. Обработка данных.md",
     "1. Содержание.md",
-    "TODO.md",
     "9. Заключение.md",
     "8. Уведомления.md",
     "5. База данных.md",
@@ -203,9 +225,6 @@
     "_images/admin.png",
     "Цель и задачи.md",
     "Уведомления.md",
-    "Парсинг внутреннего API текущего дневника.md",
-    "Обработка данных.md",
-    "Заключение.md",
     "_images"
   ]
 }

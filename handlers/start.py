@@ -11,8 +11,8 @@ router = Router(name=__name__)
 @router.message()
 @router.message(Command(commands=['start', 'help']))
 async def command_start_handler(msg: Message) -> None:
-    # Если пользователь зарегистрирован
-    if db.get_cookie(msg.from_user.id) != None:
+    # Если пользователь зарегистрирован (если не пустой ответ)
+    if db.get_cookie(msg.from_user.id):
         # Отвечаем пользователю
         await msg.answer(messages.start_old_user(msg.from_user.first_name, msg.from_user.language_code))
     # Если пользователь не зарегистрирован
@@ -26,5 +26,6 @@ async def command_start_handler(msg: Message) -> None:
             ]
         )
         await msg.answer(messages.start_new_user(msg.from_user.first_name, msg.from_user.language_code), reply_markup=markup)
-    # Добавляем пользователя в базу данных
+
+    # Добавляем в базу данных пользователя или данные о его активности
     db.add_user(msg.from_user.id, msg.text)

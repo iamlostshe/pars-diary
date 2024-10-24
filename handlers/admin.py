@@ -14,6 +14,11 @@ router = Router(name=__name__)
 @router.message(Command('admin'))
 async def new_msg(msg: Message) -> None:
     # TODO Костыль 1
+
+    # чтобы избежать повторного импорта getenv и load_dotenv
+    # стоит имортировать ADMINS_TG как переменную из bot.property
+    # но не понятно как это сделать, ведь это router...
+    
     load_dotenv()
     ADMINS_TG = getenv('ADMINS_TG').replace(' ', '').split(',')
 

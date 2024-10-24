@@ -1,3 +1,7 @@
+# TODO Можно заменить на парсинг через requests
+# вариант который реализован на данный момент полностью блокирует бота
+# (в момент ожидания ответа от API бот не ответи)
+
 from gradio_client import Client
 from loguru import logger
 

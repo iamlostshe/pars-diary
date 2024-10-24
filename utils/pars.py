@@ -46,21 +46,21 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
         raise UnknownError(e)
 
 
-def check_cookie(cookie: str) -> bool | str:
+def check_cookie(cookie: str) -> tuple[bool, str]:
     'Функция для проверки cookie'
     # Простые тесты
     if 'sessionid=' not in cookie:
-        return 'Ваши cookie должны содержать "sessionid="'
+        return False, 'Ваши cookie должны содержать "sessionid="'
     elif 'sessionid=xxx...' in cookie:
-        return 'Нельзя использовать пример'
+        return False, 'Нельзя использовать пример'
     else:
         try:
             # Тест путем запроса к серверу
             request('https://es.ciur.ru/api/ProfileService/GetPersonData', cookie=cookie)
-            return True
+            return True, 'ok'
 
         except UnexpectedStatusCodeError:
-            return 'Не правильно введены cookie, возможно они устарели (сервер выдает неверный ответ)'
+            return False, 'Не правильно введены cookie, возможно они устарели (сервер выдает неверный ответ)'
 
 
 def minify_lesson_title(title: str) -> str:
@@ -72,13 +72,24 @@ minify_lesson_title('Физическая культура')
 >>> 'Физ-ра'
 ```'''
                     
-    a = ['Иностранный язык (английский)', 'Физическая культура', 'Литература', 'Технология', 'Информатика', 'Обществознание', 'Русский язык', 'Математика']
-    b = ['Англ. Яз.', 'Физ-ра', 'Литер.', 'Техн.', 'Информ.', 'Обществ.', 'Рус. Яз.', 'Матем.']
+    a = {
+        'Иностранный язык (английский)': 'Англ. Яз.',
+        'Физическая культура': 'Физ-ра',
+        'Литература': 'Литер.',
+        'Технология': 'Техн.',
+        'Информатика': 'Информ.',
+        'Обществознание': 'Обществ.',
+        'Русский язык': 'Рус. Яз.',
+        'Математика': 'Матем.',
+        'Основы безопасности и защиты Родины': 'ОБЗР',
+        'Вероятность и статистика': 'Теор. Вер.',
+        'Индивидуальный проект': 'Инд. пр.'
+    }.get(title)
 
-    for i in range(len(a)):
-        title = title.replace(a[i], b[i])
-
-    return title
+    if a:
+        return a
+    else:
+        return title
 
 
 class Pars:
@@ -174,7 +185,7 @@ class Pars:
             marks = []
             g = minify_lesson_title(subject['discipline'])
 
-            while len(g) < 9:
+            while len(g) < 10:
                 g += ' '
 
             for i in subject['marks']:
@@ -199,7 +210,7 @@ class Pars:
         url = 'https://es.ciur.ru/api/MarkService/GetTotalMarks'
         data = request(url, user_id)
     
-        msg_text = 'Итоговые оценки:\n\n1-4 - Четвертные оценки\nГ - Годовая\nЭ - Экзаменационная (если есть)\nИ - Итоговая\n\n<pre>\nПредмет   │ 1 │ 2 │ 3 │ 4 │ Г │ Э │ И │\n──────────┼───┼───┼───┼───┼───┼───┼───┤\n'
+        msg_text = 'Итоговые оценки:\n\n1-4 - Четвертные оценки\nГ - Годовая\nЭ - Экзаменационная (если есть)\nИ - Итоговая\n\n<pre>\nПредмет    │ 1 │ 2 │ 3 │ 4 │ Г │ Э │ И │\n───────────┼───┼───┼───┼───┼───┼───┼───┤\n'
 
         if data['discipline_marks'] == []:
             return 'Информация об итоговых оценках отсутствует\n\nКажется, вам пока не поставили ни одной('
@@ -208,7 +219,7 @@ class Pars:
             list = ['-', '-', '-', '-', '-', '-', '-']
             g = minify_lesson_title(discipline['discipline'])
             
-            while len(g) < 9:
+            while len(g) < 10:
                 g += ' '
             
             msg_text += f"{g} │ "

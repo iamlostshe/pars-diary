@@ -27,12 +27,12 @@ class UnexpectedStatusCodeError(Exception):
         self.text = f'<b>Ошибка во время парсинга:</b> Сервер вернул неожиданный статус-код ({status_code})'
         super().__init__(self.text)
 
+# db.py
+
 class UserNotAuthorizatedError(Exception):
     def __init__(self) -> None:
         self.text = 'Для выполнения этого действия необходимо авторизоваться в боте.\n\nИнструкция по авторизации доступна по -> /start'
         super().__init__(self.text)
-
-# db.py
 
 class UserNotFoundError(Exception):
     def __init__(self) -> None:

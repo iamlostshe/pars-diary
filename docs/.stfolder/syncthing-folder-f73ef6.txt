@@ -1,5 +1,0 @@
-# This directory is a Syncthing folder marker.
-# Do not delete.
-
-folderID: cpaca-ftvwu
-created: 2024-10-06T23:37:16+04:00

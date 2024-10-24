@@ -1,3 +1,10 @@
+# TODO Переписать с нуля, добавить больше функций:
+
+# - Вкл./Откл. уведомлений
+# - Вкл./Откл. умных уведомлений
+# - настройка времени оповещения
+# - настройка времени оповещения для умных уведомлений
+
 from aiogram import Router
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.filters import Command

@@ -1,3 +1,9 @@
+# TODO Исправить ошибку: не дает пользователям указать cookie,
+# при этом выдает ошибку в консоли,
+# но не отвечает пользователю в тг
+
+# TODO использовать метод get для безопасного доступа к данным
+
 'Класс для работы с json базой данных'
 
 DB_NAME = 'users.json'
@@ -12,7 +18,7 @@ import matplotlib.pyplot as plt
 from utils.exceptions import *
 from utils.pars import check_cookie
 
-def add_user(user_id: int | str, refer: str | None = None) -> None | dict:
+def add_user(user_id: int | str, refer: str) -> None | dict:
     'Добавляет пользователя в json базу данных'
     # Получаем реферальные сведения
     if refer[:7] == '/start ':
@@ -58,14 +64,14 @@ def add_user(user_id: int | str, refer: str | None = None) -> None | dict:
         raise UnknownError(e)
 
 
-def add_user_cookie(user_id: int | str, cookie: str) -> None | str | dict: 
+def add_user_cookie(user_id: int | str, cookie: str) -> str: 
     'Добавляет пользователю cookie в json базе данных'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
     try:
         c_c = check_cookie(cookie)
-        if c_c:
+        if c_c[0]:
             # Открываем файл для чтения и записи
             with open(DB_NAME, "r+", encoding='UTF-8') as f:
                 # Загрузка и десериализация данных из файла
@@ -79,9 +85,9 @@ def add_user_cookie(user_id: int | str, cookie: str) -> None | str | dict:
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
                 # Отправляем сообщение об успешной записи в дб
-                return 'Пользователь успешно добавлен в базу данных'
+                return 'Пользователь успешно добавлен в базу данных.'
         else:
-            return c_c
+            return c_c[1]
             
     # Обработчики ошибок
     except KeyError:
@@ -106,7 +112,10 @@ def get_cookie(user_id: str | int) -> None | str | dict:
             data = json.load(f)
 
             # Возвращаем cookie пользователя
-            return data[user_id]['cookie']
+            if data.get(user_id):
+                return data[user_id].get('cookie')
+            else:
+                return None
     
     # Обработчики ошибок
     except KeyError:
