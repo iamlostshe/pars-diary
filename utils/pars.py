@@ -1,4 +1,3 @@
-import json
 import datetime
 
 import requests
@@ -35,7 +34,7 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
             raise ValidationError()
 
         # Возвращаем загруженные и десериализованные данные из файла
-        return json.loads(r.text)
+        return r.json()
     
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout:

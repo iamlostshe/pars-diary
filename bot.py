@@ -3,7 +3,6 @@ import asyncio
 import os
 
 # Modules need to be installed
-from dotenv import load_dotenv
 from loguru import logger
 
 # Aiogram
@@ -12,6 +11,7 @@ from aiogram import Bot, Dispatcher
 # Writed by me modules
 from handlers import routers
 from utils.db import DB_NAME
+from utils.load_env import TOKEN
 
 # Starting bot
 async def main() -> None:
@@ -21,10 +21,6 @@ async def main() -> None:
         with open(DB_NAME, 'a+', encoding='UTF-8') as f:
             f.write('{}')
             
-    # Get token for telegram bot from .env
-    load_dotenv()
-    TOKEN = os.getenv('TOKEN_TG')
-
     # Initializating dp and bot
     dp = Dispatcher()
     bot = Bot(token=TOKEN)
