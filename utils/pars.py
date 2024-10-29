@@ -19,8 +19,11 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
         headers = {'cookie': cookie}
         r = requests.post(url, headers=headers, timeout=20)
 
+        # Преобразуем в json
+        r_json = r.json()
+
         # Выводим лог в консоль
-        logger.debug(r.text)
+        logger.debug(r_json)
 
         # Проверяем какой статус-код вернул сервер
         if r.status_code != 200:
@@ -34,7 +37,7 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
             raise ValidationError()
 
         # Возвращаем загруженные и десериализованные данные из файла
-        return r.json()
+        return r_json
     
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout:
@@ -117,7 +120,7 @@ class Pars:
 
             # Номера может и не быть
             try:
-                msg_text += f"Номер телефона - +{data['phone']}"
+                msg_text += f"Номер телефона - {data['phone']}"
             except:
                 pass
 

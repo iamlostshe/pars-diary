@@ -6,11 +6,14 @@
 # 
 # Врядли ботом будет пользоваться не говорящий
 # по русски человек. Эта функция нужна больше
-# для эстетики, ибо у меня, дума как и у мнрогих
+# для эстетики, ибо у меня, думаю как и у многих
 # тг на английском и было бы приятнее получать
 # ответы на английском)
 
+# Aiogram
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+# Writed by me modules
 from utils import db
 from utils.load_env import GIT_URL
 
@@ -99,6 +102,13 @@ def not_auth(lang_code: None = None) -> str:
     return 'Для выполнения этого действия вам необходимо зарегистрироваться.'
 
 
+def not_auth_keyboard(land_code: None = None) -> InlineKeyboardMarkup:
+    if land_code != 'ru':
+        land_code = 'en'
+
+    return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Инструкция', url='https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25')]])
+
+
 def about(lang_code: None = None) -> str:
     if lang_code != 'ru':
         lang_code = 'en'
@@ -118,15 +128,17 @@ def about(lang_code: None = None) -> str:
 
 *<b>умные уведомления</b> - [в разработке] уникальная функция для анализа оценок и простых уведомлений, например:
 
-<blockquote>Спорная оценка по математике, необходимо исправить, иначе может выйти 4
+<blockquote>Спорная оценка по математике, необходимо исправить, иначе может выйти 4!
+
 Для настройки уведомлений используйте /notify
 </blockquote>
 или
 
 <blockquote>Вам не хватает всего 0.25 балла до оценки 5, стоит постараться!
+
 Для настройки уведомлений используйте /notify
 </blockquote>
 
-Что-то сломалось (или просто хочешь пообщаться) - пиши админу @iamlostshe
+Что-то сломалось? - пиши админу @iamlostshe
 
 <b>Исходный код</b>: {GIT_URL}'''

@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "8. Уведомления.md",
+                "file": "3. Что не так сейчас (Раскрываем актуальность проекта).md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "8. Уведомления"
+              "title": "3. Что не так сейчас (Раскрываем актуальность проекта)"
             }
           }
         ],
@@ -180,10 +180,19 @@
   },
   "active": "d8d9cf5dec1a1c6f",
   "lastOpenFiles": [
-    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
-    "2. Цель и задачи.md",
     "TODO.md",
     "4. Выбор платформы для проекта.md",
+    "5. База данных.md",
+    "6. Парсинг внутреннего API текущего дневника.md",
+    "7. Обработка данных.md",
+    "8. Уведомления.md",
+    "_images/notify_new_marks.png",
+    "_images/notify.png",
+    "Pasted.md",
+    "9. Заключение.md",
+    "1. Содержание.md",
+    "2. Цель и задачи.md",
+    "3. Что не так сейчас (Раскрываем актуальность проекта).md",
     "Elektronnyy_dnevnik_dlya_roditelya_i_uchenika.pdf",
     "дзп.md",
     "app-todo.md",
@@ -194,12 +203,6 @@
     "num = 2.py",
     "список команд.md",
     "~syncthing~список команд.md.tmp",
-    "6. Парсинг внутреннего API текущего дневника.md",
-    "7. Обработка данных.md",
-    "1. Содержание.md",
-    "9. Заключение.md",
-    "8. Уведомления.md",
-    "5. База данных.md",
     "Untitled.canvas",
     "2024-09-18.md",
     "_images/Pasted image 20240831013407.png",
@@ -216,13 +219,10 @@
     "Что не так сейчас.md",
     "_images/Pasted image 20240731061453.png",
     "_images/Pasted image 20240731055004.png",
-    "Pasted.md",
     "().md",
     "_images/mod-app.png",
     "_images/ьщв-фзз.png",
     "_images/mod-app.jpg",
-    "_images/active.png",
-    "_images/admin.png",
     "Цель и задачи.md",
     "Уведомления.md",
     "_images"

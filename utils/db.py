@@ -42,6 +42,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
                     "refer": [],
                     "cookie": None,
                     "notify": True,
+                    "smart_notify": True,
                     "marks": ''
                 }
             # Если пользователь уже есть в json базе данных
@@ -58,7 +59,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
 
     # Обработчики ошибок
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
@@ -94,7 +95,7 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
         raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
@@ -122,13 +123,13 @@ def get_cookie(user_id: str | int) -> None | str | dict:
         return UserNotAuthorizatedError()
     
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
 
 
-def get_notify(user_id: str | int) -> str | dict:
+def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
     'Возвращает значение уведомлений'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -140,20 +141,23 @@ def get_notify(user_id: str | int) -> str | dict:
             data = json.load(f)
 
             # Возвращаем notify пользователя
-            return data[user_id]['notify']
+            if index == 's':
+                return data[user_id]['smart_notify']
+            else:
+                return data[user_id]['notify']
     
     # Обработчики ошибок
     except KeyError:
         raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
 
 
-def swith_notify(user_id: str | int) -> None | dict: 
+def swith_notify(user_id: str | int, index: str | None = None) -> None | dict: 
     'Меняет значение уведомлений (вкл -> выкл | выкл -> вкл)'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -165,21 +169,29 @@ def swith_notify(user_id: str | int) -> None | dict:
             data = json.load(f)
 
             # Меняем значение cookie пользователя на противоположное
-            data[user_id]['notify'] = not data[user_id]['notify']
+            if index == 's':
+                data[user_id]['smart_notify'] = not data[user_id]['smart_notify']
+            else:
+                data[user_id]['notify'] = not data[user_id]['notify']
         
             # Сохраняем изменения в json базе данных
             f.seek(0)
+            f.truncate()
             json.dump(data, f, indent=4, ensure_ascii=False)
 
-            # Возвращаем новое значение переменной notify
+        # Возвращаем новое значение переменной
+        if index == 's':
+            return data[user_id]['smart_notify']
+        else:
             return data[user_id]['notify']
+        
     
     # Обработчики ошибок
     except KeyError:
         raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
@@ -210,7 +222,7 @@ def get_graph() -> None:
     
     # Обработчики ошибок
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
@@ -234,7 +246,7 @@ def get_stat() -> tuple[int, str]:
     
     # Обработчики ошибок
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)
@@ -259,7 +271,7 @@ def get_marks(user_id: str | int) -> dict | str:
         raise UserNotFoundError()
     
     except FileNotFoundError:
-        raise DBFilleNotFoundError(DB_NAME)
+        raise DBFileNotFoundError(DB_NAME)
     
     except Exception as e:
         raise UnknownError(e)

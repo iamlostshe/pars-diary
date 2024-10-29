@@ -8,18 +8,41 @@ router = Router(name=__name__)
 # Хендлеры для кнопок
 @router.callback_query()
 async def callback(call: CallbackQuery) -> None:
-    if call.data == 'notyfi_on':
-        db.swith_notify(call.from_user.id)
-        markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='notyfi_off')]])
-        await call.message.edit_text('Сейчас уведомления <strong>включены</strong>, для <strong>отключения</strong> нажми кнопку ниже:', reply_markup=markup)
+    # Изменение состояния уведомлений
+    if 'n_n' in call.data:
+        # Меняем состояние и создаем клавиатуру
+        if db.swith_notify(call.from_user.id):
+            markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='n_n')]])
+        else:
+            markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='✅ Включить', callback_data='n_n')]])
+
+        # Отправляем сообщение
+        await call.message.edit_text('🔔 <b>Уведомления об изменении оценок</b>', parse_mode='HTML', reply_markup=markup)
+
+    # Изменение состояния умных уведомлений
+    elif 'n_s' in call.data:
+        # Меняем состояние и создаем клавиатуру
+        if db.swith_notify(call.from_user.id, index='s'):
+            markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='❌ Отключить', callback_data='n_s')]])
+        else:
+            markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='✅ Включить', callback_data='n_s')]])
+
+        # Отправлем сообщение
+        await call.message.edit_text('''🔔 <b>Умные уведомления</b>* - [в разработке] уникальная функция для анализа оценок и простых уведомлений, например:
+
+<blockquote>Спорная оценка по математике, необходимо исправить, иначе может выйти 4!
+
+Для настройки уведомлений используйте /notify
+</blockquote>
+или
+
+<blockquote>Вам не хватает всего 0.25 балла до оценки 5, стоит постараться!
+
+Для настройки уведомлений используйте /notify
+</blockquote>''', parse_mode='HTML', reply_markup=markup)
 
 
-    elif call.data == 'notyfi_off':
-        db.swith_notify(call.from_user.id)
-        markup = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='✅ Включить', callback_data='notyfi_on')]])
-        await call.message.edit_text('Сейчас уведомления <strong>отключены</strong>, для <strong>включения</strong> нажми кнопку ниже:', reply_markup=markup)
-
-
+    # Домашнее задание
     elif 'hw' in call.data:
         if call.data == 'hw_days':
             markup = InlineKeyboardMarkup(inline_keyboard=[[

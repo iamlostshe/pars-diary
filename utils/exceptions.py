@@ -39,7 +39,7 @@ class UserNotFoundError(Exception):
         self.text = '<b>Ошибка во время работы с базой данных:</b> Пользователь не найден.'
         super().__init__(self.text)
 
-class DBFilleNotFoundError(Exception):
+class DBFileNotFoundError(Exception):
     def __init__(self, DB_NAME) -> None:
         self.text = f'<b>Ошибка во время работы с базой данных:</b> Файл {DB_NAME} не найден.'
         super().__init__(self.text)

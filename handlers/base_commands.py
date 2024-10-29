@@ -3,7 +3,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.filters import Command
 
 from utils.pars import Pars
-from utils import messages
+from utils.messages import not_auth, not_auth_keyboard, error
 from utils import db
 
 router = Router(name=__name__)
@@ -35,17 +35,10 @@ async def simple_msg(msg: Message) -> None:
             await msg.answer(commands[msg.text](user_id), 'HTML')
 
         else:
-            # TODO Централизовать клавиатуры в файле messages.py
-            # чтобы не создавать одинаковые (повтор handlers.start)
-
-            # Создаем клавиатуру
-            markup = InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(text='Инструкция', url='https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25')
-            ]])
             # Выводим сообщение о необходимости регестрации и клавиатуру
-            await msg.answer(messages.not_auth(msg.from_user.language_code), 'HTML', reply_markup=markup)
+            await msg.answer(not_auth(msg.from_user.language_code), 'HTML', reply_markup=not_auth_keyboard(msg.from_user.language_code))
 
     # Проверка ошибок
     # TODO Разобраться почему ошибки иногда не выводятся в сообщении
     except Exception as e:
-        await msg.answer(messages.error(e, msg.from_user.language_code), 'HTML')
+        await msg.answer(error(e, msg.from_user.language_code), 'HTML')
