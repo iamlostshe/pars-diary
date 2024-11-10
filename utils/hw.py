@@ -105,20 +105,6 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
     return f'<pre>{msg_text}</pre>', markup
                 
 
-def chatgpt(user_id: str | int, index: str) -> str:
-    'Функция для формирования запроса к GPT'
-
-    day = int(index.split('_')[1])
-    subject_num = int(index.split('_')[2])
-
-    url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
-    data = request(url, user_id)
-    day_hw = data[day]['homeworks']
-
-    hw = day_hw[subject_num]['homework']
-    subject_name = day_hw[subject_num]['discipline']
-
-    return ask_gpt(f'Пожалуйста, отвечай на русском. Помоги мне с решением домашнего задания по {subject_name}: {hw}')
 
 # Tests
 if __name__ == '__main__':
