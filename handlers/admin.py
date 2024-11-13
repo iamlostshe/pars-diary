@@ -1,3 +1,13 @@
+'''
+Админка
+
+Включает в себя информацию для админов:
+
+- график прихода пользователей
+- количество пользователей
+- список рефералов
+'''
+
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
@@ -8,9 +18,11 @@ from utils.load_env import ADMINS_TG
 
 router = Router(name=__name__)
 
+
 # Комманда /admin
 @router.message(Command('admin'))
 async def new_msg(msg: Message) -> None:
+    'Отвечает за /admin'
     # Если пользователь - админ
     if str(msg.from_user.id) in ADMINS_TG:
         # Обновляем график

@@ -1,11 +1,11 @@
+'Модуль для создания и отправки уведомлений'
+
 # Integrated python modules
-from os import getenv
 import asyncio
 import json
 
 # Modules need to be installed
 from loguru import logger
-from dotenv import load_dotenv
 
 # Aiogram
 from aiogram import Bot
@@ -14,7 +14,7 @@ from aiogram import Bot
 from utils import db
 from utils.db import DB_NAME
 from utils.pars import Pars
-from utils.exceptions import *
+from utils.exceptions import UnknownError, UserNotFoundError, DBFileNotFoundError
 from utils.load_env import TOKEN
 
 # Инициализируем бота
@@ -46,15 +46,15 @@ async def send_notify() -> None:
             f.seek(0)
             f.truncate()
             json.dump(data, f, indent=4, ensure_ascii=False)
-    
-    except KeyError:
-        raise UserNotFoundError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError()
-    
+
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
 async def check_notify(user: str | int, data: dict):
@@ -80,14 +80,14 @@ async def check_notify(user: str | int, data: dict):
 
         for o in old_data:
             o_title = o.split('│')[0][2:].strip()
-            
+
             # Сравниваем значения
             if n_title == o_title:
-                found = True # Предмет найден в old_data
+                found = True  # Предмет найден в old_data
                 if n != o:
                     msg_text.append(f'-- {o}')
                     msg_text.append(f'++ {n}')
-                break # Выходим из внутреннего цикла, так как предмет найден
+                break  # Выходим из внутреннего цикла, так как предмет найден
 
         # Если предмет не найден в old_data, добавляем его как новый
         if not found:
@@ -96,24 +96,27 @@ async def check_notify(user: str | int, data: dict):
     # Проверяем на удаленные предметы
     for o in old_data:
         o_title = o.split('│')[0][2:].strip()
-        found = False # Сбрасываем флаг для проверки удаленных предметов
+        found = False  # Сбрасываем флаг для проверки удаленных предметов
 
         for n in new_data:
             n_title = n.split('│')[0][2:].strip()
-            
-            if n_title == o_title:
-                found = True # Предмет найден в new_data
-                break # Выходим из внутреннего цикла, так как предмет найден
 
-        # Если предмет не найден в new_data и не пуст, добавляем его как удаленный 
+            if n_title == o_title:
+                found = True  # Предмет найден в new_data
+                break  # Выходим из внутреннего цикла, так как предмет найден
+
+        # Если предмет не найден в new_data и не пуст, добавляем его как удаленный
         if not found:
             msg_text.append(f'-- {o} (удаленный предмет)')
 
     # Если есть изменения
-    if msg_text != []:
+    if msg_text:
         logger.info(msg_text)
         # Отправляем сообщение пользователю
-        msg_text = 'У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>' + '\n'.join(msg_text) + '</pre>'
+        msg_text = (
+            'У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>'
+            f"{'\n'.join(msg_text)}</pre>"
+        )
         await bot.send_message(user, msg_text, parse_mode='HTML')
         # Регестрируем изменения
         data[user]["marks"] = new_data
@@ -123,7 +126,7 @@ async def check_notify(user: str | int, data: dict):
 
 async def check_smart_notify(user: str | int):
     'Проверка наличия умных уведомлений'
-    
+
     # Выводим лог в консоль
     logger.debug(f'Проверяю пользователя {user} на наличие умных уведомлений')
 

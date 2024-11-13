@@ -1,11 +1,19 @@
-# TODO Можно заменить на парсинг через requests
+'''
+Нейросеть для помощи в учёбе
+
+Использует API Hugging Face
+'''
+
+# TODO Желательно заменить на парсинг через requests
 # вариант который реализован на данный момент полностью блокирует бота
 # (в момент ожидания ответа от API бот не ответи)
 
 from gradio_client import Client
 from loguru import logger
 
+
 def ask_gpt(prompt: str, system_prompt: str | None = 'You are a helpful assistant.') -> str:
+    'Формирует запрос к API и возвращает ответ'
     logger.debug(prompt)
 
     client = Client("gokaygokay/Gemma-2-llamacpp")
@@ -20,6 +28,6 @@ def ask_gpt(prompt: str, system_prompt: str | None = 'You are a helpful assistan
             repeat_penalty=1.1,
             api_name="/chat"
     )
-    
+
     logger.debug(result)
     return result

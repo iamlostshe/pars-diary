@@ -1,34 +1,40 @@
-# TODO Написать докстроки всем router-ам
+'''
+Собирает все роутеры воедино:
+
+- Публичные комманды (в меню)
+    - /about - О проекте
+    - /notify - Настройка уведомлений
+    - /base_commands - Основные комманды (marks, i_marks, hw, me, cs, events, birthdays)
+    - /chatgpt - Нейросеть для помощи в учёбе
+
+- Приватные комманды (нет в меню)
+    - /admin - Админка
+    - /new - Авторизация в боте
+    - /keyboard - Клавиатуры и кнопки
+    - /start - Начало диалога в боте (гл. меню)
+'''
 
 # Импортируем все обработчики
 from handlers import (
-
-    # Публичные комманды (в меню)
-    about, # О проекте
-    notify, # Настройка уведомлений
-    base_commands, # Основные комманды (marks, i_marks, hw, me, cs, events, birthdays)
-    chatgpt, # Нейросеть для помощи в учёбе
-
-    # Приватные комманды (нет в меню)
-    admin, # Админка
-    new, # Авторизация в боте
-    keyboard, # Клавиатуры и кнопки
-    start # Начало диалога в боте (гл. меню)
+    about,
+    notify,
+    base_commands,
+    chatgpt,
+    admin,
+    new,
+    keyboard,
+    start
 )
 
 routers = (
-    
-    # Публичные комманды (в меню)
-    about.router, # О проекте
-    notify.router, # Настройка уведомлений
-    base_commands.router, # Основные комманды (marks, i_marks, hw, me, cs, events, birthdays)
-    chatgpt.router, # Нейросеть для помощи в учёбе
-
-    # Приватные комманды (нет в меню)
-    admin.router, # Админка
-    new.router, # Авторизация в боте
-    keyboard.router, # Клавиатуры и кнопки
-    start.router # Начало диалога в боте (гл. меню)
+    about.router,
+    notify.router,
+    base_commands.router,
+    chatgpt.router,
+    admin.router,
+    new.router,
+    keyboard.router,
+    start.router
 )
 
-__all__ = ("routers")
+__all__ = ("routers",)

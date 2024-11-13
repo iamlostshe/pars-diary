@@ -1,3 +1,5 @@
+'Получает все константы из .env'
+
 # Integrated python modules
 from os import getenv
 

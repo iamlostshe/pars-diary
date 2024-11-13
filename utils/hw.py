@@ -1,10 +1,13 @@
+'Модуль отвечающий за парсинг'
+
 import datetime
 import urllib.parse
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from utils.pars import minify_lesson_title, request
 from utils.ask_gpt import ask_gpt
-from utils.exceptions import *
+from utils.exceptions import DayIndexError
+from utils import demo_data
 
 
 DAYS = [
@@ -20,98 +23,178 @@ DAYS = [
 DAYS_SHORT = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс']
 
 
-def get_hw(data: str | int, day: int, msg_text: str, inline_keyboard: InlineKeyboardMarkup) -> str:
-    'Функция для получения дз по дню недели'
-    # если завтра воскресенье - выводим дз на понедельник
-    # мы же не учимся по воскресеньям?
-    if day == 6:
-        day == 0
+# Вспомогательные функции
+def get_hw(data: str | int) -> str:
+    'Функция для получения Д/З по дню недели'
 
-    msg_text += f"Д/З на {data[day]['date'].replace('-', ' ')} {DAYS[day]} \n\n"
-    count = 0
+    inline_keyboards = []
+    result = []
 
-    day_hw = data[day]['homeworks']
+    # Проходимся по всем дням недели (кроме воскресенья)
+    for day in range(6):
+        # Задаём пустой счетчик
+        count = 1
 
-    if day_hw != []:
-        for i in enumerate(day_hw):
-            subject = minify_lesson_title(day_hw[i]['discipline'])
+        # Получаем данные по дню
+        day_hw = data[day]['homeworks']
 
-            while len(subject) < 9:
-                subject += ' '
+        # Приводим дату к более верному формату
+        date = data[day]['date'].split('-')
+        date = f'{date[2]}.{date[1]}.{date[0]}'
 
-            msg_text += f"{count}. {subject} │ {day_hw[i]['homework']}\n"
+        # Добавляем пояснение
+        msg_text = f"Д/З на {date} {DAYS[day]}\n\n"
+        inline_keyboard = []
 
-            if i['homework'] != '':
-                google_url = f"https://www.google.com/search?q={urllib.parse.quote(day_hw[i]['discipline'])} ГДЗ {urllib.parse.quote(day_hw[i]['homework']).replace(' ', '+')}"
-                ask_gpt_text = f"chatgpt_{day}_{i}"
+        # Обрабатываем данные
+        if day_hw != []:
+            for i in day_hw:
+                subject = minify_lesson_title(i['discipline'])
 
-                inline_keyboard.append([
-                    InlineKeyboardButton(text=f'{DAYS_SHORT[day]} {subject}', callback_data='None'),
-                    InlineKeyboardButton(text='chatgpt', callback_data=ask_gpt_text),
-                    InlineKeyboardButton(text='google', url=google_url)
-                ])
-            count += 1
-    else:
-        msg_text += 'Нет д/з'
-    
-    msg_text += '\n'
+                while len(subject) < 10:
+                    subject += ' '
+
+                msg_text += f"{count}. {subject} │ {i['homework']}\n"
+
+                if i['homework'] != '':
+                    google_url = (
+                        'https://www.google.com/search?'
+                        f"q={urllib.parse.quote(i['discipline'] + ' ГДЗ')} "
+                        f"{urllib.parse.quote(i['homework']).replace(' ', '+')}"
+                    )
+                    ask_gpt_text = f"chatgpt_{day}_{count - 1}"
+
+                    inline_keyboard.append([
+                        InlineKeyboardButton(
+                            text=f'{DAYS_SHORT[day]} {subject.strip()}',
+                            callback_data='None'
+                        ),
+                        InlineKeyboardButton(text='chatgpt', callback_data=ask_gpt_text),
+                        InlineKeyboardButton(text='google', url=google_url)
+                    ])
+                count += 1
+        else:
+            msg_text += 'На этот день не указано д/з'
+
+        result.append(msg_text)
+        inline_keyboards.append(inline_keyboard)
+
+    return result, inline_keyboards
 
 
-def hw(user_id: str | int, index: str | int) -> str | tuple:
-    '''Функция для парсинга дз
-    
-| index | функция                        |
-| ----- | ------------------------------ |
-| t     | дз на завтра                   |
-| w     | дз на неделю                   |
-| 0-6   | дз на определенный день недели |'''
+def chatgpt(user_id: str | int, index: str) -> str:
+    'Функция для формирования запроса к GPT'
 
-    # Получаем данные из api
+    day = int(index.split('_')[1])
+    subject_num = int(index.split('_')[2])
+
     url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
     data = request(url, user_id)
+    day_hw = data[day]['homeworks']
 
-    msg_text = ''
-    inline_keyboard = []
+    hwhw = day_hw[subject_num]['homework']
+    subject_name = day_hw[subject_num]['discipline']
 
-    # дз на неделю
+    return ask_gpt((
+        'Пожалуйста, отвечай на русском. '
+        f'Помоги мне с решением домашнего задания по {subject_name}: {hwhw}'
+    ))
+
+
+# Основная функция
+
+def hw(user_id: str | int, index: str | int) -> str | tuple:
+    '''Функция для парсинга Д/З
+
+    | index | функция                         |
+    | ----- | ------------------------------- |
+    | t     | Д/З на завтра                   |
+    | w     | Д/З на неделю                   |
+    | 0-6   | Д/З на определенный день недели |'''
+
+    # Подбираем следующий понедельник (специфика апи)
+    date = datetime.datetime.today()
+
+    if date.weekday() == 6:
+        date += datetime.timedelta(days=1)
+
+    while date.weekday() != 0:
+        date -= datetime.timedelta(days=1)
+
+    # Получаем данные из api
+    url = f'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange?date={date.date()}'
+    data = request(url, user_id)
+
+    # Проверяем не включена ли демо-версия
+    if data == 'demo':
+        return demo_data.hw(index)
+
+    # Д/З на неделю
     if index == 'w':
-        for day in range(6):
-            get_hw(data, day)
+        # Получем Д/З
+        homework = get_hw(data)
 
+        msg_text = '\n\n'.join(homework[0])
+        inline_keyboard = sum(homework[1], [])
+
+        # Редактируем клавиатуру
         inline_keyboard.append([
-            InlineKeyboardButton(text='На завтра', callback_data=f'hw_t'),
-            InlineKeyboardButton(text='Дни недели', callback_data='hw_days')
-        ])           
-
-    # дз на завтра
-    elif index == 't':
-        day = (datetime.datetime.today() + datetime.timedelta(days=1)).weekday()
-        # дз на определенный день недели
-    else:
-        # Проверим корректно ли задан день недели
-        if int(index) in range(6):
-            day = int(index)
-        else:
-            DayIndexError()
-
-        get_hw(data, day)
-
-        inline_keyboard.append([
-            InlineKeyboardButton(text='На неделю', callback_data=f'hw_w'),
-            InlineKeyboardButton(text='Дни недели', callback_data='hw_days')
+            InlineKeyboardButton(text='На завтра', callback_data='hw_t'),
         ])
 
+    # Д/З на завтра
+    elif index == 't':
+        # Задаём день недели
+        day = (
+            datetime.datetime.today() + datetime.timedelta(days=1)
+        ).weekday()
+
+        if day == 6:
+            day == 0
+
+        # Получем Д/З
+        homework = get_hw(data)
+
+        msg_text = homework[0][day]
+        inline_keyboard = homework[1][day]
+
+        # Редактируем клавиатуру
+        inline_keyboard.append([
+            InlineKeyboardButton(text='На неделю', callback_data='hw_w')
+        ])
+
+    # Д/З на определённый день недели
+    elif str(index) in '0123456':
+        # Получем Д/З
+        homework = get_hw(data)
+
+        msg_text = homework[0][int(index)]
+        inline_keyboard = homework[1][int(index)]
+
+        # Редактируем клавиатуру
+        inline_keyboard.append([
+            InlineKeyboardButton(text='На завтра', callback_data='hw_t'),
+            InlineKeyboardButton(text='На неделю', callback_data='hw_w')
+        ])
+
+    # Если неправильно задан день недели
+    else:
+        raise DayIndexError()
+
+    # Редактриуем клавиатуру
+    inline_keyboard.append([
+        InlineKeyboardButton(text='Дни недели', callback_data='hw_days')
+    ])
+
+    # Редактируем сообщение
+    msg_text = (
+        f'<pre>{msg_text}</pre>\n\n<b>Д/З МОЖЕТ БЫТЬ НЕ АКТУАЛЬНЫМ!!!</b>\n\nЕго указывают '
+        '(зачастую не указывают) учителя и мы никак не можем повлиять на этот процесс.\n\n'
+        '<b>Для получения актуального Д/З попросите вашего учителя указывать его в дневнике)</b>'
+    )
+
+    # Создаём клавиатуру
     markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-    return f'<pre>{msg_text}</pre>', markup
-                
 
-
-# Tests
-if __name__ == '__main__':
-    user_id = ''
-
-    hw(user_id, 't') # Дз на завтра
-    hw(user_id, 'w') # Дз на неделю
-    hw(user_id, '1') # Дз на вторник
-
-    chatgpt(user_id, 'chatgpt_1_0') # Дз на первый урок во вторник
+    # Возвращаем тект сообщения и клавиатуру
+    return msg_text, markup

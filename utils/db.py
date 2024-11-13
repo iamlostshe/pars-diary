@@ -1,13 +1,6 @@
-# TODO Исправить ошибку: не дает пользователям указать cookie,
-# при этом выдает ошибку в консоли,
-# но не отвечает пользователю в тг
-
-# TODO использовать метод get для безопасного доступа к данным
-
 'Класс для работы с json базой данных'
 
-DB_NAME = 'users.json'
-GRAPH_NAME = 'stat_img.png'
+# TODO использовать метод get для безопасного доступа к данным
 
 from collections import Counter
 import json
@@ -15,8 +8,14 @@ import time
 
 import matplotlib.pyplot as plt
 
-from utils.exceptions import *
+from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
+from utils.exceptions import UserNotAuthorizatedError
 from utils.pars import check_cookie
+
+
+DB_NAME = 'users.json'
+GRAPH_NAME = 'stat_img.png'
+
 
 def add_user(user_id: int | str, refer: str) -> None | dict:
     'Добавляет пользователя в json базу данных'
@@ -49,8 +48,8 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
             else:
                 data[user_id]['time_online'].append(time.time())
 
-            # В случае если поле refer не пусто указываем его в json базе данных
-            if refer != None:
+            # В случае если поле refer не пусто указываем его в json бд
+            if refer is not None:
                 data[user_id]['refer'].append(refer)
 
             # Сохраняем изменения в json базе данных
@@ -58,14 +57,14 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     # Обработчики ошибок
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
-def add_user_cookie(user_id: int | str, cookie: str) -> str: 
+def add_user_cookie(user_id: int | str, cookie: str) -> str:
     'Добавляет пользователю cookie в json базе данных'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -83,23 +82,22 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
 
                 # Сохраняем изменения в json базе данных
                 f.seek(0)
+                f.truncate()
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
-                # Отправляем сообщение об успешной записи в дб
-                return 'Пользователь успешно добавлен в базу данных.'
-        else:
-            return c_c[1]
-            
+        # В любом случае возвращаем ответ
+        return c_c[1]
+
     # Обработчики ошибок
-    except KeyError:
-        raise UserNotFoundError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
-    
+        raise UnknownError(e) from e
+
 
 def get_cookie(user_id: str | int) -> None | str | dict:
     'Возвращает куки из базы данных (Если они прежде были записаны)'
@@ -116,17 +114,18 @@ def get_cookie(user_id: str | int) -> None | str | dict:
             if data.get(user_id):
                 return data[user_id].get('cookie')
             else:
+                print(f'Пользователя {user_id} нет в бд')
                 return None
-    
+
     # Обработчики ошибок
-    except KeyError:
-        return UserNotAuthorizatedError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except KeyError as e:
+        raise UserNotAuthorizatedError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
 def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
@@ -145,19 +144,19 @@ def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
                 return data[user_id]['smart_notify']
             else:
                 return data[user_id]['notify']
-    
+
     # Обработчики ошибок
-    except KeyError:
-        raise UserNotFoundError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
-def swith_notify(user_id: str | int, index: str | None = None) -> None | dict: 
+def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
     'Меняет значение уведомлений (вкл -> выкл | выкл -> вкл)'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -173,7 +172,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
                 data[user_id]['smart_notify'] = not data[user_id]['smart_notify']
             else:
                 data[user_id]['notify'] = not data[user_id]['notify']
-        
+
             # Сохраняем изменения в json базе данных
             f.seek(0)
             f.truncate()
@@ -184,17 +183,16 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
             return data[user_id]['smart_notify']
         else:
             return data[user_id]['notify']
-        
-    
+
     # Обработчики ошибок
-    except KeyError:
-        raise UserNotFoundError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
 def get_graph() -> None:
@@ -202,7 +200,7 @@ def get_graph() -> None:
     try:
         with open(DB_NAME, 'r', encoding='UTF-8') as file:
             data = json.load(file)
-            
+
         conuter = 0
 
         times = []
@@ -211,21 +209,21 @@ def get_graph() -> None:
         for user in data:
             conuter += 1
 
-            times.append(int(str(data[user]['time_online'][0]).split('.')[0]))
+            times.append(int(str(data[user]['time_online'][0]).split('.', maxsplit=1)[0]))
             users.append(conuter)
-                
+
         plt.plot(times, users)
         plt.ylabel('Пользователи')
         plt.xlabel('Время входа')
         plt.title('График времени входа пользователей')
         plt.savefig(GRAPH_NAME)
-    
+
     # Обработчики ошибок
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
 def get_stat() -> tuple[int, str]:
@@ -233,7 +231,7 @@ def get_stat() -> tuple[int, str]:
     try:
         with open(DB_NAME, 'r', encoding='UTF-8') as file:
             data = json.load(file)
-            
+
         refers = []
 
         for user in data:
@@ -243,13 +241,13 @@ def get_stat() -> tuple[int, str]:
         refers = '\n'.join([f'{k} - {v}' for k, v in Counter(refers).items()])
 
         return len(data), refers
-    
+
     # Обработчики ошибок
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
+        raise UnknownError(e) from e
 
 
 def get_marks(user_id: str | int) -> dict | str:
@@ -265,43 +263,13 @@ def get_marks(user_id: str | int) -> dict | str:
 
             # Возвращаем оценки пользователя
             return data[user_id]['marks']
-    
+
     # Обработчики ошибок
-    except KeyError:
-        raise UserNotFoundError()
-    
-    except FileNotFoundError:
-        raise DBFileNotFoundError(DB_NAME)
-    
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
     except Exception as e:
-        raise UnknownError(e)
-
-
-# Тесты (все, что вызывает ошибки закомментированно)
-if __name__ == '__main__':
-    print(1, add_user(12345)) # Без рефера (число)
-    print(2, add_user('12345')) # Без рефера (строка)
-    print(3, add_user(12345, 'abcdef')) # С рефером
-
-    print(4, add_user_cookie(12345, 'qwert12345')) # Случайные cookie (число)
-    print(5, add_user_cookie('12345', 'qwert12345')) # Случайные cookie (строка)
-    print(6, add_user_cookie(12345, 'sessionid=xxx...')) # Используем cookie из примера
-    print(7, add_user_cookie(12345, 'sessionid=12345678')) # Проверка путем запроса к серверу
-    print(8, add_user_cookie(12345, '<куки-которые-пройдут-валидацию-сервером>')) # Правильные cookie
-    #print(9, add_user_cookie(54321, '<куки-которые-пройдут-валидацию-сервером>')) # Несуществующий пользователь
-
-    print(10, get_cookie('12345')) # Строка
-    print(11, get_cookie(12345)) # Число
-    #print(12, get_cookie(54321)) # Несуществующий пользователь
-
-    print(13, get_notify('12345')) # Строка
-    print(14, get_notify(12345)) # Число
-    #print(15, get_notify(54321)) # Несуществующий пользователь
-
-    print(16, swith_notify('12345')) # Строка
-    print(17, swith_notify(12345)) # Число
-    #print(18, swith_notify(54321)) # Несуществующий пользователь
-
-    print(19, get_graph()) # Генерируем график
-
-    print(20, get_stat()) # Получаем статистику
+        raise UnknownError(e) from e

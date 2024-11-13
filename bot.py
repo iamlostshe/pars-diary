@@ -1,3 +1,5 @@
+'Основной модуль запуска телеграмм-бота'
+
 # Integrated python modules
 import asyncio
 import os
@@ -13,14 +15,19 @@ from handlers import routers
 from utils.db import DB_NAME
 from utils.load_env import TOKEN
 
+
 # Starting bot
 async def main() -> None:
+    'Основная функция запуска бота'
+    # Connecting log file
+    logger.add("log.log")
+
     # Checking for the existence of the users.json file
     if not os.path.isfile(DB_NAME):
         # and creating if it does not exist
         with open(DB_NAME, 'a+', encoding='UTF-8') as f:
             f.write('{}')
-            
+
     # Initializating dp and bot
     dp = Dispatcher()
     bot = Bot(token=TOKEN)
