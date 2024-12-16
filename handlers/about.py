@@ -13,7 +13,10 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from utils.messages import about
+from loguru import logger
+
+from utils.db import counter
+from utils.messages import about, error
 
 router = Router(name=__name__)
 
@@ -22,4 +25,17 @@ router = Router(name=__name__)
 @router.message(Command('about'))
 async def lessons_msg(msg: Message) -> None:
     'Отвечает за /about'
-    await msg.answer(about(msg.from_user.language_code), 'HTML')
+
+    # Выводим лог в консоль
+    logger.debug('[m] {}', msg.text)
+
+    # Проверяем ошибки
+    try:
+        # Обновляем значение счётчика
+        counter(msg.from_user.id, msg.text.split()[0][1:])
+
+        # Отвечаем пользователю
+        await msg.answer(about(msg.from_user.language_code), 'HTML')
+
+    except Exception as e:
+        await msg.answer(error(e, msg.from_user.language_code), 'HTML')

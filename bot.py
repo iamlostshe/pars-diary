@@ -1,4 +1,4 @@
-'Основной модуль запуска телеграмм-бота'
+'Main module to start telegram-bot'
 
 # Integrated python modules
 import asyncio

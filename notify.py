@@ -16,12 +16,10 @@ from utils.db import DB_NAME
 from utils.pars import Pars
 from utils.exceptions import UnknownError, UserNotFoundError, DBFileNotFoundError
 from utils.load_env import TOKEN
-
-# Инициализируем бота
-bot = Bot(token=TOKEN)
+from utils.messages import error
 
 
-async def send_notify() -> None:
+async def send_notify(bot) -> None:
     'Асинхронная функция для обновления оценок'
     try:
         # Открываем файл для чтения и записи
@@ -29,18 +27,28 @@ async def send_notify() -> None:
             data = json.load(f)
 
             # Проходимся по всем пользователям
-            for user in data:
+            for user in data:             
 
                 # Проверяем указаны ли у пользователя cookie
-                if db.get_cookie(user):
+                if data[user].get('cookie') not in [None, 'demo']:
+
+                    # Получаем новые оценки
+                    pars = Pars()
+                    new_data = pars.marks(user).split('\n')[3:-1]
+
+                    # Получаем старые оценки
+                    old_data = db.get_marks(user)
 
                     # Если у пользователя включены уведомления
                     if data[user].get('notify'):
-                        data = await check_notify(user, data)
+                        await check_notify(user, new_data, old_data)
 
                     # Если у пользователя включены умные уведомления
                     if data[user].get('smart_notify'):
-                        await check_smart_notify(user)
+                        await check_smart_notify(user, new_data)
+
+                    # Регестрируем изменения
+                    data[user]["notify_marks"] = new_data
 
             # Записываем изменения в файл
             f.seek(0)
@@ -56,8 +64,11 @@ async def send_notify() -> None:
     except Exception as e:
         raise UnknownError(e) from e
 
+    finally:
+        await bot.session.close()
 
-async def check_notify(user: str | int, data: dict):
+
+async def check_notify(user: str | int, new_data: dict, old_data: dict):
     'Проверка наличия уведомлений об изменении оценок'
 
     # Выводим лог в консоль
@@ -65,13 +76,6 @@ async def check_notify(user: str | int, data: dict):
 
     # Пустая переменная для сообщения
     msg_text = []
-
-    # Получаем новые оценки
-    pars = Pars()
-    new_data = pars.marks(user).split('\n')[3:-1]
-
-    # Получаем старые оценки
-    old_data = db.get_marks(user)
 
     # Ищем изменения
     for n in new_data:
@@ -111,33 +115,65 @@ async def check_notify(user: str | int, data: dict):
 
     # Если есть изменения
     if msg_text:
-        logger.info(msg_text)
         # Отправляем сообщение пользователю
         msg_text = (
             'У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>'
             f"{'\n'.join(msg_text)}</pre>"
         )
         await bot.send_message(user, msg_text, parse_mode='HTML')
-        # Регестрируем изменения
-        data[user]["marks"] = new_data
-
-    return data
 
 
-async def check_smart_notify(user: str | int):
+async def check_smart_notify(user: str | int, new_data: dict):
     'Проверка наличия умных уведомлений'
 
     # Выводим лог в консоль
     logger.debug(f'Проверяю пользователя {user} на наличие умных уведомлений')
 
-    # Получаем оценки пользователя по всем предметам
+    # Задаём переменные под сообщение и спорные оценки
+    msg_text = ''
+    controversial = ''
 
-    # Получаем спорные
-    # Полчаем те, до которых не хватает одной-двух оценок
+    for i in new_data:
+        if '│ 'in i:
+            mark = float(i.split('│ ')[1])
 
-    # Отправляем ответ пользователю
-    # bot.send_message(...)
+            # Получаем 3 и 2
+            if mark < 3.5:
+                msg_text += f'{i}\n'
 
+            # Получаем спорные
+            elif 4.6 < mark < 4.4 or 3.6 > mark:
+                controversial += f'{i}\n'
+
+    # Добавляем к сообщению 3 и 2
+    if msg_text != '':
+        msg_text = f'Привет, вот персональная сводка по оценкам!\n\nПоторопись! <b>По этим предметам могут выйти плохие оценки (2 и 3):</b>\n\n<pre>{msg_text}</pre>\n'
+
+    # Добавляем к сообщению спорные
+    if controversial != '':
+        if msg_text == '':
+            msg_text = f'Привет, вот персональная сводка по оценкам!\n'
+        msg_text += f'\n<b>У вас есть спорные оценки:</b>\n\n<pre>{controversial}</pre>'
+
+    # TODO Полчаем те, до которых не хватает одной-двух оценок
+
+    if msg_text != '':
+        # Дорабатываем сообщение
+        msg_text += '\nУправление уведомлениями -> /notify'
+
+        # Отправляем ответ пользователю
+        await bot.send_message(user, msg_text, parse_mode='HTML')
+
+# Инициализируем бота
+bot = Bot(token=TOKEN)
+
+async def main():
+    while True:
+        # Запускаем скрипт
+        await send_notify(bot)
+        
+        # Задержка (час в секундах)
+        await asyncio.sleep(3600)
 
 if __name__ == '__main__':
-    asyncio.run(send_notify())
+    asyncio.run(main())

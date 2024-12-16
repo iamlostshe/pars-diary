@@ -21,7 +21,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
     'Добавляет пользователя в json базу данных'
     # Получаем реферальные сведения
     if refer[:7] == '/start ':
-        refer = refer[7:]
+        refer = refer[7:].split('/n')
     else:
         refer = None
 
@@ -37,16 +37,16 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
             # Если пользователя нет в json базе данных
             if user_id not in data:
                 data[user_id] = {
-                    "time_online": [time.time()],
+                    "start": [time.time()],
                     "refer": [],
                     "cookie": None,
                     "notify": True,
                     "smart_notify": True,
-                    "marks": ''
+                    "notify_marks": []
                 }
             # Если пользователь уже есть в json базе данных
             else:
-                data[user_id]['time_online'].append(time.time())
+                data[user_id]['start'].append(time.time())
 
             # В случае если поле refer не пусто указываем его в json бд
             if refer is not None:
@@ -209,7 +209,7 @@ def get_graph() -> None:
         for user in data:
             conuter += 1
 
-            times.append(int(str(data[user]['time_online'][0]).split('.', maxsplit=1)[0]))
+            times.append(int(str(data[user]['start'][0]).split('.', maxsplit=1)[0]))
             users.append(conuter)
 
         plt.plot(times, users)
@@ -262,12 +262,46 @@ def get_marks(user_id: str | int) -> dict | str:
             data = json.load(f)
 
             # Возвращаем оценки пользователя
-            return data[user_id]['marks']
+            if data.get(user_id):
+                return data[user_id]['notify_marks']
+            else:
+                raise UserNotFoundError()
 
     # Обработчики ошибок
-    except KeyError as e:
-        raise UserNotFoundError() from e
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
 
+    except Exception as e:
+        raise UnknownError(e) from e
+
+
+def counter(user_id: str | int, counter_name: str) -> None:
+    'Счётчик для аналитики'
+
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения
+        with open(DB_NAME, 'r+', encoding='UTF-8') as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # Работа со счётчиками
+            if data.get(user_id):
+                if data[user_id].get(counter_name):
+                    data[user_id][counter_name].append(time.time())
+                else:
+                    data[user_id][counter_name] = [time.time()]
+            else:
+                raise UserNotFoundError()
+
+            # Сохраняем изменения в json базе данных
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+    # Обработчики ошибок
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 

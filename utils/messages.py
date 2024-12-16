@@ -63,22 +63,27 @@ def start_new_user(first_name: int | str, lang_code: str | None = 'ru') -> str:
     )
 
 
-def error(e: str, lang_code: str | None = 'ru') -> str:
+def error(e: str, lang_code: str | None = 'ru', notify: bool | None = False) -> str:
     'Сообщение об ошибке'
 
     if lang_code != 'ru':
         lang_code = 'en'
+
+    if notify:
+        text_e = f'Ошибка во время отправки уведомления ({e})'
+    else:
+        text_e = e
 
     logger.error(e)
 
     return (
         'Произошла непредвиденная ошибка, возможно '
         'информация ниже поможет вам понять в чем дело:\n\n'
-        '<b>Ошибка:</b>\n\n'
+        'Ошибка:\n\n'
         f'{type(e).__name__}\n\n'
-        '<b>Пояснение:</b>\n\n'
-        '{e}\n\n'
-        '<b>Если ошибка произошла не по вашей вине напишите админу @iamlostshe</b>'
+        'Пояснение:\n\n'
+        f'{text_e}\n\n'
+        'Если ошибка произошла не по вашей вине напишите админу @iamlostshe'
     )
 
 

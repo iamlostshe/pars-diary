@@ -12,9 +12,11 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
 
-from utils import db
-from utils import messages
+from loguru import logger
+
+from utils.db import counter, get_graph, GRAPH_NAME
 from utils.load_env import ADMINS_TG
+from utils.messages import error, admin
 
 router = Router(name=__name__)
 
@@ -23,9 +25,21 @@ router = Router(name=__name__)
 @router.message(Command('admin'))
 async def new_msg(msg: Message) -> None:
     'Отвечает за /admin'
-    # Если пользователь - админ
-    if str(msg.from_user.id) in ADMINS_TG:
-        # Обновляем график
-        db.get_graph()
-        # Отвечаем пользователю
-        await msg.answer_photo(FSInputFile(db.GRAPH_NAME), messages.admin())
+
+    # Выводим лог в консоль
+    logger.debug('[m] {}', msg.text)
+
+    # Проверяем ошибки
+    try:
+        # Обновляем значение счётчика
+        counter(msg.from_user.id, msg.text.split()[0][1:])
+
+        # Если пользователь - админ
+        if str(msg.from_user.id) in ADMINS_TG:
+            # Обновляем график
+            get_graph()
+            # Отвечаем пользователю
+            await msg.answer_photo(FSInputFile(GRAPH_NAME), admin())
+
+    except Exception as e:
+        await msg.answer(error(e, msg.from_user.language_code), 'HTML')

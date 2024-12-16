@@ -29,25 +29,27 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
         headers = {'cookie': cookie}
         r = requests.post(url, headers=headers, timeout=20)
 
-        # Преобразуем в json
-        r_json = r.json()
-
-        # Выводим лог в консоль
-        logger.debug(r_json)
-
-        # Проверяем какой статус-код вернул сервер
-        if r.status_code != 200:
-            raise UnexpectedStatusCodeError(r.status_code)
-
-        # Проверяем ответ сервера на наличае ошибок в тексте
-        elif 'Server.UserNotAuthenticated' in r.text:
+        # Проверяем ответ сервера на наличае ошибок в ответе
+        if 'Server.UserNotAuthenticated' in r.text:
             raise UserNotAuthenticated()
 
         elif 'Client.ValidationError' in r.text:
             raise ValidationError()
 
-        # Возвращаем загруженные и десериализованные данные из файла
-        return r_json
+        # Проверяем какой статус-код вернул сервер
+        elif r.status_code != 200:
+            raise UnexpectedStatusCodeError(r.status_code)
+        
+        # Если нет ошибок
+        else:
+            # Преобразуем в json
+            r_json = r.json()
+
+            # Выводим лог в консоль
+            logger.debug(r_json)
+
+            # Возвращаем загруженные и десериализованные данные из файла
+            return r_json
 
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout as e:
@@ -133,9 +135,9 @@ class Pars:
                 sex = 'Женский'
 
             return (
-                f'ФИО - {data['user_fullname']}\n',
-                f'Пол - {sex}\n',
-                f'Школа - {data['selected_pupil_school']}\n',
+                f'ФИО - {data['user_fullname']}\n'
+                f'Пол - {sex}\n'
+                f'Школа - {data['selected_pupil_school']}\n'
                 f'Класс - {data['selected_pupil_classyear']}'
             )
 
@@ -180,10 +182,10 @@ class Pars:
         if data == {}:
             return 'Информация о классных часах отсутсвует'
         return (
-            'КЛАССНЫЙ ЧАС\n\n',
-            f'{data['date']}\n',
-            f'{data['begin']}-{data['end']}\n\n',
-            f'{data['place']}\n',
+            'КЛАССНЫЙ ЧАС\n\n'
+            f'{data['date']}\n'
+            f'{data['begin']}-{data['end']}\n\n'
+            f'каб. {data['place']}\n'
             f'{data['theme']}\n'
         )
 
@@ -228,6 +230,7 @@ class Pars:
             return demo_data.marks()
 
         msg_text = ''
+        for_midle_marks = []
 
         if data['discipline_marks'] == []:
             return 'Информация об оценках отсутствует\n\nКажется, вам пока не поставили ни одной('
@@ -246,6 +249,8 @@ class Pars:
                 average_mark = '0.00'
             else:
                 average_mark = subject['average_mark']
+            
+            for_midle_marks.append(float(average_mark))
 
             if float(average_mark) >= 4.5:
                 color_mark = '🟩'
@@ -258,7 +263,9 @@ class Pars:
 
             msg_text += f"{color_mark} {g}│ {average_mark} │ {' '.join(marks)}\n"
 
-        return f'Оценки:\n\n<pre>\n{msg_text}</pre>'
+        msg_text += f'\nОбщий средний балл (рассичитан): {sum(for_midle_marks) / len(for_midle_marks)}'
+
+        return f'Оценки:\n\n<pre>{msg_text}</pre>'
 
     def i_marks(self, user_id: str | int) -> str:
         'Информация об итоговых оценках'

@@ -16,8 +16,8 @@ class UserNotAuthenticated(Exception):
 
     def __init__(self) -> None:
         self.text = (
-            '<b>Ошибка во время парсинга:</b> ',
-            'Для выполнения этого действия необходимо авторизоваться в боте.\n\n',
+            '<b>Ошибка во время парсинга:</b> '
+            'Для выполнения этого действия необходимо авторизоваться в боте.\n\n'
             'Инструкция по авторизации доступна по -> /start (Server.UserNotAuthenticated)'
         )
         super().__init__(self.text)
@@ -28,8 +28,8 @@ class ValidationError(Exception):
 
     def __init__(self) -> None:
         self.text = (
-            '<b>Ошибка во время парсинга:</b> ',
-            'Для выполнения этого действия необходимо авторизоваться в боте.\n\n',
+            '<b>Ошибка во время парсинга:</b> '
+            'Для выполнения этого действия необходимо авторизоваться в боте.\n\n'
             'Инструкция по авторизации доступна по -> /start (Client.ValidationError)'
         )
         super().__init__(self.text)
@@ -82,7 +82,7 @@ class UserNotFoundError(Exception):
 class DBFileNotFoundError(Exception):
     'Файл базы данных не найден'
 
-    def __init__(self, DB_NAME) -> None:
+    def __init__(self, DB_NAME: str) -> None:
         self.text = f'<b>Ошибка во время работы с базой данных:</b> Файл {DB_NAME} не найден.'
         super().__init__(self.text)
 
@@ -91,5 +91,12 @@ class DBFileNotFoundError(Exception):
 class DayIndexError(Exception):
     'Неправильный индекс дня'
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.text = '<b>Ошибка модуля работы с дз</b> Неправильно задан день недели'
+
+# ask_gpt.py
+class ChatGPTError(Exception):
+    'Ошибка при работе с нейросетью'
+
+    def __init__(self, text: str) -> None:
+        self.text = f'<b>Ошибка при работе с неросетью</b> {text}'
