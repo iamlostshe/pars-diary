@@ -13,3 +13,6 @@ stat_img.png
 # IDE
 .idea/
 .vscode/
+
+# DOCS
+docs/.obsidian

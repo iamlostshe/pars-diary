@@ -17,8 +17,9 @@ from loguru import logger
 
 from utils.pars import Pars
 from utils.hw import hw
-from utils.messages import not_auth, not_auth_keyboard, error
-from utils.db import get_cookie, counter
+from utils.messages import not_auth, error
+from utils.keyboards import not_auth_keyboard
+from utils.db import get_cookie, counter, get_server_name
 
 router = Router(name=__name__)
 
@@ -40,6 +41,9 @@ async def simple_msg(msg: Message) -> None:
 
         # Получаем user_id пользователя
         user_id = msg.from_user.id
+
+        # Получаем server_name пользователя
+        server_name = get_server_name(user_id)
 
         # Проверяем зарегестирован ли пользователь
         if get_cookie(user_id):

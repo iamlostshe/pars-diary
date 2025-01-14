@@ -1,20 +1,30 @@
 'Класс для работы с json базой данных'
 
-# TODO использовать метод get для безопасного доступа к данным
+# TODO: Использовать метод get для безопасного доступа к данным
 
 from collections import Counter
 import json
 import time
+import os
 
 import matplotlib.pyplot as plt
 
-from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
-from utils.exceptions import UserNotAuthorizatedError
+from utils.exceptions import DBFileNotFoundError, UnknownError
+from utils.exceptions import UserNotAuthorizatedError, UserNotFoundError
 from utils.pars import check_cookie
 
 
 DB_NAME = 'users.json'
 GRAPH_NAME = 'stat_img.png'
+
+
+def check_db() -> None:
+    'Проверяет наличие базы данных'
+
+    if not os.path.isfile(DB_NAME):
+        # and creating if it does not exist
+        with open(DB_NAME, 'a+', encoding='UTF-8') as f:
+            f.write('{}\n')
 
 
 def add_user(user_id: int | str, refer: str) -> None | dict:
@@ -64,13 +74,46 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
         raise UnknownError(e) from e
 
 
+def add_user_server_name(user_id: int | str, server_name: str) -> str:
+    'Добавляет пользователю cookie в json базе данных'
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения и записи
+        with open(DB_NAME, "r+", encoding='UTF-8') as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # Запись cookie в json базу данных
+            data[user_id]['server_name'] = server_name
+
+            # Сохраняем изменения в json базе данных
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+    # Обработчики ошибок
+    except KeyError as e:
+        raise UserNotFoundError() from e
+
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
+    except Exception as e:
+        raise UnknownError(e) from e
+
+
 def add_user_cookie(user_id: int | str, cookie: str) -> str:
     'Добавляет пользователю cookie в json базе данных'
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
     try:
-        c_c = check_cookie(cookie)
+        # Получаем server_name из бд
+        server_name = get_server_name(user_id)
+
+        c_c = check_cookie(cookie, server_name)
         if c_c[0]:
             # Открываем файл для чтения и записи
             with open(DB_NAME, "r+", encoding='UTF-8') as f:
@@ -114,7 +157,7 @@ def get_cookie(user_id: str | int) -> None | str | dict:
             if data.get(user_id):
                 return data[user_id].get('cookie')
             else:
-                print(f'Пользователя {user_id} нет в бд')
+                # print(f'Пользователя {user_id} нет в бд')
                 return None
 
     # Обработчики ошибок
@@ -287,6 +330,9 @@ def counter(user_id: str | int, counter_name: str) -> None:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
 
+            # TODO: Оптимизировать эту функцию
+            # (смотри ниже для примера)
+
             # Работа со счётчиками
             if data.get(user_id):
                 if data[user_id].get(counter_name):
@@ -300,6 +346,40 @@ def counter(user_id: str | int, counter_name: str) -> None:
             f.seek(0)
             f.truncate()
             json.dump(data, f, indent=4, ensure_ascii=False)
+
+    # Обработчики ошибок
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
+    except Exception as e:
+        raise UnknownError(e) from e
+
+
+def get_server_name(user_id: int | str) -> str:
+    'Возвращает server_name по user_id'
+
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения
+        with open(DB_NAME, 'r', encoding='UTF-8') as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # Возвращаем server_name
+            user = data.get(user_id)
+
+            if user:
+                server_name = data[user_id].get('server_name')
+
+                if server_name:
+                    return server_name
+
+                # TODO Сделать специальное исключение
+                raise FileNotFoundError('Не указан регион.')
+            else:
+                raise UserNotFoundError()
 
     # Обработчики ошибок
     except FileNotFoundError as e:

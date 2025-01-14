@@ -32,7 +32,9 @@ async def new_msg(msg: Message) -> None:
             await msg.answer('Комманда работает так - "/new sessionid=xxx..."')
         else:
             # Добавляем cookie пользователя в дб и отвечаем пользователю
-            await msg.answer(add_user_cookie(msg.from_user.id, msg.text[5:]))
+            await msg.answer(
+                add_user_cookie(msg.from_user.id, msg.text[5:])
+            )
 
     except Exception as e:
         await msg.answer(error(e, msg.from_user.language_code), 'HTML')

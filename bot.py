@@ -2,7 +2,6 @@
 
 # Integrated python modules
 import asyncio
-import os
 
 # Modules need to be installed
 from loguru import logger
@@ -12,7 +11,7 @@ from aiogram import Bot, Dispatcher
 
 # Writed by me modules
 from handlers import routers
-from utils.db import DB_NAME
+from utils.db import check_db
 from utils.load_env import TOKEN
 
 
@@ -22,11 +21,8 @@ async def main() -> None:
     # Connecting log file
     logger.add("log.log")
 
-    # Checking for the existence of the users.json file
-    if not os.path.isfile(DB_NAME):
-        # and creating if it does not exist
-        with open(DB_NAME, 'a+', encoding='UTF-8') as f:
-            f.write('{}')
+    # Checking for the existence database
+    check_db()
 
     # Initializating dp and bot
     dp = Dispatcher()

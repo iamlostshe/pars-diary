@@ -12,7 +12,8 @@ from aiogram.filters import Command
 from loguru import logger
 
 from utils.db import get_cookie, get_notify, counter
-from utils.messages import error, not_auth, not_auth_keyboard
+from utils.messages import error, not_auth
+from utils.keyboards import not_auth_keyboard
 
 router = Router(name=__name__)
 

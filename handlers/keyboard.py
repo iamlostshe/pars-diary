@@ -16,7 +16,8 @@ from loguru import logger
 
 from utils import db
 from utils.hw import hw, chatgpt
-from utils.messages import error
+from utils.messages import error, registration_0, registration_1, registration_2
+from utils.keyboards import reg_0, reg_1, reg_2
 
 router = Router(name=__name__)
 
@@ -37,12 +38,16 @@ async def callback(call: CallbackQuery) -> None:
             if db.swith_notify(call.from_user.id):
                 markup = InlineKeyboardMarkup(inline_keyboard=[
                     [
-                        InlineKeyboardButton(text='❌ Отключить', callback_data='n_n')]
+                        InlineKeyboardButton(
+                            text='❌ Отключить', callback_data='n_n'
+                        )]
                     ])
             else:
                 markup = InlineKeyboardMarkup(inline_keyboard=[
                     [
-                        InlineKeyboardButton(text='✅ Включить', callback_data='n_n')
+                        InlineKeyboardButton(
+                            text='✅ Включить', callback_data='n_n'
+                        )
                     ]])
 
             # Отправляем сообщение
@@ -109,6 +114,30 @@ async def callback(call: CallbackQuery) -> None:
             await call.message.edit_text('Chatgpt думает...')
             send_text = chatgpt(call.from_user.id, call.data, call.from_user.first_name)
             await call.message.edit_text(send_text)
+
+        # Регистрация в боте
+        elif call.data == 'reg_0':
+            await call.message.edit_text(
+                registration_1(
+                    call.from_user.first_name,
+                    call.from_user.language_code
+                ),
+                reply_markup=reg_1()
+            )
+        
+        elif 'reg_1_' in call.data:
+            # Записываем server_name в бд
+            server_name = ''.join(call.data.split('_')[2:])
+            logger.info('server_name = {}', server_name)
+            db.add_user_server_name(call.from_user.id, server_name)
+
+            await call.message.edit_text(
+                registration_2(
+                    call.from_user.first_name,
+                    call.from_user.language_code
+                ),
+                reply_markup=reg_2()
+            )
 
     except Exception as e:
         await call.message.edit_text(error(e, call.from_user.language_code))

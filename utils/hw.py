@@ -1,5 +1,10 @@
 'Модуль отвечающий за парсинг'
 
+# TODO: Иногда в ответе проскальзывает html, в связи с этим происходит ошибка:
+# Tag "span" must have class "tg-spoiler"
+# "homework": '<span style="background-color: rgb(244, 244, 244);">§82,85 стр.274 №5-7</span>'
+
+
 import datetime
 import urllib.parse
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -88,8 +93,9 @@ def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
     day = int(index.split('_')[1])
     subject_num = int(index.split('_')[2])
 
-    url = 'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange'
+    url = '/api/HomeworkService/GetHomeworkFromRange'
     data = request(url, user_id)
+
     day_hw = data[day]['homeworks']
 
     hwhw = day_hw[subject_num]['homework']
@@ -102,7 +108,6 @@ def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
 
 
 # Основная функция
-
 def hw(user_id: str | int, index: str | int) -> str | tuple:
     '''Функция для парсинга Д/З
 
@@ -122,7 +127,7 @@ def hw(user_id: str | int, index: str | int) -> str | tuple:
         date -= datetime.timedelta(days=1)
 
     # Получаем данные из api
-    url = f'https://es.ciur.ru/api/HomeworkService/GetHomeworkFromRange?date={date.date()}'
+    url = f'/api/HomeworkService/GetHomeworkFromRange?date={date.date()}'
     data = request(url, user_id)
 
     # Проверяем не включена ли демо-версия

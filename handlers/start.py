@@ -7,7 +7,8 @@ from aiogram.types import Message
 
 from loguru import logger
 
-from utils.messages import not_auth_keyboard, start_new_user, start_old_user, error
+from utils.messages import registration_0, start_old_user, error
+from utils.keyboards import not_auth_keyboard, reg_0
 from utils.db import get_cookie, counter, add_user
 
 router = Router(name=__name__)
@@ -35,8 +36,8 @@ async def command_start_handler(msg: Message) -> None:
         else:
             # Отвечаем пользователю
             await msg.answer(
-                start_new_user(msg.from_user.first_name, msg.from_user.language_code),
-                reply_markup=not_auth_keyboard()
+                registration_0(msg.from_user.first_name, msg.from_user.language_code),
+                reply_markup=reg_0()
             )
 
         # Добавляем в базу данных пользователя или данные о его активности

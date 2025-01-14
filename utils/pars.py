@@ -1,5 +1,8 @@
 'Модуль для парсинга'
 
+# TODO: Доделать типизацию Dict[] и List[]
+# from typing import Dict, List
+
 import datetime
 
 import requests
@@ -11,6 +14,41 @@ from utils import demo_data
 
 
 # Вспомогательные функции
+def get_regions() -> dict:
+    'Получаем все доступные регионы'
+
+    try:
+        r = requests.get(
+            'http://aggregator-obr.bars-open.ru/my_diary'
+        )
+
+        # Проверяем какой статус-код вернул сервер
+        if r.status_code != 200:
+            raise UnexpectedStatusCodeError(r.status_code)
+        
+        data = r.json()
+        result = {}
+
+        if data.get('success') == True and data.get('data'):
+            for region in r.json()['data']:
+                name = region.get('name')
+                url = region.get('url')
+                if name and url:
+                    if url[-1] == '/':
+                        url = url[:-1]
+                    result[name] = url
+                else:
+                    # TODO: Сделать специальное исключение
+                    raise UnexpectedStatusCodeError(data.get('success'))
+            return result
+        else:
+            # TODO: Сделать специальное исключение
+            raise UnexpectedStatusCodeError(data.get('success'))
+
+    # Обработка ошибок
+    except Exception as e:
+        raise UnknownError(e) from e
+
 
 def request(url: str, user_id: str | int | None = None, cookie: str | None = None) -> dict:
     'Функция для осуществеления запроса по id пользователя и url'
@@ -23,7 +61,13 @@ def request(url: str, user_id: str | int | None = None, cookie: str | None = Non
             cookie = db.get_cookie(user_id)
 
         if cookie in ['demo', 'демо']:
-            return 'demo'
+            return 'demo', ''
+
+        # Получаем server_name из бд
+        server_name = db.get_server_name(user_id)
+
+        # Преобразуем url
+        url = server_name + url
 
         # Отпраляем запрос
         headers = {'cookie': cookie}
@@ -77,7 +121,7 @@ def check_cookie(cookie: str) -> tuple[bool, str]:
         else:
             try:
                 # Тест путем запроса к серверу
-                request('https://es.ciur.ru/api/ProfileService/GetPersonData', cookie=cookie)
+                request('/api/ProfileService/GetPersonData', cookie=cookie)
                 return True, 'Пользователь успешно добавлен в базу данных.'
 
             except UnexpectedStatusCodeError:
@@ -106,7 +150,8 @@ def minify_lesson_title(title: str) -> str:
         'Основы безопасности и защиты Родины': 'ОБЗР',
         'Вероятность и статистика': 'Теор. Вер.',
         'Индивидуальный проект': 'Инд. пр.',
-        'Факультатив "Функциональная грамотность"': 'Функ. Гр.'
+        'Факультатив "Функциональная грамотность"': 'Функ. Гр.',
+        'Факультатив "Основы 1С Предприятие"': 'Фак. 1С'
     }.get(title)
 
     if a:
@@ -121,7 +166,7 @@ class Pars:
     def me(self, user_id: str | int) -> str:
         'Информация о пользователе'
 
-        url = 'https://es.ciur.ru/api/ProfileService/GetPersonData'
+        url = '/api/ProfileService/GetPersonData'
         data = request(url, user_id)
 
         if data == 'demo':
@@ -173,7 +218,7 @@ class Pars:
     def cs(self, user_id: str | int) -> str:
         'Информация о классных часах'
 
-        url = 'https://es.ciur.ru/api/WidgetService/getClassHours'
+        url = '/api/WidgetService/getClassHours'
         data = request(url, user_id)
 
         if data == 'demo':
@@ -192,7 +237,7 @@ class Pars:
     def events(self, user_id: str | int) -> str:
         'Информация о ивентах'
 
-        url = 'https://es.ciur.ru/api/WidgetService/getEvents'
+        url = '/api/WidgetService/getEvents'
         data = request(url, user_id)
 
         if data == 'demo':
@@ -206,7 +251,7 @@ class Pars:
     def birthdays(self, user_id: str | int) -> str:
         'Информация о днях рождения'
 
-        url = 'https://es.ciur.ru/api/WidgetService/getBirthdays'
+        url = '/api/WidgetService/getBirthdays'
         data = request(url, user_id)
 
         if data == 'demo':
@@ -221,7 +266,7 @@ class Pars:
         'Информация об оценках'
 
         url = (
-            'https://es.ciur.ru/api/MarkService/GetSummaryMarks?'
+            '/api/MarkService/GetSummaryMarks?'
             f'date={datetime.datetime.now().date()}'
         )
         data = request(url, user_id)
@@ -270,7 +315,7 @@ class Pars:
     def i_marks(self, user_id: str | int) -> str:
         'Информация об итоговых оценках'
 
-        url = 'https://es.ciur.ru/api/MarkService/GetTotalMarks'
+        url = '/api/MarkService/GetTotalMarks'
         data = request(url, user_id)
 
         if data == 'demo':
