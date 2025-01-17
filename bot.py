@@ -1,13 +1,13 @@
-'Main module to start telegram-bot'
+"""Main module to start telegram-bot."""
 
 # Integrated python modules
 import asyncio
 
-# Modules need to be installed
-from loguru import logger
-
 # Aiogram
 from aiogram import Bot, Dispatcher
+
+# Modules need to be installed
+from loguru import logger
 
 # Writed by me modules
 from handlers import routers
@@ -17,7 +17,7 @@ from utils.load_env import TOKEN
 
 # Starting bot
 async def main() -> None:
-    'Основная функция запуска бота'
+    """Основная функция запуска бота."""
     # Connecting log file
     logger.add("log.log")
 
@@ -30,13 +30,13 @@ async def main() -> None:
 
     # Connect hendlers
     for r in routers:
-        logger.info('Include router: {} ...', r.name)
+        logger.info("Include router: {} ...", r.name)
         dp.include_router(r)
 
     # Starting
-    logger.info('Bot start polling...')
+    logger.info("Bot start polling...")
     await dp.start_polling(bot)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

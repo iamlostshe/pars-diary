@@ -1,5 +1,4 @@
-'''
-Информация о боте
+"""Информация о боте.
 
 Содержит подробную информацию о боте, включая:
 
@@ -7,12 +6,11 @@
 - информацию об умных уведомлениях
 - ссылку на админа
 - ссылку на исходный код
-'''
+"""
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-
 from loguru import logger
 
 from utils.db import counter
@@ -22,12 +20,11 @@ router = Router(name=__name__)
 
 
 # О проекте
-@router.message(Command('about'))
+@router.message(Command("about"))
 async def lessons_msg(msg: Message) -> None:
-    'Отвечает за /about'
-
+    """Отвечает за /about."""
     # Выводим лог в консоль
-    logger.debug('[m] {}', msg.text)
+    logger.debug("[m] {}", msg.text)
 
     # Проверяем ошибки
     try:
@@ -35,7 +32,7 @@ async def lessons_msg(msg: Message) -> None:
         counter(msg.from_user.id, msg.text.split()[0][1:])
 
         # Отвечаем пользователю
-        await msg.answer(about(msg.from_user.language_code), 'HTML')
+        await msg.answer(about(msg.from_user.language_code), "HTML")
 
     except Exception as e:
-        await msg.answer(error(e, msg.from_user.language_code), 'HTML')
+        await msg.answer(error(e, msg.from_user.language_code), "HTML")

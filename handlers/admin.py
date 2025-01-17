@@ -1,33 +1,30 @@
-'''
-Админка
+"""Админка.
 
 Включает в себя информацию для админов:
 
 - график прихода пользователей
 - количество пользователей
 - список рефералов
-'''
+"""
 
 from aiogram import Router
 from aiogram.filters import Command
-from aiogram.types import Message, FSInputFile
-
+from aiogram.types import FSInputFile, Message
 from loguru import logger
 
-from utils.db import counter, get_graph, GRAPH_NAME
+from utils.db import GRAPH_NAME, counter, get_graph
 from utils.load_env import ADMINS_TG
-from utils.messages import error, admin
+from utils.messages import admin, error
 
 router = Router(name=__name__)
 
 
 # Комманда /admin
-@router.message(Command('admin'))
+@router.message(Command("admin"))
 async def new_msg(msg: Message) -> None:
-    'Отвечает за /admin'
-
+    """Отвечает за /admin."""
     # Выводим лог в консоль
-    logger.debug('[m] {}', msg.text)
+    logger.debug("[m] {}", msg.text)
 
     # Проверяем ошибки
     try:
@@ -42,4 +39,4 @@ async def new_msg(msg: Message) -> None:
             await msg.answer_photo(FSInputFile(GRAPH_NAME), admin())
 
     except Exception as e:
-        await msg.answer(error(e, msg.from_user.language_code), 'HTML')
+        await msg.answer(error(e, msg.from_user.language_code), "HTML")

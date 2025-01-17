@@ -1,5 +1,4 @@
-'''
-Собирает все роутеры воедино:
+"""Собирает все роутеры воедино.
 
 - Публичные комманды (в меню)
     - /about - О проекте
@@ -12,18 +11,18 @@
     - /new - Авторизация в боте
     - /keyboard - Клавиатуры и кнопки
     - /start - Начало диалога в боте (гл. меню)
-'''
+"""
 
 # Импортируем все обработчики
 from handlers import (
     about,
-    notify,
+    admin,
     base_commands,
     chatgpt,
-    admin,
-    new,
     keyboard,
-    start
+    new,
+    notify,
+    start,
 )
 
 routers = (
@@ -34,7 +33,7 @@ routers = (
     admin.router,
     new.router,
     keyboard.router,
-    start.router
+    start.router,
 )
 
 __all__ = ("routers",)
