@@ -3,17 +3,21 @@
 # TODO @iamlostshe: Использовать метод get для безопасного доступа к данным
 
 from __future__ import annotations
+
 import json
 import time
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from utils.exceptions import DBFileNotFoundError, UnknownError
-from utils.exceptions import UserNotAuthorizatedError, UserNotFoundError
+from utils.exceptions import (
+    DBFileNotFoundError,
+    UnknownError,
+    UserNotAuthorizatedError,
+    UserNotFoundError,
+)
 from utils.pars import check_cookie
-
 
 DB_NAME = "users.json"
 GRAPH_NAME = "stat_img.png"
@@ -21,7 +25,7 @@ GRAPH_NAME = "stat_img.png"
 
 def check_db() -> None:
     """Проверяет наличие базы данных."""
-    if not Path.isfile(DB_NAME):
+    if not Path.is_file(Path(DB_NAME)):
         # and creating if it does not exist
         with Path.open(DB_NAME, "a+", encoding="UTF-8") as f:
             f.write("{}\n")

@@ -147,7 +147,6 @@ async def callback(call: CallbackQuery) -> None:
         elif "reg_1_" in call.data:
             # Записываем server_name в бд
             server_name = "".join(call.data.split("_")[2:])
-            logger.info("server_name = {}", server_name)
             db.add_user_server_name(call.from_user.id, server_name)
 
             await call.message.edit_text(

@@ -44,9 +44,8 @@ def get_regions() -> dict:
                     # TODO @iamlostshe: Сделать специальное исключение
                     raise UnexpectedStatusCodeError(data.get("success"))
             return result
-        else:
-            # TODO @iamlostshe: Сделать специальное исключение
-            raise UnexpectedStatusCodeError(data.get("success"))
+        # TODO @iamlostshe: Сделать специальное исключение
+        raise UnexpectedStatusCodeError(data.get("success"))
 
     # Обработка ошибок
     except Exception as e:
