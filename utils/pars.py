@@ -110,32 +110,40 @@ def request(
         raise UnknownError(e) from e
 
 
-def check_cookie(cookie: str) -> tuple[bool, str]:
+def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str]:
     """Функция для проверки cookie."""
-    # Если используется демоверсия, то проверки она не пройдет)
+    # Если используется демоверсия
     if cookie in ["demo", "демо"]:
         return True, (
             "Пользователь успешно добавлен в базу данных, однако учтите, что "
             "демонстрационный режим открывает не все функции, для "
             "вас будут недоступны уведомления."
         )
+
     # Простые тесты
     if "sessionid=" not in cookie:
         return False, 'Ваши cookie должны содержать "sessionid="'
     if "sessionid=xxx..." in cookie:
         return False, "Нельзя использовать пример"
-    try:
-        # Тест путем запроса к серверу
-        r = request("/api/ProfileService/GetPersonData", cookie=cookie)
-        if r.status_code == 200:
-            return True, "Пользователь успешно добавлен в базу данных."
-        raise UnexpectedStatusCodeError
+    if not server_name:
+        return False, "Укажите ваш регион -> /start"
 
-    except UnexpectedStatusCodeError:
-        return False, (
-            "Не правильно введены cookie, возможно они "
-            "устарели (сервер выдает неверный ответ)"
-        )
+    # Тест путем запроса к серверу
+    headers = {"cookie": cookie}
+    r = requests.get(
+        f"{server_name}/api/ProfileService/GetPersonData",
+        headers=headers,
+        timeout=20,
+    )
+
+    logger.debug(r.json())
+
+    if r.status_code == 200:
+        return True, "Пользователь успешно добавлен в базу данных."
+    return False, (
+        "Не правильно введены cookie, возможно они "
+        f"устарели (сервер выдает неверный ответ - {r.status_code})"
+    )
 
 
 def minify_lesson_title(title: str) -> str:

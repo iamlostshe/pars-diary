@@ -111,18 +111,24 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
     user_id = str(user_id)
 
     try:
-        # Получаем server_name из бд
-        server_name = get_server_name(user_id)
+        # Открываем файл для чтения и записи
+        with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
 
-        c_c = check_cookie(cookie, server_name)
-        if c_c[0]:
-            # Открываем файл для чтения и записи
-            with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
-                # Загрузка и десериализация данных из файла
-                data = json.load(f)
+            # Проверяем есть ли пользователь в базе дланных
+            user = data[user_id]
+            if not user:
+                raise UserNotFoundError()
 
-                # Запись cookie в json базу данных
-                data[user_id]["cookie"] = cookie
+            # Получаем server_name
+            server_name = user.get("server_name")
+
+            # Проверяем cookie пользователя
+            c_c = check_cookie(cookie, server_name)
+            if c_c[0]:
+                # Записываем cookie в базу данных
+                user["cookie"] = cookie
 
                 # Сохраняем изменения в json базе данных
                 f.seek(0)
@@ -133,9 +139,6 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
         return c_c[1]
 
     # Обработчики ошибок
-    except KeyError as e:
-        raise UserNotFoundError from e
-
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
