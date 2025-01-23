@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import datetime
+import json
+import re
 
 import requests
 from loguru import logger
@@ -16,7 +18,11 @@ from utils.exceptions import (
     ValidationError,
 )
 
+# Ссылка на страницу со ссылками на все сервера дневников в разных регионах
 AGGREGATOR_URL = "http://aggregator-obr.bars-open.ru/my_diary"
+
+# Регулярное выражение для удаления тегов <span>
+SPAN_CLEANER = r"<span[^>]*>(.*?)</span>"
 
 
 # Вспомогательные функции
@@ -92,14 +98,16 @@ def request(
 
         # Если нет ошибок
         else:
+            # Фильруем ответ
+            text = re.sub(SPAN_CLEANER, r"\1", r.text.replace("\u200b", ""))
+
             # Преобразуем в json
-            r_json = r.json()
+            data = json.loads(text)
 
             # Выводим лог в консоль
-            logger.debug(r_json)
+            logger.debug(data)
 
-            # Возвращаем загруженные и десериализованные данные из файла
-            return r_json
+            return data
 
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout as e:

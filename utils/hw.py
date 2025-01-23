@@ -1,10 +1,5 @@
 """Модуль отвечающий за парсинг."""
 
-# TODO @iamlostshe: Иногда в ответе проскальзывает html,
-# в связи с этим происходит ошибка:
-# Tag "span" must have class "tg-spoiler"
-# "<span style="background-color: rgb(244, 244, 244);">§82,85 стр.274 №5-7</span>"
-
 from __future__ import annotations
 
 import datetime
