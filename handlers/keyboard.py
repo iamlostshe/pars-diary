@@ -32,26 +32,18 @@ async def callback(call: CallbackQuery) -> None:
         # Изменение состояния уведомлений
         if "n_n" in call.data:
             # Меняем состояние и создаем клавиатуру
-            if db.swith_notify(call.from_user.id):
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="❌ Отключить', callback_data='n_n",
-                            ),
-                        ],
+            markup = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="❌ Отключить"
+                            if db.swith_notify(call.from_user.id)
+                            else "✅ Включить",
+                            callback_data="n_n",
+                        ),
                     ],
-                )
-            else:
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✅ Включить', callback_data='n_n",
-                            ),
-                        ],
-                    ],
-                )
+                ],
+            )
 
             # Отправляем сообщение
             await call.message.edit_text(
@@ -63,28 +55,18 @@ async def callback(call: CallbackQuery) -> None:
         # Изменение состояния умных уведомлений
         elif "n_s" in call.data:
             # Меняем состояние и создаем клавиатуру
-            if db.swith_notify(call.from_user.id, index="s"):
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="❌ Отключить",
-                                callback_data="n_s",
-                            ),
-                        ],
+            markup = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="❌ Отключить"
+                            if db.swith_notify(call.from_user.id, index="s")
+                            else "✅ Включить",
+                            callback_data="n_s",
+                        ),
                     ],
-                )
-            else:
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✅ Включить",
-                                callback_data="n_s",
-                            ),
-                        ],
-                    ],
-                )
+                ],
+            )
 
             # Отправлем сообщение
             await call.message.edit_text(

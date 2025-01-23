@@ -31,28 +31,18 @@ async def lessons_msg(msg: Message) -> None:
         if get_cookie(msg.from_user.id):
             await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
 
-            if get_notify(msg.from_user.id):
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="❌ Отключить",
-                                callback_data="n_n",
-                            ),
-                        ],
+            markup = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="❌ Отключить"
+                            if get_notify(msg.from_user.id)
+                            else "✅ Включить",
+                            callback_data="n_n",
+                        ),
                     ],
-                )
-            else:
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✅ Включить",
-                                callback_data="n_n",
-                            ),
-                        ],
-                    ],
-                )
+                ],
+            )
 
             await msg.answer(
                 "🔔 <b>Уведомления об изменении оценок</b>",
@@ -60,28 +50,18 @@ async def lessons_msg(msg: Message) -> None:
                 reply_markup=markup,
             )
 
-            if get_notify(msg.from_user.id, index="s"):
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="❌ Отключить",
-                                callback_data="n_s",
-                            ),
-                        ],
+            markup = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="❌ Отключить"
+                            if get_notify(msg.from_user.id, index="s")
+                            else "✅ Включить",
+                            callback_data="n_s",
+                        ),
                     ],
-                )
-            else:
-                markup = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✅ Включить",
-                                callback_data="n_s",
-                            ),
-                        ],
-                    ],
-                )
+                ],
+            )
 
             await msg.answer(
                 (
