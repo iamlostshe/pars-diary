@@ -273,7 +273,7 @@ class Pars:
 
     def marks(self, user_id: str | int) -> str:
         """Информация об оценках."""
-        url = f"/api/MarkService/GetSummaryMarks?date={datetime.now().date()}"
+        url = f"/api/MarkService/GetSummaryMarks?date={datetime.datetime.now().date()}"
         data = request(url, user_id)
 
         if data == "demo":

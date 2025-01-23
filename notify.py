@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+from pathlib import Path
 
 from aiogram import Bot
 from loguru import logger
-from path import Path
 
 # Writed by me modules
 from utils import db
@@ -16,8 +16,14 @@ from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundErro
 from utils.load_env import TOKEN
 from utils.pars import Pars
 
+# Задержка между обычными уведомлениями (в часах, целое число)
+NOTIFY_DURATION = 1
 
-async def send_notify(bot: Bot) -> None:
+# Задержка между умными уведомлениями (в часах, целое число)
+SMART_NOTIFY_DURATION = 24
+
+
+async def send_notify(bot: Bot, smart: bool | None = False) -> None:
     """Асинхронная функция для обновления оценок."""
     try:
         # Открываем файл для чтения и записи
@@ -39,9 +45,10 @@ async def send_notify(bot: Bot) -> None:
                     if data[user].get("notify"):
                         await check_notify(user, new_data, old_data)
 
-                    # Если у пользователя включены умные уведомления
-                    if data[user].get("smart_notify"):
-                        await check_smart_notify(user, new_data)
+                        # Если нужно отправить умное уведомление
+                        # и у пользователя включены умные уведомления
+                        if smart and data[user].get("smart_notify"):
+                            await check_smart_notify(user, new_data)
 
                     # Регестрируем изменения
                     data[user]["notify_marks"] = new_data
@@ -169,12 +176,29 @@ bot = Bot(token=TOKEN)
 
 async def main() -> None:
     """Запуск проверки уведомлений."""
+    # Счётчик часов
+    count = SMART_NOTIFY_DURATION
+
     while True:
-        # Запускаем скрипт
-        await send_notify(bot)
+        # Инициализируем переменную для проверки умных уведомлений
+        smart = False
+
+        # Определяем нужно ли запускать умные уведомления
+        if count >= SMART_NOTIFY_DURATION:
+            # Меняем значение проверки умных уведомлений
+            smart = True
+
+            # Обнуляем счётчик
+            count = 0
+
+        # Запускаем скрипт отправки уведомлений
+        await send_notify(bot, smart=smart)
 
         # Задержка (час в секундах)
-        await asyncio.sleep(3600)
+        await asyncio.sleep(NOTIFY_DURATION * 3600)
+
+        # Обновляем значение счётчика
+        count += NOTIFY_DURATION
 
 
 if __name__ == "__main__":
