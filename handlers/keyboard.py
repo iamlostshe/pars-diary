@@ -4,7 +4,7 @@
 
     - Изменение состояния уведомлений (Вкл./Откл.)
     - Изменение состояния умных уведомлений (Вкл./Откл.)
-    - Домашнее задание (на завтра, на недлю, на конкретный день)
+    - Домашнее задание (на завтра, на неделю, на конкретный день)
     - Нейросеть для помощи в учебе
 """
 
@@ -92,7 +92,7 @@ async def callback(call: CallbackQuery) -> None:
         elif "hw" in call.data:
             if call.data == "hw_days":
                 result = []
-                for day, n in enumerate(DAYS_SHORT[:-1]):
+                for n, day in enumerate(DAYS_SHORT[:-1]):
                     result.append(
                         InlineKeyboardButton(text=day, callback_data=f"hw_{n}"),
                     )

@@ -355,6 +355,7 @@ class Pars:
 
             for period_mark in discipline["period_marks"]:
                 # Словарь для сопоставления subperiod_code с индексами
+                # (для четвертей)
                 subperiod_index = {
                     "1_1": 0,  # 1 четверть
                     "1_2": 1,  # 2 четверть
@@ -364,6 +365,8 @@ class Pars:
                     "4_2": 5,  # Экзаменационная (если есть)
                     "4_3": 6,  # Итоговая
                 }
+
+                # TODO(@iamlostshe): Добавить обработку семестров/полугодий
 
                 # Получаем индекс из словаря и присваиваем значение
                 if period_mark["subperiod_code"] in subperiod_index:
