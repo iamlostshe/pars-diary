@@ -29,7 +29,10 @@ async def new_msg(msg: Message) -> None:
         else:
             # Добавляем cookie пользователя в дб и отвечаем пользователю
             await msg.answer(
-                add_user_cookie(msg.from_user.id, msg.text[5:]),
+                add_user_cookie(
+                    msg.from_user.id,
+                    "".join("".join(msg.text[5:].split()).split("\n")),
+                ),
             )
 
     except Exception as e:
