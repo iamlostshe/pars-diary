@@ -41,22 +41,23 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
                     # Получаем старые оценки
                     old_data = db.get_marks(user)
 
-                    # Если у пользователя включены уведомления
-                    if data[user].get("notify"):
-                        await check_notify(user, new_data, old_data)
-
-                        # Если нужно отправить умное уведомление
-                        # и у пользователя включены умные уведомления
-                        if smart and data[user].get("smart_notify"):
-                            await check_smart_notify(user, new_data)
-
                     # Регестрируем изменения
                     data[user]["notify_marks"] = new_data
 
-            # Записываем изменения в файл
-            f.seek(0)
-            f.truncate()
-            json.dump(data, f, indent=4, ensure_ascii=False)
+                    # Записываем изменения в файл
+                    f.seek(0)
+                    f.truncate()
+                    json.dump(data, f, indent=4, ensure_ascii=False)
+
+                    # Если у пользователя включены уведомления
+                    if data[user].get("notify"):
+                        # Проверяем уведомления
+                        await check_notify(user, new_data, old_data)
+
+                    # Если нужно отправить умное уведомление
+                    # и у пользователя включены умные уведомления
+                    if smart and data[user].get("smart_notify"):
+                        await check_smart_notify(user, new_data)
 
     except KeyError as e:
         logger.error(UserNotFoundError(e))
