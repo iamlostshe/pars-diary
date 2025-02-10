@@ -193,7 +193,7 @@ class Pars:
         if data == "demo":
             return demo_data.me()
 
-        if data["children_persons"] == []:
+        if not data.get("children_persons"):
             # Logged in on children account
             sex = "Мужской" if data["user_is_male"] else "Женский"
 
@@ -212,6 +212,7 @@ class Pars:
 
         # Номера может и не быть
         number = data.get("phone")
+
         if number:
             msg_text += f"Номер телефона - {number}"
 
@@ -237,8 +238,9 @@ class Pars:
         if data == "demo":
             return demo_data.cs()
 
-        if data == {}:
+        if not data:
             return "Информация о классных часах отсутсвует"
+
         return (
             "КЛАССНЫЙ ЧАС\n\n"
             f"{data['date']}\n"
@@ -255,8 +257,9 @@ class Pars:
         if data == "demo":
             return demo_data.events()
 
-        if str(data) == "[]":
+        if not data:
             return "Кажется, ивентов не намечается)"
+
         return f"{data}"
 
     def birthdays(self, user_id: str | int) -> str:
@@ -267,8 +270,9 @@ class Pars:
         if data == "demo":
             return demo_data.birthdays()
 
-        if str(data) == "[]":
+        if not data:
             return "Кажется, дней рождений не намечается)"
+
         return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
 
     def marks(self, user_id: str | int) -> str:
@@ -279,14 +283,14 @@ class Pars:
         if data == "demo":
             return demo_data.marks()
 
-        msg_text = ""
-        for_midle_marks = []
-
-        if data["discipline_marks"] == []:
+        if not data.get("discipline_marks"):
             return (
                 "Информация об оценках отсутствует\n\n"
                 "Кажется, вам пока не поставили ни одной("
             )
+
+        msg_text = ""
+        for_midle_marks = []
 
         for subject in data["discipline_marks"]:
             marks = []
@@ -298,7 +302,7 @@ class Pars:
             for i in subject["marks"]:
                 marks.append(i["mark"])
 
-            if subject["average_mark"] == "":
+            if not subject.get("average_mark"):
                 average_mark = "0.00"
             else:
                 average_mark = subject["average_mark"]
@@ -330,22 +334,32 @@ class Pars:
 
         if data == "demo":
             return demo_data.i_marks()
-
-        msg_text = (
-            "Итоговые оценки:\n\n1-4 - Четвертные оценки\nГ - Годовая\n"
-            "Э - Экзаменационная (если есть)\nИ - Итоговая\n\n<pre>\n"
-            "Предмет    │ 1 │ 2 │ 3 │ 4 │ Г │ Э │ И │\n"
-            "───────────┼───┼───┼───┼───┼───┼───┼───┤\n"
-        )
-
-        if data["discipline_marks"] == []:
+        
+        if not data.get("discipline_marks"):
             return (
                 "Информация об итоговых оценках отсутствует\n\n"
                 "Кажется, вам пока не поставили ни одной("
             )
 
+        subperiods = {i["code"]:i["name"] for i in data["subperiods"]}
+
+        subperiods_names = list(subperiods.values())
+        len_subperiods_names = len(subperiods_names)
+
+        subperiods_names_first_letter = [i[0] for i in subperiods_names]
+
+        explanation = [f"{subperiods_names_first_letter[i]} - {subperiods_names[i]}" for i, _ in enumerate(subperiods_names)]
+
+        msg_text = (
+            f'Итоговые оценки:\n\n{"\n".join(explanation)}\n\n<pre>\n'
+            f'Предмет    │ {" | ".join(subperiods_names_first_letter)} |\n'
+            f'───────────┼{("───┼" * len_subperiods_names)[:-1]}┤\n'
+        )
+
+        subperiod_index = list(subperiods.keys())
+
         for discipline in data["discipline_marks"]:
-            stroka = ["-", "-", "-", "-", "-", "-", "-"]
+            stroka = list("-" * len_subperiods_names)
             g = minify_lesson_title(discipline["discipline"])
 
             while len(g) < 10:
@@ -354,23 +368,9 @@ class Pars:
             msg_text += f"{g} │ "
 
             for period_mark in discipline["period_marks"]:
-                # Словарь для сопоставления subperiod_code с индексами
-                # (для четвертей)
-                subperiod_index = {
-                    "1_1": 0,  # 1 четверть
-                    "1_2": 1,  # 2 четверть
-                    "1_3": 2,  # 3 четверть
-                    "1_4": 3,  # 4 четверть
-                    "4_1": 4,  # Годовая
-                    "4_2": 5,  # Экзаменационная (если есть)
-                    "4_3": 6,  # Итоговая
-                }
-
-                # TODO(@iamlostshe): Добавить обработку семестров/полугодий
-
-                # Получаем индекс из словаря и присваиваем значение
+                # Получаем индекс и присваиваем значение
                 if period_mark["subperiod_code"] in subperiod_index:
-                    stroka[subperiod_index[period_mark["subperiod_code"]]] = (
+                    stroka[subperiod_index.index(period_mark["subperiod_code"])] = (
                         period_mark["mark"]
                     )
 

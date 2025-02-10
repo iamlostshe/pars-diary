@@ -59,13 +59,13 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     except KeyError as e:
-        raise UserNotFoundError from e
+        logger.error(UserNotFoundError(e))
 
     except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e
+        logger.error(DBFileNotFoundError(e))
 
     except Exception as e:
-        raise UnknownError(e) from e
+        logger.error(UnknownError(e))
 
     finally:
         await bot.session.close()
@@ -147,7 +147,7 @@ async def check_smart_notify(user: str | int, new_data: dict) -> None:
                 controversial += f"{i}\n"
 
     # Добавляем к сообщению 3 и 2
-    if msg_text != "":
+    if msg_text:
         msg_text = (
             "Привет, вот персональная сводка по оценкам!\n\nПоторопись! "
             "<b>По этим предметам могут выйти плохие оценки "
@@ -155,14 +155,14 @@ async def check_smart_notify(user: str | int, new_data: dict) -> None:
         )
 
     # Добавляем к сообщению спорные
-    if controversial != "":
-        if msg_text == "":
+    if controversial:
+        if not msg_text:
             msg_text = "Привет, вот персональная сводка по оценкам!\n"
         msg_text += f"\n<b>У вас есть спорные оценки:</b>\n\n<pre>{controversial}</pre>"
 
     # TODO @iamlostshe: Полчаем те, до которых не хватает одной-двух оценок
 
-    if msg_text != "":
+    if msg_text:
         # Дорабатываем сообщение
         msg_text += "\nУправление уведомлениями -> /notify"
 
@@ -182,7 +182,6 @@ async def main() -> None:
     while True:
         # Инициализируем переменную для проверки умных уведомлений
         smart = False
-
         # Определяем нужно ли запускать умные уведомления
         if count >= SMART_NOTIFY_DURATION:
             # Меняем значение проверки умных уведомлений
@@ -193,6 +192,9 @@ async def main() -> None:
 
         # Запускаем скрипт отправки уведомлений
         await send_notify(bot, smart=smart)
+
+        # Выводим лог об ожидании заданого времени
+        logger.debug(f"Ожидаю {NOTIFY_DURATION} час")
 
         # Задержка (час в секундах)
         await asyncio.sleep(NOTIFY_DURATION * 3600)

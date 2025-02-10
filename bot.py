@@ -30,8 +30,11 @@ async def main() -> None:
 
     # Connect hendlers
     for r in routers:
-        logger.info("Include router: {} ...", r.name)
+        logger.debug("Include router: {} ...", r.name)
         dp.include_router(r)
+
+    # Clean the webhook
+    await bot.delete_webhook(drop_pending_updates=True)
 
     # Starting
     logger.info("Bot start polling...")

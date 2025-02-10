@@ -62,7 +62,7 @@ def get_hw(data: str | int) -> str:
 
                 msg_text += f"{count}. {subject} │ {i['homework']}\n"
 
-                if i["homework"] != "":
+                if i.get("homework"):
                     link = quote(f"ГДЗ {i['discipline']}: {i['homework']}")
                     google_url = f"https://www.google.com/search?q={link}"
                     ask_gpt_text = f"chatgpt_{day}_{count - 1}"

@@ -1,0 +1,170 @@
+{
+    "subperiods": [
+        {
+            "code": "3_1",
+            "name": "1 Полугодие"
+        },
+        {
+            "code": "3_2",
+            "name": "2 Полугодие"
+        },
+        {
+            "code": "4_1",
+            "name": "Годовая"
+        }
+    ],
+    "discipline_marks": [
+        {
+            "discipline": "Русский язык",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "3"
+                }
+            ]
+        },
+        {
+            "discipline": "Биология",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Иностранный язык (английский)",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Физическая культура",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Алгебра",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "3"
+                }
+            ]
+        },
+        {
+            "discipline": "Геометрия",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "3"
+                }
+            ]
+        },
+        {
+            "discipline": "Вероятность и статистика",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "География",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "3"
+                }
+            ]
+        },
+        {
+            "discipline": "Информатика",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Физика",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Химия",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "3"
+                }
+            ]
+        },
+        {
+            "discipline": "История",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Обществознание",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Литература",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "4"
+                }
+            ]
+        },
+        {
+            "discipline": "Индивидуальный проект",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "5"
+                }
+            ]
+        },
+        {
+            "discipline": "Основы безопасности и защиты Родины",
+            "period_marks": [
+                {
+                    "subperiod_code": "3_1",
+                    "mark": "5"
+                }
+            ]
+        },
+        {
+            "discipline": "Факультатив \"Основы 1С Предприятие\"",
+            "period_marks": []
+        },
+        {
+            "discipline": "Факультатив \"Функциональная грамотность\"",
+            "period_marks": []
+        }
+    ]
+}
