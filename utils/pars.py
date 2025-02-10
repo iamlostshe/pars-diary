@@ -73,7 +73,7 @@ def request(
             cookie = db.get_cookie(user_id)
 
         if cookie in ["demo", "демо"]:
-            return "demo", ""
+            return "demo"
 
         # Получаем server_name из бд
         server_name = db.get_server_name(user_id)
