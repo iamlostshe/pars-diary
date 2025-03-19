@@ -1,15 +1,10 @@
 """Main module to start telegram-bot."""
 
-# Integrated python modules
 import asyncio
 
-# Aiogram
 from aiogram import Bot, Dispatcher
-
-# Modules need to be installed
 from loguru import logger
 
-# Writed by me modules
 from handlers import routers
 from utils.db import check_db
 from utils.load_env import TOKEN

@@ -22,33 +22,27 @@ cd PARS-DIARY
 
 <details>
 <summary>
-Через poetry (рекомендуется)
+Через uv (рекомендуется)
 </summary>
 
-**Устанавливаем `poetry` (если еще не установлен):**
+**Устанавливаем `uv` (если еще не установлен):**
 
 Linux:
 
 ``` bash
-curl -sSL https://install.python-poetry.org | python3 -
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 Windows:
 
 ``` bash
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**Устанавливаем зависимости:**
+**Запускаем:**
 
-``` bash
-poetry install
-```
-
-**Запускаем бота:**
-
-``` bash
-poetry run python3 -m bot
+```bash
+uv run bot.py
 ```
 
 </details>
