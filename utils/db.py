@@ -34,7 +34,7 @@ def check_db() -> None:
 def add_user(user_id: int | str, refer: str) -> None | dict:
     """Добавляет пользователя в json базу данных."""
     # Получаем реферальные сведения
-    refer = refer[7:].split("/n") if refer[:7] == "/start " else None
+    refer = refer[7:] if refer[:7] == "/start " else None
 
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -245,11 +245,13 @@ def get_graph() -> None:
             data = json.load(file)
 
         times = []
-        users = []
+        users = list(range(len(data)))
 
-        for counter, user in enumerate(data):
-            times.append(int(str(data[user]["start"][0]).split(".", maxsplit=1)[0]))
-            users.append(counter)
+        for user in data:
+            print(1)
+            start = str(data[user]["start"][0])
+            print(2)
+            times.append(int(start.split(".")[0]))
 
         plt.plot(times, users)
         plt.ylabel("Пользователи")
@@ -271,13 +273,17 @@ def get_stat() -> tuple[int, str]:
         with Path.open(DB_NAME, "r", encoding="UTF-8") as file:
             data = json.load(file)
 
-        refers = []
+        refers_values = [
+            list(set(data[user]["refer"])) for user in data if data[user]["refer"]
+        ]
 
-        for user in data:
-            for i in data[user]["refer"]:
-                refers.append(i)
+        refers = ""
+        used = []
 
-        refers = "\n".join([f"{k} - {v}" for k, v in Counter(refers).items()])
+        for refer in refers_values:
+            if refer not in used:
+                used.append(refer)
+                refers += f"{refer[0]} - {refers_values.count(refer)}"
 
         return len(data), refers
 

@@ -3,7 +3,7 @@
 - Публичные комманды (в меню)
     - /about - О проекте
     - /notify - Настройка уведомлений
-    - /base_commands - Основные комманды (marks, i_marks, hw, me, cs, events, birthdays)
+    - /base_commands - Основные комманды (marks, i_marks, hw, me, ch, events, birthdays)
     - /chatgpt - Нейросеть для помощи в учёбе
 
 - Приватные комманды (нет в меню)

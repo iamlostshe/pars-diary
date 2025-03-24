@@ -4,7 +4,7 @@
 - /i_marks - Итоговые оценки
 - /hw - Домашнее задание
 - /me - Данные о пользователе
-- /cs - Классные часы
+- /ch - Классные часы
 - /events - Ивенты
 - /birthdays - Дни рождения
 """
@@ -26,11 +26,11 @@ router = Router(name=__name__)
 # Базовые комманы (парсинг + небольшое изменение)
 @router.message(
     Command(
-        commands=["marks", "i_marks", "hw", "me", "cs", "events", "birthdays"],
+        commands=["marks", "i_marks", "hw", "me", "ch", "events", "birthdays"],
     ),
 )
 async def simple_msg(msg: Message) -> None:
-    """Отвечает за /marks, /i_marks, /hw, /me, /cs, /events, /birthdays."""
+    """Отвечает за /marks, /i_marks, /hw, /me, /ch, /events, /birthdays."""
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
@@ -50,7 +50,7 @@ async def simple_msg(msg: Message) -> None:
             # Выбираем функцию, в зависимости от комманды
             commands = {
                 "/me": pars.me,
-                "/cs": pars.cs,
+                "/ch": pars.ch,
                 "/events": pars.events,
                 "/birthdays": pars.birthdays,
                 "/i_marks": pars.i_marks,

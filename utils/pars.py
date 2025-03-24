@@ -230,13 +230,13 @@ class Pars:
 
         return msg_text
 
-    def cs(self, user_id: str | int) -> str:
+    def ch(self, user_id: str | int) -> str:
         """Информация о классных часах."""
         url = "/api/WidgetService/getClassHours"
         data = request(url, user_id)
 
         if data == "demo":
-            return demo_data.cs()
+            return demo_data.ch()
 
         if not data:
             return "Информация о классных часах отсутсвует"

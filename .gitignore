@@ -6,10 +6,8 @@ venv
 # Logs
 *.log
 
-# PARS-DIARI
-.env
-users.json
-stat_img.png
+# uv
+uv.lock
 
 # IDE
 .idea/
@@ -17,3 +15,8 @@ stat_img.png
 
 # DOCS
 docs/.obsidian
+
+# PARS-DIARI
+.env
+users.json
+stat_img.png
