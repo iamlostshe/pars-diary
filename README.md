@@ -1,6 +1,10 @@
-# PARS-DIARY
+# [PARS-DIARY](https://t.me/pars_diary_bot)
 
 Проект для упрощения жизни школьников.
+
+Бот запущен и вы можете пользоваться им здесь:
+
+https://t.me/pars_diary_bot
 
 ### Установка / Installation
 
