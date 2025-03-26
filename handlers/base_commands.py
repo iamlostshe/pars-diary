@@ -4,10 +4,9 @@
 - /i_marks - Итоговые оценки
 - /hw - Домашнее задание
 - /me - Данные о пользователе
-- /ch - Классные часы
 - /events - Ивенты
 - /birthdays - Дни рождения
-"""  # noqa: RUF002
+"""
 
 from aiogram import Router
 from aiogram.filters import Command
@@ -26,11 +25,11 @@ router = Router(name=__name__)
 # Базовые комманы (парсинг + небольшое изменение)
 @router.message(
     Command(
-        commands=["marks", "i_marks", "hw", "me", "ch", "events", "birthdays"],
+        commands=["marks", "i_marks", "hw", "me", "events", "birthdays"],
     ),
 )
 async def simple_msg(msg: Message) -> None:
-    """Отвечает за /marks, /i_marks, /hw, /me, /ch, /events, /birthdays."""
+    """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
@@ -50,7 +49,6 @@ async def simple_msg(msg: Message) -> None:
             # Выбираем функцию, в зависимости от комманды
             commands = {
                 "/me": pars.me,
-                "/ch": pars.ch,
                 "/events": pars.events,
                 "/birthdays": pars.birthdays,
                 "/i_marks": pars.i_marks,
@@ -64,8 +62,6 @@ async def simple_msg(msg: Message) -> None:
             # Отвечаем пользователю
             if len(answer) == 2 and isinstance(answer, tuple):
                 await msg.answer(answer[0], "HTML", reply_markup=answer[1])
-            elif msg.text == "/ch":
-                await msg.answer_photo(answer[0], answer[1])
             else:
                 await msg.answer(answer, "HTML")
 
@@ -78,4 +74,8 @@ async def simple_msg(msg: Message) -> None:
             )
 
     except Exception as e:
+        # Овечаем пользователю
         await msg.answer(error(e, msg.from_user.language_code), "HTML")
+
+        # Выводим лог
+        logger.error(e)
