@@ -14,7 +14,7 @@ from loguru import logger
 
 from utils.db import GRAPH_NAME, counter, get_graph
 from utils.load_env import ADMINS_TG
-from utils.messages import admin, error
+from utils.messages import admin
 
 router = Router(name=__name__)
 

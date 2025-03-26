@@ -7,7 +7,7 @@
 - /ch - Классные часы
 - /events - Ивенты
 - /birthdays - Дни рождения
-"""
+"""  # noqa: RUF002
 
 from aiogram import Router
 from aiogram.filters import Command
@@ -64,6 +64,8 @@ async def simple_msg(msg: Message) -> None:
             # Отвечаем пользователю
             if len(answer) == 2 and isinstance(answer, tuple):
                 await msg.answer(answer[0], "HTML", reply_markup=answer[1])
+            elif msg.text == "/ch":
+                await msg.answer_photo(answer[0], answer[1])
             else:
                 await msg.answer(answer, "HTML")
 

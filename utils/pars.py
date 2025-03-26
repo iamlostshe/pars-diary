@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import re
 
 import requests
+from aiogram.types import FSInputFile
+from conversations_about_important_api import CAIParser
+from conversations_about_important_api.pars import NoDataForThisDayError
 from loguru import logger
 
 from utils import demo_data
@@ -56,6 +59,25 @@ def get_regions() -> dict:
     # Обработка ошибок
     except Exception as e:
         raise UnknownError(e) from e
+
+
+def get_next_date(minus_week: int | None = None) -> str:
+    """Получаем ссылку для парсинга."""
+    # Получаем параметр сдвига
+    if not minus_week:
+        minus_week = 0
+
+    # Получаем текущую дату
+    now = dt.datetime.now()
+
+    # Меняем дату на следующий понедельник
+    now += dt.timedelta(days=7 - now.weekday())
+
+    # Учитываем сдвиг
+    now -= dt.timedelta(days=7 * minus_week)
+
+    # Переводим дату в строку и возвращаем её
+    return now.strftime("%d-%m-%Y")
 
 
 def request(
@@ -231,23 +253,31 @@ class Pars:
         return msg_text
 
     def ch(self, user_id: str | int) -> str:
-        """Информация о классных часах."""
+        """Информация о классных часах."""  # noqa: RUF002
         url = "/api/WidgetService/getClassHours"
         data = request(url, user_id)
 
         if data == "demo":
             return demo_data.ch()
 
-        if not data:
-            return "Информация о классных часах отсутсвует"
+        parser = CAIParser()
+        msg = ""
 
-        return (
-            "КЛАССНЫЙ ЧАС\n\n"
-            f"{data['date']}\n"
-            f"{data['begin']}-{data['end']}\n\n"
-            f"каб. {data['place']}\n"
-            f"{data['theme']}\n"
-        )
+        try:
+            data = parser.get_info(get_next_date())
+
+        except NoDataForThisDayError:
+            msg += (
+                "Информация о следующем классном часе не найдена, "
+                "поэтому предоставлена информация о прошлом:\n\n"
+            )
+
+        data = parser.get_info(get_next_date(1))
+        msg += f"<b>{data.title}</b>\n\n"
+        msg += f"{data.str_date}\n\n"
+
+        return FSInputFile(data.plakat_url), msg
+
 
     def events(self, user_id: str | int) -> str:
         """Информация о ивентах."""
@@ -277,7 +307,7 @@ class Pars:
 
     def marks(self, user_id: str | int) -> str:
         """Информация об оценках."""
-        url = f"/api/MarkService/GetSummaryMarks?date={datetime.datetime.now().date()}"
+        url = f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
         data = request(url, user_id)
 
         if data == "demo":
