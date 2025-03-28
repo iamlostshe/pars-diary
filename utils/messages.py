@@ -58,20 +58,6 @@ def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> 
     )
 
 
-def admin(lang_code: None = "ru") -> str:
-    """Сообщение для администраторов."""
-    if lang_code != "ru":
-        lang_code = "en"
-
-    get_stat = db.get_stat()
-
-    return (
-        f"Количество пользователей в боте: {get_stat[0]}\n\n"
-        "Рефералы (источники прихода аудитории, в порядке убывания):\n\n"
-        f"{get_stat[1]}"
-    )
-
-
 def not_auth(lang_code: None = "ru") -> str:
     """Если этот контент не доступен без авторизациия."""
     if lang_code != "ru":

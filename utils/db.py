@@ -1,13 +1,12 @@
 """Класс для работы с json базой данных."""
 
-# TODO @iamlostshe: Использовать метод get для безопасного доступа к данным
-
 from __future__ import annotations
 
 import json
 import time
 from collections import Counter
 from pathlib import Path
+from typing import Self
 
 import matplotlib.pyplot as plt
 
@@ -33,9 +32,6 @@ def check_db() -> None:
 
 def add_user(user_id: int | str, refer: str) -> None | dict:
     """Добавляет пользователя в json базу данных."""
-    # Получаем реферальные сведения
-    refer = refer[7:] if refer[:7] == "/start " else None
-
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
@@ -49,7 +45,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
             if user_id not in data:
                 data[user_id] = {
                     "start": [time.time()],
-                    "refer": [],
+                    "refer": refer,
                     "cookie": None,
                     "notify": True,
                     "smart_notify": True,
@@ -58,10 +54,6 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
             # Если пользователь уже есть в json базе данных
             else:
                 data[user_id]["start"].append(time.time())
-
-            # В случае если поле refer не пусто указываем его в json бд
-            if refer is not None:
-                data[user_id]["refer"].append(refer)
 
             # Сохраняем изменения в json базе данных
             f.seek(0)
@@ -248,9 +240,7 @@ def get_graph() -> None:
         users = list(range(len(data)))
 
         for user in data:
-            print(1)
             start = str(data[user]["start"][0])
-            print(2)
             times.append(int(start.split(".")[0]))
 
         plt.plot(times, users)
@@ -267,32 +257,87 @@ def get_graph() -> None:
         raise UnknownError(e) from e
 
 
-def get_stat() -> tuple[int, str]:
+class GetStat:
     """Возвращает статистику для (сис-) админов."""
-    try:
-        with Path.open(DB_NAME, "r", encoding="UTF-8") as file:
-            data = json.load(file)
 
-        refers_values = [
-            list(set(data[user]["refer"])) for user in data if data[user]["refer"]
-        ]
+    def __init__(self: Self) -> tuple[int, str]:
+        """Возвращает статистику для (сис-) админов."""
+        # Инициализируем переменные для хранения статистики
+        self.refer = []
 
-        refers = ""
-        used = []
+        self.cookie = 0
 
-        for refer in refers_values:
-            if refer not in used:
-                used.append(refer)
-                refers += f"{refer[0]} - {refers_values.count(refer)}"
+        self.notify = 0
+        self.smart_notify = 0
 
-        return len(data), refers
+        self.command_about = 0
+        self.command_admin = 0
+        self.command_birthdays = 0
+        self.command_ch = 0
+        self.command_cs = 0
+        self.command_events = 0
+        self.command_hw = 0
+        self.command_i_marks = 0
+        self.command_marks = 0
+        self.command_me = 0
+        self.command_new = 0
+        self.command_notify_settings = 0
+        self.command_start = 0
 
-    # Обработчики ошибок
-    except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e
+        try:
+            with Path.open(DB_NAME, "r", encoding="UTF-8") as f:
+                data = json.load(f)
 
-    except Exception as e:
-        raise UnknownError(e) from e
+            self.users_count = len(data)
+
+            for u in data:
+                data_u = data[u]
+
+                self.refer.append(data_u.get("refer"))
+
+                self.cookie += int(bool(data_u.get("cookie")))
+
+                self.notify += int(data_u.get("notify"))
+                self.smart_notify += int(data_u.get("smart_notify"))
+
+                self.command_about += len(data_u.get("about", []))
+                self.command_admin += len(data_u.get("admin", []))
+                self.command_birthdays += len(data_u.get("birthdays", []))
+                self.command_ch += len(data_u.get("ch", []))
+                self.command_cs += len(data_u.get("cs", []))
+                self.command_events += len(data_u.get("events", []))
+                self.command_hw += len(data_u.get("hw", []))
+                self.command_i_marks += len(data_u.get("i_marks", []))
+                self.command_marks += len(data_u.get("marks", []))
+                self.command_me += len(data_u.get("me", []))
+                self.command_new += len(data_u.get("new", []))
+                self.command_notify_settings += len(data_u.get("notify-settings", []))
+                self.command_start += len(data_u.get("start", []))
+
+        # Обработчики ошибок
+        except FileNotFoundError as e:
+            raise DBFileNotFoundError(DB_NAME) from e
+
+        except Exception as e:
+            raise UnknownError(e) from e
+
+
+    def str_refer(self: Self) -> str:
+        """Создаёт строковое представление источников прихода аудитории."""
+        # Создаем Counter для подсчета вхождений каждого элемента
+        count_dict = Counter(item for item in self.refer if item is not None)
+
+        # Создаем список кортежей из словаря и сортируем его по убыванию
+        sorted_items = sorted(count_dict.items(), key=lambda x: x[1], reverse=True)
+
+        # Формируем строку результата
+        result = "\n".join(f"{item} - {count}" for item, count in sorted_items)
+
+        # Добавляем количество None в конце
+        result += f"\n\nБез указания реферала - {self.refer.count(None)}"
+
+        # Возвращаем результат в виде строки
+        return result
 
 
 def get_marks(user_id: str | int) -> dict | str:
