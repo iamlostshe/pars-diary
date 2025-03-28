@@ -275,27 +275,24 @@ class Pars:
         for_midle_marks = []
 
         for subject in data["discipline_marks"]:
-            marks = []
             g = minify_lesson_title(subject["discipline"])
 
             while len(g) < 10:
                 g += " "
 
-            for i in subject["marks"]:
-                marks.append(i["mark"])
+            marks = [m["mark"] for m in subject["marks"]]
 
-            if not subject.get("average_mark"):
-                average_mark = "0.00"
-            else:
-                average_mark = subject["average_mark"]
+            len_marks = len(marks)
+            average_mark = "0.00" if len_marks == 0 else f"{sum(marks) / len_marks:.2f}"
+            float_average_mark = float(average_mark)
 
-            for_midle_marks.append(float(average_mark))
+            for_midle_marks.append(float_average_mark)
 
-            if float(average_mark) >= 4.5:
+            if float_average_mark >= 4.5:
                 color_mark = "🟩"
-            elif float(average_mark) >= 3.5:
+            elif float_average_mark >= 3.5:
                 color_mark = "🟨"
-            elif float(average_mark) >= 2.5:
+            elif float_average_mark >= 2.5:
                 color_mark = "🟧"
             else:
                 color_mark = "🟥"
@@ -316,7 +313,7 @@ class Pars:
 
         if data == "demo":
             return demo_data.i_marks()
-        
+
         if not data.get("discipline_marks"):
             return (
                 "Информация об итоговых оценках отсутствует\n\n"
