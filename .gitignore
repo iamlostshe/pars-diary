@@ -8,6 +8,7 @@ venv
 
 # uv
 uv.lock
+.env
 
 # IDE
 .idea/
@@ -17,6 +18,5 @@ uv.lock
 docs/.obsidian
 
 # PARS-DIARI
-.env
 users.json
 stat_img.png

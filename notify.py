@@ -5,18 +5,20 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from aiogram import Bot
 from loguru import logger
 
-# Writed by me modules
+from models import User
 from utils import db
 from utils.db import DB_NAME
 from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
 from utils.load_env import TOKEN
 from utils.pars import Pars
-from utils.typing import UserId
-from models import User
+
+if TYPE_CHECKING:
+    from utils.typing import UserId
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1
@@ -24,7 +26,8 @@ NOTIFY_DURATION = 1
 # Задержка между умными уведомлениями (в часах, целое число)
 SMART_NOTIFY_DURATION = 24
 
-async def send_notify(bot: Bot, smart: bool = False) -> None:
+
+async def send_notify(bot: Bot, smart: bool | None = False) -> None:  # noqa: FBT002
     """Асинхронная функция для обновления оценок."""
     try:
         # Открываем файл для чтения и записи
@@ -75,7 +78,7 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
         await bot.session.close()
 
 
-async def check_notify(user_id: UserId, new_data: dict, old_data: dict) -> None:
+async def check_notify(user_id: UserId, new_data: dict, old_data: dict) -> None:  # noqa: C901
     """Проверка наличия уведомлений об изменении оценок."""
     # Выводим лог в консоль
     logger.debug(f"Проверяю пользователя {user_id} на наличие изменённых оценок")
