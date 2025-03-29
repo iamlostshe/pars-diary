@@ -1,4 +1,4 @@
-"""Базовые комманды.
+"""Базовые команды.
 
 - /marks - Оценки
 - /i_marks - Итоговые оценки
@@ -16,13 +16,14 @@ from loguru import logger
 from pars_diary.utils.db import counter, get_cookie
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
-from pars_diary.utils.messages import error, not_auth
+from pars_diary.utils.messages import not_auth
 from pars_diary.utils.pars import Pars
 
-router = Router(name=__name__)
+router = Router(name="Base commands")
 
 
-# Базовые комманы (парсинг + небольшое изменение)
+# Базовые команды (парсинг + небольшое изменение)
+# TODO @milinuri: Я кусаться буду, что за беспредел в командах?
 @router.message(
     Command(
         commands=["marks", "i_marks", "hw", "me", "events", "birthdays"],
@@ -30,52 +31,40 @@ router = Router(name=__name__)
 )
 async def simple_msg(msg: Message) -> None:
     """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
-    # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
+    counter(msg.from_user.id, msg.text.split()[0][1:])
 
-    # Проверяем ошибки
-    try:
-        # Обновляем значение счётчика
-        counter(msg.from_user.id, msg.text.split()[0][1:])
+    # Получаем user_id пользователя
+    user_id = msg.from_user.id
 
-        # Получаем user_id пользователя
-        user_id = msg.from_user.id
+    # Проверяем зарегистрирован ли пользователь
+    if not get_cookie(user_id):
+        # Выводим сообщение о необходимости регистрации и клавиатуру
+        await msg.answer(
+            not_auth(msg.from_user.language_code),
+            "HTML",
+            reply_markup=not_auth_keyboard(msg.from_user.language_code),
+        )
+        return
 
-        # Проверяем зарегестирован ли пользователь
-        if get_cookie(user_id):
-            # Создаем объект класса
-            pars = Pars()
+    # Создаем объект класса
+    pars = Pars()
 
-            # Выбираем функцию, в зависимости от комманды
-            commands = {
-                "/me": pars.me,
-                "/events": pars.events,
-                "/birthdays": pars.birthdays,
-                "/i_marks": pars.i_marks,
-                "/marks": pars.marks,
-                "/hw": lambda user_id: hw(user_id, "t"),
-            }
+    # Выбираем функцию, в зависимости от команды
+    commands = {
+        "/me": pars.me,
+        "/events": pars.events,
+        "/birthdays": pars.birthdays,
+        "/i_marks": pars.i_marks,
+        "/marks": pars.marks,
+        "/hw": lambda user_id: hw(user_id, "t"),
+    }
 
-            # Создаем ответ
-            answer = commands[msg.text](user_id)
+    # Создаем ответ
+    answer = commands[msg.text](user_id)
 
-            # Отвечаем пользователю
-            if len(answer) == 2 and isinstance(answer, tuple):
-                await msg.answer(answer[0], "HTML", reply_markup=answer[1])
-            else:
-                await msg.answer(answer, "HTML")
-
-        else:
-            # Выводим сообщение о необходимости регестрации и клавиатуру
-            await msg.answer(
-                not_auth(msg.from_user.language_code),
-                "HTML",
-                reply_markup=not_auth_keyboard(msg.from_user.language_code),
-            )
-
-    except Exception as e:
-        # Овечаем пользователю
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
-
-        # Выводим лог
-        logger.error(e)
+    # Отвечаем пользователю
+    if len(answer) == 2 and isinstance(answer, tuple):
+        await msg.answer(answer[0], "HTML", reply_markup=answer[1])
+    else:
+        await msg.answer(answer, "HTML")
