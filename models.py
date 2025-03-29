@@ -1,23 +1,42 @@
+"""Определение структур данных."""
+
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from datetime import date
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import date
+
 
 @dataclass
 class User:
-    cookie: str | None = None 
+    """Пользователь."""
+
+    cookie: str | None = None
     notify: bool = False
     smart_notify: bool = False
     notify_marks: list[str] | None = None
 
+
 @dataclass
 class Homework:
+    """Домашнее задание."""
+
     discipline: str
     homework: str = ""
 
-@dataclass 
+
+@dataclass
 class DayHomework:
-    date: date 
+    """Домашнее задание на день."""
+
+    date: date
     homeworks: list[Homework] = field(default_factory=list)
+
 
 @dataclass
 class WeekHomework:
+    """Домашнее задание на неделю."""
+
     days: list[DayHomework] = field(default_factory=list)

@@ -10,12 +10,12 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from models import DayHomework, Homework, WeekHomework
 from utils import demo_data
 from utils.ask_gpt import ask_gpt
 from utils.exceptions import DayIndexError
 from utils.pars import minify_lesson_title, request
-from utils.typing import UserId, HomeworkIndex
-from models import WeekHomework, DayHomework, Homework
+from utils.typing import HomeworkIndex, UserId
 
 SPACES_AFTER_SUBJECT = 10
 
@@ -42,9 +42,9 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
             homeworks=[
                 Homework(
                     discipline=hw["discipline"],
-                    homework=hw["homework"]
+                    homework=hw["homework"],
                 ) for hw in day_data["homeworks"]
-            ]
+            ],
         )
         week_data.days.append(day)
 

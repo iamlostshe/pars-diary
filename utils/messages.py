@@ -14,7 +14,6 @@ from __future__ import annotations
 from loguru import logger
 
 # Writed by me modules
-from utils import db
 from utils.load_env import GIT_URL
 
 
