@@ -6,7 +6,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from pars_diary.utils.ask_gpt import ask_gpt
+from pars_diary.services.ask_gpt import ask_gpt
 
 router = Router(name=__name__)
 

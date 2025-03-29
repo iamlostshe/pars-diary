@@ -7,9 +7,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from loguru import logger
 
+from pars_diary.config import config
 from pars_diary.handlers import ROUTERS
 from pars_diary.utils.db import check_db, counter
-from pars_diary.utils.load_env import TOKEN
 from pars_diary.utils.messages import error
 
 # Константы
@@ -70,7 +70,7 @@ async def main() -> None:
     # Checking for the existence database
     check_db()
 
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=config.telegram_token)
     # Connect handlers
     for router in ROUTERS:
         logger.debug("Include router: {} ...", router.name)

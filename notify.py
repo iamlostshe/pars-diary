@@ -7,6 +7,7 @@ from itertools import zip_longest
 from aiogram import Bot
 from loguru import logger
 
+from pars_diary.config import config
 from pars_diary.models import User
 from pars_diary.utils import db
 from pars_diary.utils.db import DB_NAME
@@ -15,7 +16,6 @@ from pars_diary.utils.exceptions import (
     UnknownError,
     UserNotFoundError,
 )
-from pars_diary.utils.load_env import TOKEN
 from pars_diary.utils.pars import Pars
 from pars_diary.utils.typing import UserId
 
@@ -143,7 +143,7 @@ async def check_smart_notify(bot: Bot, user_id: UserId, new_grades: dict) -> Non
 
 async def main() -> None:
     """Запуск проверки уведомлений."""
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=config.telegram_token)
     time_counter = SMART_NOTIFY_DURATION
 
     while True:

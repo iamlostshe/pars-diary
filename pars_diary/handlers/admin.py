@@ -12,8 +12,8 @@ from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
 from loguru import logger
 
+from pars_diary.config import config
 from pars_diary.utils.db import GRAPH_NAME, GetStat, get_graph
-from pars_diary.utils.load_env import ADMINS_TG
 
 router = Router(name="Admin commands")
 
@@ -22,7 +22,7 @@ router = Router(name="Admin commands")
 async def new_msg(msg: Message) -> None:
     """Отвечает за /admin."""
     # Если пользователь не админ - кусаемся
-    if str(msg.from_user.id) not in ADMINS_TG:
+    if str(msg.from_user.id) not in config.admins:
         logger.warning("{} try to use /admin", msg.from_user.id)
         return
 

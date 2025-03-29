@@ -10,8 +10,8 @@ from urllib.parse import quote
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from pars_diary.models import DayHomework, Homework, WeekHomework
+from pars_diary.services.ask_gpt import ask_gpt
 from pars_diary.utils import demo_data
-from pars_diary.utils.ask_gpt import ask_gpt
 from pars_diary.utils.exceptions import DayIndexError
 from pars_diary.utils.pars import minify_lesson_title, request
 
@@ -24,7 +24,7 @@ DAYS = [
     "четверг",
     "пятницу",
     "субботу",
-    "воскресень",
+    "воскресенье",
 ]
 
 DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
