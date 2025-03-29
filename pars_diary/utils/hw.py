@@ -1,21 +1,19 @@
 """Модуль отвечающий за парсинг."""
 
-from __future__ import annotations
-
 import datetime
 import functools
 import operator
 from datetime import datetime as dt
+from typing import HomeworkIndex, UserId
 from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from models import DayHomework, Homework, WeekHomework
-from utils import demo_data
-from utils.ask_gpt import ask_gpt
-from utils.exceptions import DayIndexError
-from utils.pars import minify_lesson_title, request
-from utils.typing import HomeworkIndex, UserId
+from pars_diary.models import DayHomework, Homework, WeekHomework
+from pars_diary.utils import demo_data
+from pars_diary.utils.ask_gpt import ask_gpt
+from pars_diary.utils.exceptions import DayIndexError
+from pars_diary.utils.pars import minify_lesson_title, request
 
 SPACES_AFTER_SUBJECT = 10
 
@@ -43,7 +41,8 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
                 Homework(
                     discipline=hw["discipline"],
                     homework=hw["homework"],
-                ) for hw in day_data["homeworks"]
+                )
+                for hw in day_data["homeworks"]
             ],
         )
         week_data.days.append(day)

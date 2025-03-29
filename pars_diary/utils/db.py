@@ -1,7 +1,5 @@
 """Класс для работы с json базой данных."""
 
-from __future__ import annotations
-
 import json
 import time
 from collections import Counter
@@ -10,16 +8,16 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
-from utils.exceptions import (
+from pars_diary.utils.exceptions import (
     DBFileNotFoundError,
     UnknownError,
     UserNotAuthorizatedError,
     UserNotFoundError,
 )
-from utils.pars import check_cookie
+from pars_diary.utils.pars import check_cookie
 
-DB_NAME = "users.json"
-GRAPH_NAME = "stat_img.png"
+DB_NAME = Path("users.json")
+GRAPH_NAME = Path("stat_img.png")
 
 
 def check_db() -> None:
@@ -320,7 +318,6 @@ class GetStat:
 
         except Exception as e:
             raise UnknownError(e) from e
-
 
     def str_refer(self: Self) -> str:
         """Создаёт строковое представление источников прихода аудитории."""

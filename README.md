@@ -38,7 +38,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 **Запускаем:**
 
 ```bash
-uv run bot.py
+uv run python -m pars_diary
 ```
 
 </details>
@@ -73,7 +73,7 @@ pip install -r requirements.txt
 **Запускаем бота:**
 
 ``` bash
-python bot.py
+python -m pars_diary
 ```
 
 </details>

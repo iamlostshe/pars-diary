@@ -1,12 +1,12 @@
 """Собирает все роутеры воедино.
 
-- Публичные комманды (в меню)
+- Публичные команды (в меню)
     - /about - О проекте
     - /notify - Настройка уведомлений
-    - /base_commands - Основные комманды (marks, i_marks, hw, me, ch, events, birthdays)
+    - /base_commands - Основные команда (marks, i_marks, hw, me, ch, events, birthdays)
     - /chatgpt - Нейросеть для помощи в учёбе
 
-- Приватные комманды (нет в меню)
+- Приватные команды (нет в меню)
     - /admin - Админка
     - /new - Авторизация в боте
     - /keyboard - Клавиатуры и кнопки
@@ -14,7 +14,7 @@
 """
 
 # Импортируем все обработчики
-from handlers import (
+from pars_diary.handlers import (
     about,
     admin,
     base_commands,
@@ -26,7 +26,7 @@ from handlers import (
     start,
 )
 
-routers = (
+ROUTERS = (
     about.router,
     notify.router,
     base_commands.router,

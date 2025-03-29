@@ -1,7 +1,5 @@
 """Билдеры демонстрационных сообщений."""
 
-from __future__ import annotations
-
 import functools
 import operator
 from urllib.parse import quote

@@ -1,10 +1,8 @@
 """Билдеры клавиатур."""
 
-from __future__ import annotations
-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from utils.pars import get_regions
+from pars_diary.utils.pars import get_regions
 
 
 def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:

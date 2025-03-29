@@ -6,7 +6,7 @@
 import aiohttp
 from loguru import logger
 
-from utils.load_env import HF_TOKEN
+from pars_diary.utils.load_env import HF_TOKEN
 
 
 async def ask_gpt(prompt: str, firstname: str) -> str:

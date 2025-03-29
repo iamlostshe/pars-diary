@@ -23,7 +23,18 @@ ignore = [
     "RUF002",
     "RUF003",
 
+    # We use modern python
+    "FA",
+    "COM812",
+    "D203",
+    "D213",
+
     # TODO (need issue link; )
     "TD003",
     "FIX002",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
 ]

@@ -5,8 +5,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from loguru import logger
 
-from utils.db import add_user_cookie, counter
-from utils.messages import error
+from pars_diary.utils.db import add_user_cookie, counter
+from pars_diary.utils.messages import error
 
 router = Router(name=__name__)
 

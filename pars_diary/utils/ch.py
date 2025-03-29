@@ -1,7 +1,5 @@
 """Работа с классными часами."""
 
-from __future__ import annotations
-
 import datetime as dt
 
 from conversations_about_important_api import CAIParser
@@ -26,6 +24,7 @@ def get_next_date(minus_week: int | None = None) -> str:
 
     # Переводим дату в строку и возвращаем её
     return now.strftime("%d-%m-%Y")
+
 
 def ch() -> str:
     """Информация о классных часах."""

@@ -13,8 +13,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from loguru import logger
 
-from utils.db import counter
-from utils.messages import about, error
+from pars_diary.utils.db import counter
+from pars_diary.utils.messages import about, error
 
 router = Router(name=__name__)
 
