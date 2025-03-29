@@ -2,7 +2,6 @@
 
 from aiogram import Router
 from aiogram.types import Message
-from loguru import logger
 
 from pars_diary.utils.db import add_user, get_cookie
 from pars_diary.utils.keyboards import not_auth_keyboard, reg_0
@@ -18,8 +17,6 @@ async def command_start_handler(msg: Message) -> None:
     Команды /start, /help, любое другое сообщение.
     Если предыдущие обработчики не сработали.
     """
-    logger.debug("[m] {}", msg.text)
-
     # Если пользователь зарегистрирован (если не пустой ответ)
     if get_cookie(msg.from_user.id):
         # Отвечаем пользователю

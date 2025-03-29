@@ -10,7 +10,6 @@
 
 from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from loguru import logger
 
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
@@ -24,8 +23,6 @@ router = Router(name=__name__)
 @router.callback_query()
 async def callback(call: CallbackQuery) -> None:
     """Отвечает за все callback кнопки."""
-    logger.debug("[c] {}", call.data)
-
     # Изменение состояния уведомлений
     if "n_n" in call.data:
         # Меняем состояние и создаем клавиатуру

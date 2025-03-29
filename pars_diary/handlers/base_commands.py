@@ -11,9 +11,8 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from loguru import logger
 
-from pars_diary.utils.db import counter, get_cookie
+from pars_diary.utils.db import get_cookie
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
@@ -31,10 +30,6 @@ router = Router(name="Base commands")
 )
 async def simple_msg(msg: Message) -> None:
     """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
-    logger.debug("[m] {}", msg.text)
-    counter(msg.from_user.id, msg.text.split()[0][1:])
-
-    # Получаем user_id пользователя
     user_id = msg.from_user.id
 
     # Проверяем зарегистрирован ли пользователь

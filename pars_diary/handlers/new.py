@@ -3,9 +3,8 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from loguru import logger
 
-from pars_diary.utils.db import add_user_cookie, counter
+from pars_diary.utils.db import add_user_cookie
 
 router = Router(name="Register user")
 
@@ -13,9 +12,6 @@ router = Router(name="Register user")
 @router.message(Command("new"))
 async def new_msg(msg: Message) -> None:
     """Вход в новую учебную запись."""
-    logger.debug("[m] {}", msg.text)
-    counter(msg.from_user.id, msg.text.split()[0][1:])
-
     # Если пользователь не передал куки
     if msg.text == "/new":
         await msg.answer('Команда работает так - "/new sessionid=xxx..."')

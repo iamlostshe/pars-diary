@@ -5,10 +5,8 @@ from secrets import choice
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from loguru import logger
 
 from pars_diary.utils.ask_gpt import ask_gpt
-from pars_diary.utils.db import counter
 
 router = Router(name=__name__)
 
@@ -30,9 +28,6 @@ async def lessons_msg(msg: Message) -> None:
         "Напиши вступление проекта о создании telegram бота",
         "Что такое функциональная грамотность?",
     ]
-
-    logger.debug("[m] {}", msg.text)
-    counter(msg.from_user.id, msg.text.split()[0][1:])
 
     if msg.text == "/chatgpt":
         await msg.answer(

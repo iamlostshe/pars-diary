@@ -1,11 +1,14 @@
 """Main module to start telegram-bot."""
 
+from collections.abc import Awaitable
+from typing import Any, Callable
+
 from aiogram import Bot, Dispatcher
-from aiogram.types import ErrorEvent
+from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from loguru import logger
 
 from pars_diary.handlers import ROUTERS
-from pars_diary.utils.db import check_db
+from pars_diary.utils.db import check_db, counter
 from pars_diary.utils.load_env import TOKEN
 from pars_diary.utils.messages import error
 
@@ -16,6 +19,25 @@ dp = Dispatcher()
 
 # Корневые обработчики
 # ====================
+
+
+@dp.message.middleware()
+@dp.callback_query.middleware()
+async def game_middleware(
+    handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
+    event: Update,
+    data: dict[str, Any],
+) -> Callable[[Update, dict[str, Any]], Awaitable[Any]]:
+    """Логирование для сообщений и подсчёт использованных команд."""
+    if isinstance(event, CallbackQuery):
+        logger.info("[c] {}", event.callback_query.data)
+    elif isinstance(event, Message):
+        logger.debug("[m] {}", event.message.text)
+        counter(event.message.from_user.id, event.message.text.split()[0][1:])
+    else:
+        logger.warning("Unprocessed event {}", type(event))
+
+    return await handler(event, data)
 
 
 @dp.errors()
