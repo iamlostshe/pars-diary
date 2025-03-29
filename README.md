@@ -3,31 +3,23 @@
 Проект для упрощения жизни школьников.
 
 Бот запущен и вы можете пользоваться им здесь:
+[@pars_diary_bot](https://t.me/pars_diary_bot)
 
-https://t.me/pars_diary_bot
+## Установка / Installation
 
-### Установка / Installation
-
-1. **Клонируем репозиторий:**
+1. Клонируем репозиторий:
 
 ``` bash
 git clone https://github.com/iamlostshe/PARS-DIARY
-```
-
-2. **Переходим в дирректорию с проектом:**
-
-``` bash
 cd PARS-DIARY
 ```
 
-3. **Заполняем поля в `.env.dist` и переименовываем его в `.env`**
+2. копируем `.env.dist` в `.env` и заполняем поля.
 
-4. **Устанавливаем зависимости и запускаем бота:**
+3. **Устанавливаем зависимости** и запускаем бота:
 
 <details>
-<summary>
-Через uv (рекомендуется)
-</summary>
+<summary>Через uv (рекомендуется)</summary>
 
 **Устанавливаем `uv` (если еще не установлен):**
 
@@ -52,38 +44,36 @@ uv run bot.py
 </details>
 
 <details>
-<summary>
-Через `requirements.txt`
-</summary>
+<summary>Через venv + `requirements.txt`</summary>
 
 **Создаём виртуальное окружение:**
 
 ``` bash
-python3 -m venv venv
+python -m venv .venv
 ```
 
 **Активируем виртуальное окружение:**
 
 ``` bash
-. venv/bin/activate
+. .venv/bin/activate
 ```
 
 > Последняя команда для Windows:
 >
 > ``` bash
-> venv\Scripts\activate
+> .venv\Scripts\activate
 > ```
 
 **Устанавливаем зависимости:**
 
 ``` bash
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 **Запускаем бота:**
 
 ``` bash
-python3 bot.py
+python bot.py
 ```
 
 </details>
