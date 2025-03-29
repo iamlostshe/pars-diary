@@ -14,6 +14,8 @@ from utils import demo_data
 from utils.ask_gpt import ask_gpt
 from utils.exceptions import DayIndexError
 from utils.pars import minify_lesson_title, request
+from utils.typing import UserId, HomeworkIndex
+from models import WeekHomework, DayHomework, Homework
 
 SPACES_AFTER_SUBJECT = 10
 
@@ -31,46 +33,45 @@ DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 
 # Вспомогательные функции
-def get_hw(data: str | int) -> str:
+def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
+    week_data = WeekHomework()
+    for day_data in data[:6]:
+        day = DayHomework(
+            date=datetime.strptime(day_data["date"], "%Y-%m-%d").date(),
+            homeworks=[
+                Homework(
+                    discipline=hw["discipline"],
+                    homework=hw["homework"]
+                ) for hw in day_data["homeworks"]
+            ]
+        )
+        week_data.days.append(day)
+
     inline_keyboards = []
     result = []
 
-    # Проходимся по всем дням недели (кроме воскресенья)
-    for day in range(6):
-        # Задаём пустой счетчик
+    for day_index, day in enumerate(week_data.days):
         count = 1
-
-        # Получаем данные по дню
-        day_hw = data[day]["homeworks"]
-
-        # Приводим дату к более верному формату
-        date = data[day]["date"].split("-")
-        date = ".".join(date[::-1])
-
-        # Добавляем пояснение
-        msg_text = f"Д/З на {date} {DAYS[day]}\n\n"
+        date_str = day.date.strftime("%d.%m.%Y")
+        msg_text = f"Д/З на {date_str} {DAYS[day_index]}\n\n"
         inline_keyboard = []
 
-        # Обрабатываем данные
-        if day_hw != []:
-            for i in day_hw:
-                subject = minify_lesson_title(i["discipline"])
+        if day.homeworks:
+            for hw in day.homeworks:
+                subject = minify_lesson_title(hw.discipline)
+                subject = subject.ljust(SPACES_AFTER_SUBJECT)
+                msg_text += f"{count}. {subject} │ {hw.homework}\n"
 
-                while len(subject) < SPACES_AFTER_SUBJECT:
-                    subject += " "
-
-                msg_text += f"{count}. {subject} │ {i['homework']}\n"
-
-                if i.get("homework"):
-                    link = quote(f"ГДЗ {i['discipline']}: {i['homework']}")
+                if hw.homework:
+                    link = quote(f"ГДЗ {hw.discipline}: {hw.homework}")
                     google_url = f"https://www.google.com/search?q={link}"
-                    ask_gpt_text = f"chatgpt_{day}_{count - 1}"
+                    ask_gpt_text = f"chatgpt_{day_index}_{count - 1}"
 
                     inline_keyboard.append(
                         [
                             InlineKeyboardButton(
-                                text=f"{DAYS_SHORT[day]} {subject.strip()}",
+                                text=f"{DAYS_SHORT[day_index]} {subject.strip()}",
                                 callback_data="None",
                             ),
                             InlineKeyboardButton(
@@ -90,7 +91,7 @@ def get_hw(data: str | int) -> str:
     return result, inline_keyboards
 
 
-async def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
+async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
     """Функция для формирования запроса к GPT."""
     day = int(index.split("_")[1])
     subject_num = int(index.split("_")[2])
@@ -110,7 +111,7 @@ async def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
 
 
 # Основная функция
-def hw(user_id: str | int, index: str | int) -> str | tuple:
+def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup] | str:
     """Функция для парсинга Д/З.
 
     | index | функция                         |
