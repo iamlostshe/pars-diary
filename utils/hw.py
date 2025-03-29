@@ -90,7 +90,7 @@ def get_hw(data: str | int) -> str:
     return result, inline_keyboards
 
 
-def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
+async def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
     """Функция для формирования запроса к GPT."""
     day = int(index.split("_")[1])
     subject_num = int(index.split("_")[2])
@@ -103,7 +103,7 @@ def chatgpt(user_id: str | int, index: str, firstname: str) -> str:
     hwhw = day_hw[subject_num]["homework"]
     subject_name = day_hw[subject_num]["discipline"]
 
-    return ask_gpt(
+    return await ask_gpt(
         f"Помоги мне с решением домашнего задания по {subject_name}: {hwhw}",
         firstname,
     )

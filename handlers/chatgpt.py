@@ -47,7 +47,7 @@ async def lessons_msg(msg: Message) -> None:
             )
         else:
             # TODO @iamlostshe: answer_msg = await msg.answer('ChatGPT думает...')
-            send_text = ask_gpt(
+            send_text = await ask_gpt(
                 " ".join(msg.text.split()[1:]),
                 msg.from_user.first_name,
             )
