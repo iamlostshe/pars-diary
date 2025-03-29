@@ -2,13 +2,10 @@
 __pycache__
 venv
 .venv
+uv.lock
 
 # Logs
 *.log
-
-# uv
-uv.lock
-.env
 
 # IDE
 .idea/
@@ -20,3 +17,4 @@ docs/.obsidian
 # PARS-DIARI
 users.json
 stat_img.png
+.env
