@@ -15,6 +15,7 @@ from utils.db import DB_NAME
 from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
 from utils.load_env import TOKEN
 from utils.pars import Pars
+from models import User
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1
@@ -22,6 +23,7 @@ NOTIFY_DURATION = 1
 # Задержка между умными уведомлениями (в часах, целое число)
 SMART_NOTIFY_DURATION = 24
 
+UserId = int | str  #  Но лучше привести все id к одному из типов!
 
 async def send_notify(bot: Bot, smart: bool | None = False) -> None:
     """Асинхронная функция для обновления оценок."""
@@ -31,18 +33,20 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
             data = json.load(f)
 
             # Проходимся по всем пользователям
-            for user in data:
+            for user_id in data:
+                user = User(**data[user_id])
                 # Проверяем указаны ли у пользователя cookie
-                if data[user].get("cookie") not in [None, "demo"]:
+                if user.cookie not in [None, "demo"]:
                     # Получаем новые оценки
                     pars = Pars()
-                    new_data = pars.marks(user).split("\n")[3:-1]
+                    new_data = pars.marks(user_id).split("\n")[3:-1]
 
                     # Получаем старые оценки
-                    old_data = db.get_marks(user)
+                    old_data = db.get_marks(user_id)
 
                     # Регестрируем изменения
-                    data[user]["notify_marks"] = new_data
+                    user.notify_marks = new_data
+                    data[user_id] = vars(user)
 
                     # Записываем изменения в файл
                     f.seek(0)
@@ -50,14 +54,14 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
                     json.dump(data, f, indent=4, ensure_ascii=False)
 
                     # Если у пользователя включены уведомления
-                    if data[user].get("notify"):
+                    if user.notify:
                         # Проверяем уведомления
-                        await check_notify(user, new_data, old_data)
+                        await check_notify(user_id, new_data, old_data)
 
                     # Если нужно отправить умное уведомление
                     # и у пользователя включены умные уведомления
-                    if smart and data[user].get("smart_notify"):
-                        await check_smart_notify(user, new_data)
+                    if smart and user.smart_notify:
+                        await check_smart_notify(user_id, new_data)
 
     except KeyError as e:
         logger.error(UserNotFoundError(e))
@@ -72,10 +76,10 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
         await bot.session.close()
 
 
-async def check_notify(user: str | int, new_data: dict, old_data: dict) -> None:
+async def check_notify(user_id: UserId, new_data: dict, old_data: dict) -> None:
     """Проверка наличия уведомлений об изменении оценок."""
     # Выводим лог в консоль
-    logger.debug(f"Проверяю пользователя {user} на наличие изменённых оценок")
+    logger.debug(f"Проверяю пользователя {user_id} на наличие изменённых оценок")
 
     # Пустая переменная для сообщения
     msg_text = []
@@ -123,10 +127,10 @@ async def check_notify(user: str | int, new_data: dict, old_data: dict) -> None:
             "У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>"
             f"{'\n'.join(msg_text)}</pre>"
         )
-        await bot.send_message(user, msg_text, parse_mode="HTML")
+        await bot.send_message(user_id, msg_text, parse_mode="HTML")
 
 
-async def check_smart_notify(user: str | int, new_data: dict) -> None:
+async def check_smart_notify(user: UserId, new_data: dict) -> None:
     """Проверка наличия умных уведомлений."""
     # Выводим лог в консоль
     logger.debug(f"Проверяю пользователя {user} на наличие умных уведомлений")
