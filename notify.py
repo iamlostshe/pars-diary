@@ -15,6 +15,7 @@ from utils.db import DB_NAME
 from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
 from utils.load_env import TOKEN
 from utils.pars import Pars
+from utils.typing import UserId
 from models import User
 
 # Задержка между обычными уведомлениями (в часах, целое число)
@@ -23,9 +24,7 @@ NOTIFY_DURATION = 1
 # Задержка между умными уведомлениями (в часах, целое число)
 SMART_NOTIFY_DURATION = 24
 
-UserId = int | str  #  Но лучше привести все id к одному из типов!
-
-async def send_notify(bot: Bot, smart: bool | None = False) -> None:
+async def send_notify(bot: Bot, smart: bool = False) -> None:
     """Асинхронная функция для обновления оценок."""
     try:
         # Открываем файл для чтения и записи
@@ -46,7 +45,7 @@ async def send_notify(bot: Bot, smart: bool | None = False) -> None:
 
                     # Регестрируем изменения
                     user.notify_marks = new_data
-                    data[user_id] = vars(user)
+                    data[user]["notify_marks"] = new_data
 
                     # Записываем изменения в файл
                     f.seek(0)
@@ -130,10 +129,10 @@ async def check_notify(user_id: UserId, new_data: dict, old_data: dict) -> None:
         await bot.send_message(user_id, msg_text, parse_mode="HTML")
 
 
-async def check_smart_notify(user: UserId, new_data: dict) -> None:
+async def check_smart_notify(user_id: UserId, new_data: dict) -> None:
     """Проверка наличия умных уведомлений."""
     # Выводим лог в консоль
-    logger.debug(f"Проверяю пользователя {user} на наличие умных уведомлений")
+    logger.debug(f"Проверяю пользователя {user_id} на наличие умных уведомлений")
 
     # Задаём переменные под сообщение и спорные оценки
     msg_text = ""
@@ -172,7 +171,7 @@ async def check_smart_notify(user: UserId, new_data: dict) -> None:
         msg_text += "\nУправление уведомлениями -> /notify"
 
         # Отправляем ответ пользователю
-        await bot.send_message(user, msg_text, parse_mode="HTML")
+        await bot.send_message(user_id, msg_text, parse_mode="HTML")
 
 
 # Инициализируем бота
