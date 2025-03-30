@@ -2,7 +2,6 @@
 
 - /marks - Оценки
 - /i_marks - Итоговые оценки
-- /hw - Домашнее задание
 - /me - Данные о пользователе
 - /events - Ивенты
 - /birthdays - Дни рождения
@@ -15,7 +14,6 @@ from aiogram.types import Message
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import not_auth
 from pars_diary.utils.db import get_cookie
-from pars_diary.utils.hw import hw
 from pars_diary.utils.pars import Pars
 
 router = Router(name="Base commands")
@@ -25,11 +23,11 @@ router = Router(name="Base commands")
 # TODO @milinuri: Я кусаться буду, что за беспредел в командах?
 @router.message(
     Command(
-        commands=["marks", "i_marks", "hw", "me", "events", "birthdays"],
+        commands=["marks", "i_marks", "me", "events", "birthdays"],
     ),
 )
 async def simple_msg(msg: Message) -> None:
-    """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
+    """Отвечает за /marks, /i_marks, /me, /events, /birthdays."""
     user_id = msg.from_user.id
 
     # Проверяем зарегистрирован ли пользователь
@@ -51,7 +49,6 @@ async def simple_msg(msg: Message) -> None:
         "/birthdays": pars.birthdays,
         "/i_marks": pars.i_marks,
         "/marks": pars.marks,
-        "/hw": lambda user_id: hw(user_id, "t"),
     }
 
     # Создаем ответ

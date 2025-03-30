@@ -19,6 +19,7 @@ class Config(BaseSettings):
     admins: list[str]
     git_url: str
     hf_token: str
+    demo_mode: bool
 
 
 config: Config = Config(_env_file=".env")

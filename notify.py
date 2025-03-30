@@ -2,13 +2,13 @@
 
 import asyncio
 import json
+from dataclasses import dataclass
 from itertools import zip_longest
 
 from aiogram import Bot
 from loguru import logger
 
 from pars_diary.config import config
-from pars_diary.models import User
 from pars_diary.parser.exceptions import (
     DBFileNotFoundError,
     DiaryParserError,
@@ -20,6 +20,17 @@ from pars_diary.utils.pars import Pars
 
 # Константы
 # =========
+
+
+@dataclass
+class User:
+    """Пользователь."""
+
+    cookie: str | None = None
+    notify: bool = False
+    smart_notify: bool = False
+    notify_marks: list[str] | None = None
+
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1

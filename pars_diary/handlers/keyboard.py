@@ -16,7 +16,6 @@ from aiogram.types import (
 )
 
 from pars_diary.utils import db
-from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
 
 router = Router(name=__name__)
 
@@ -81,35 +80,3 @@ async def callback(call: CallbackQuery) -> None:
             ),
             reply_markup=markup,
         )
-
-    # Домашнее задание
-    elif "hw" in call.data:
-        if call.data == "hw_days":
-            result = []
-            for n, day in enumerate(DAYS_SHORT[:-1]):
-                result.append(
-                    InlineKeyboardButton(text=day, callback_data=f"hw_{n}"),
-                )
-
-            markup = InlineKeyboardMarkup(inline_keyboard=[result])
-
-            await call.message.edit_text(
-                "Выбери день недели:", reply_markup=markup
-            )
-
-        else:
-            index = call.data.replace("hw_", "")
-            answer = hw(call.from_user.id, index)
-
-            await call.message.edit_text(
-                answer[0],
-                reply_markup=answer[1],
-            )
-
-    # Нейросеть для помощи в учебе
-    elif "chatgpt" in call.data:
-        await call.message.edit_text("Chatgpt думает...")
-        send_text = chatgpt(
-            call.from_user.id, call.data, call.from_user.first_name
-        )
-        await call.message.edit_text(send_text)
