@@ -1,15 +1,15 @@
 """Управление уведомлениями.
 
-- Вкл./Откл. уведомлений
-- Вкл./Откл. умных уведомлений
+- Вкл./Отключить. уведомлений
+- Вкл./Отключить. умных уведомлений
 """
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
+from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.utils.db import get_cookie, get_notify
-from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
 
 router = Router(name="Notify settings")
@@ -89,9 +89,9 @@ async def lessons_msg(msg: Message) -> None:
         )
 
     else:
-        # Выводим сообщение о необходимости регестрации и клавиатуру
+        # Выводим сообщение о необходимости регистрации и клавиатуру
         await msg.answer(
             not_auth(msg.from_user.language_code),
             "HTML",
-            reply_markup=not_auth_keyboard(msg.from_user.language_code),
+            reply_markup=not_auth_keyboard(),
         )

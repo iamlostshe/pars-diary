@@ -46,13 +46,13 @@ uv run python -m pars_diary
 <details>
 <summary>Через venv + `requirements.txt`</summary>
 
-**Создаём виртуальное окружение:**
+**Создаём виртуальное окружение**:
 
 ``` bash
 python -m venv .venv
 ```
 
-**Активируем виртуальное окружение:**
+**Активируем виртуальное окружение**:
 
 ``` bash
 . .venv/bin/activate
@@ -64,19 +64,31 @@ python -m venv .venv
 > .venv\Scripts\activate
 > ```
 
-**Устанавливаем зависимости:**
+**Устанавливаем зависимости**:
 
 ``` bash
 pip install -r requirements.txt
 ```
 
-**Запускаем бота:**
+**Компилируем перевод**:
+
+```bash
+pybabel compile -d locales -D messages
+```
+
+**Запускаем бота**:
 
 ``` bash
 python -m pars_diary
 ```
 
 </details>
+
+## Перевод
+Бот может работать на нескольких языках.
+
+Чтобы добавить перевод на др
+
 
 ## Поддержка / Contribute
 

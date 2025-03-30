@@ -1,20 +1,37 @@
 [project]
 name = "pars-diary"
-version = "0.1.1"
-description = "Проект для улучшения успеваемости учеников, путем внедрения современных технологий."
+version = "1.0.0"
+description = "Бот для улучшения успеваемости учеников, путем внедрения современных технологий."
 authors = [{ name = "Ivan Melcikov", email = "vanamelcikov7275@gmail.com" }]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.11"
+
 
 dependencies = [
     "matplotlib>=3.10.0, <4.0",
     "gradio_client>=1.3.0, <2.0",
     "loguru>=0.7.3, <0.8",
-    "aiogram>=3.19.0, <4.0",
+    "aiogram[i18n]>=3.19.0,<4.0",
     "python-dotenv>=1.1.0, < 2.0",
     "conversations-about-important-api==0.1.0",
     "pydantic-settings>=2.8.1",
 ]
+
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+]
+
+# Configure Ruff -------------------------------------------------------
+
+[tool.ruff]
+line-length = 80
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -35,7 +52,8 @@ ignore = [
     "FIX002",
 ]
 
-[dependency-groups]
-dev = [
-    "mypy>=1.15.0",
-]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

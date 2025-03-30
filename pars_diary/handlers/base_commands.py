@@ -12,9 +12,9 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.utils.db import get_cookie
 from pars_diary.utils.hw import hw
-from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
 from pars_diary.utils.pars import Pars
 

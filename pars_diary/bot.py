@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
+from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from loguru import logger
 
 from pars_diary.config import config
@@ -69,6 +70,10 @@ async def main() -> None:
 
     # Checking for the existence database
     check_db()
+
+    logger.info("Setup I18n context")
+    i18n = I18n(path="locales", default_locale="ru", domain="messages")
+    dp.message.middleware(SimpleI18nMiddleware(i18n))
 
     bot = Bot(token=config.telegram_token)
     # Connect handlers

@@ -11,9 +11,9 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
+from pars_diary.keyboards import reg_1, reg_2
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
-from pars_diary.utils.keyboards import reg_1, reg_2
 from pars_diary.utils.messages import registration_1, registration_2
 
 router = Router(name=__name__)
