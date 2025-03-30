@@ -14,7 +14,7 @@ from pars_diary.parser.exceptions import (
     UserNotAuthenticatedError,
     ValidationError,
 )
-from pars_diary.utils import demo_data
+from pars_diary.services import demo
 
 # Ссылка на страницу со ссылками на все сервера дневников в разных регионах
 AGGREGATOR_URL = "http://aggregator-obr.bars-open.ru/my_diary"
@@ -29,34 +29,29 @@ COLOR_MARKERS = ["🟥", "🟥", "🟥", "🟧", "🟨", "🟩"]
 # Вспомогательные функции
 def get_regions() -> dict:
     """Получаем все доступные регионы."""
-    try:
-        r = requests.get(AGGREGATOR_URL, timeout=20)
+    r = requests.get(AGGREGATOR_URL, timeout=20)
 
-        # Проверяем какой статус-код вернул сервер
-        if r.status_code != 200:
-            raise UnexpectedStatusCodeError(r.status_code)
+    # Проверяем какой статус-код вернул сервер
+    if r.status_code != 200:  # noqa: PLR2004
+        raise UnexpectedStatusCodeError(r.status_code) from None
 
-        data = r.json()
-        result = {}
+    data = r.json()
+    result = {}
 
-        if data.get("success") and data.get("data"):
-            for region in r.json()["data"]:
-                name = region.get("name")
-                url = region.get("url")
-                if name and url:
-                    if url[-1] == "/":
-                        url = url[:-1]
-                    result[name] = url
-                else:
-                    # TODO @iamlostshe: Сделать специальное исключение
-                    raise UnexpectedStatusCodeError(data.get("success"))
-            return result
-        # TODO @iamlostshe: Сделать специальное исключение
-        raise UnexpectedStatusCodeError(data.get("success"))
-
-    # Обработка ошибок
-    except Exception as e:
-        raise DiaryParserError(e) from e
+    if data.get("success") and data.get("data"):
+        for region in r.json()["data"]:
+            name = region.get("name")
+            url = region.get("url")
+            if name and url:
+                if url[-1] == "/":
+                    url = url[:-1]
+                result[name] = url
+            else:
+                # TODO @iamlostshe: Сделать специальное исключение
+                raise UnexpectedStatusCodeError(data.get("success"))
+        return result
+    # TODO @iamlostshe: Сделать специальное исключение
+    raise UnexpectedStatusCodeError(data.get("success"))
 
 
 def request(
@@ -189,11 +184,11 @@ class Pars:
 
     def me(self, user_id: str | int) -> str:
         """Информация о пользователе."""
-        url = "/api/ProfileService/GetPersonData"
-        data = request(url, user_id)
+        data = request("/api/ProfileService/GetPersonData", user_id)
 
+        # TODO @milinuri: Красивое получение демо данных, а не как сейчас
         if data == "demo":
-            return demo_data.me()
+            return demo.me()
 
         if not data.get("children_persons"):
             # Logged in on children account
@@ -233,15 +228,16 @@ class Pars:
         return msg_text
 
     def events(self, user_id: str | int) -> str:
-        """Информация о ивентах."""
+        """Информация о событиях."""
         url = "/api/WidgetService/getEvents"
         data = request(url, user_id)
 
+        # TODO @milinuri: Красивое получение демо данных, а не как сейчас
         if data == "demo":
-            return demo_data.events()
+            data = []
 
-        if not data:
-            return "Кажется, ивентов не намечается)"
+        if len(data) == 0:
+            return "Кажется, событий не намечается)"
 
         return f"{data}"
 
@@ -251,9 +247,9 @@ class Pars:
         data = request(url, user_id)
 
         if data == "demo":
-            return demo_data.birthdays()
+            data = []
 
-        if not data:
+        if len(data) == 0:
             return "Кажется, дней рождений не намечается)"
 
         return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
@@ -266,7 +262,7 @@ class Pars:
         data = request(url, user_id)
 
         if data == "demo":
-            return demo_data.marks()
+            return demo.marks()
 
         if not data.get("discipline_marks"):
             return (
@@ -318,7 +314,7 @@ class Pars:
         data = request(url, user_id)
 
         if data == "demo":
-            return demo_data.i_marks()
+            return demo.i_marks()
 
         if not data.get("discipline_marks"):
             return (

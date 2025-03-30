@@ -9,6 +9,7 @@ from urllib.parse import quote
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from pars_diary.config import TIMEZONE
+from pars_diary.services import demo
 from pars_diary.services.ask_gpt import ask_gpt
 from pars_diary.utils.pars import minify_lesson_title, request
 
@@ -165,13 +166,19 @@ class HomeworkResult:
 class Homework:
     """Домашние задания."""
 
-    def __init__(self, user_id: int) -> None:
+    def __init__(self, user_id: int, demo_mode: bool | None = False) -> None:
         self.user_id = user_id
-        self.homework_data = request(
-            f"/api/HomeworkService/GetHomeworkFromRange?date={_get_normalized_date()}",
-            self.user_id,
-        )
-        self.homework = get_hw(self.homework_data)
+
+        # TODO @milinuri: Тут бы глобальные функции сделать
+        # TODO @milinuri: Подключить к общей БД пользователя
+        if demo_mode:
+            self.homework = demo.hw()
+        else:
+            self.homework_data = request(
+                f"/api/HomeworkService/GetHomeworkFromRange?date={_get_normalized_date()}",
+                self.user_id,
+            )
+            self.homework = get_hw(self.homework_data)
 
     def _to_result(
         self, message: str, markup: list[list[InlineKeyboardButton]]

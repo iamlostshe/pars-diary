@@ -1,4 +1,7 @@
-"""Билдеры демонстрационных сообщений."""
+"""Предоставляет демонстрационные сообщения и данные.
+
+Посмотреть как работает проект, без обращения к API.
+"""
 
 import functools
 import operator
@@ -6,10 +9,16 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+# Вспомогательные функции
+# =======================
+
 
 def google_link_gen(word: str) -> str:
     """Создает ссылку поиска в google."""
     return f"https://www.google.com/search?q={quote(word)}"
+
+
+# пользователь
 
 
 def me() -> str:
@@ -28,21 +37,6 @@ def me() -> str:
         'Школа - МБОУ "СОШ № 9"\n'
         "Класс - 10 А\n"
     )
-
-
-def ch() -> str:
-    """Демонстрационная информация о классных часах."""
-    return "Информация о классных часах отсутсвует"
-
-
-def events() -> str:
-    """Демонстрационное сообщение об ивентах."""
-    return "Кажется, ивентов не намечается)"
-
-
-def birthdays() -> str:
-    """Демонстрационное сообщение о днях рождения."""
-    return "Кажется, дней рождений не намечается)"
 
 
 def marks() -> str:
@@ -96,7 +90,7 @@ def i_marks() -> str:
     )
 
 
-def hw(index: str | int) -> str:
+def hw() -> str:
     """Демонстрационное сообщение о домашнем задании."""
     hw_text = [
         ("Д/З на 04.11.2024 понедельник\n\nНа этот день не указано д/з"),
@@ -322,53 +316,4 @@ def hw(index: str | int) -> str:
         ],
     ]
 
-    if index == "t":
-        text = hw_text[4]
-        keyboard = hw_keyboard[4]
-
-        keyboard.append(
-            [InlineKeyboardButton(text="На неделю", callback_data="hw_w")]
-        )
-
-    elif index == "w":
-        text = "\n\n".join("".join(map(str, hw)) for hw in hw_text)
-        keyboard = functools.reduce(operator.iadd, hw_keyboard, [])
-
-        keyboard.append(
-            [
-                InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
-            ],
-        )
-
-    else:
-        index = int(index)
-
-        text = hw_text[index]
-        keyboard = hw_keyboard[index]
-
-        keyboard.append(
-            [
-                InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
-                InlineKeyboardButton(text="На неделю", callback_data="hw_w"),
-            ],
-        )
-
-    keyboard.append(
-        [
-            InlineKeyboardButton(text="Дни недели", callback_data="hw_days"),
-        ],
-    )
-
-    markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
-
-    text = (
-        f"<pre>{''.join(text)}"
-        "</pre>\n\n"
-        "Д/З МОЖЕТ БЫТЬ НЕ АКТУАЛЬНЫМ!!!\n\n"
-        "Его указывают (зачастую не указывают) "
-        "учителя и мы никак не можем повлиять на этот процесс.\n\n"
-        "Для получения актуального Д/З попросите вашего учителя указывать "
-        "его в дневнике)"
-    )
-
-    return text, markup
+    return hw_text, hw_keyboard
