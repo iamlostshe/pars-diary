@@ -7,14 +7,14 @@ import re
 import requests
 
 from pars_diary.loguru import logger
-from pars_diary.utils import demo_data
-from pars_diary.utils.exceptions import (
-    MyTimeoutError,
+from pars_diary.parser.exceptions import (
+    DiaryParserError,
+    ServerTimeoutError,
     UnexpectedStatusCodeError,
-    UnknownError,
     UserNotAuthenticatedError,
     ValidationError,
 )
+from pars_diary.utils import demo_data
 
 # Ссылка на страницу со ссылками на все сервера дневников в разных регионах
 AGGREGATOR_URL = "http://aggregator-obr.bars-open.ru/my_diary"
@@ -56,7 +56,7 @@ def get_regions() -> dict:
 
     # Обработка ошибок
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(e) from e
 
 
 def request(
@@ -111,11 +111,11 @@ def request(
 
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout as e:
-        raise MyTimeoutError from e
+        raise ServerTimeoutError from e
 
     # Обработка других ошибок
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(e) from e
 
 
 def check_cookie(

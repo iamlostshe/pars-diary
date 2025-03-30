@@ -9,15 +9,14 @@ from loguru import logger
 
 from pars_diary.config import config
 from pars_diary.models import User
-from pars_diary.utils import db
-from pars_diary.utils.db import DB_NAME
-from pars_diary.utils.exceptions import (
+from pars_diary.parser.exceptions import (
     DBFileNotFoundError,
-    UnknownError,
+    DiaryParserError,
     UserNotFoundError,
 )
+from pars_diary.utils import db
+from pars_diary.utils.db import DB_NAME
 from pars_diary.utils.pars import Pars
-from pars_diary.utils.typing import UserId
 
 # Константы
 # =========
@@ -65,7 +64,7 @@ async def update_users(bot: Bot, smart_notify: bool | None = False) -> None:  # 
 
 
 async def check_notify(
-    bot: Bot, user_id: UserId, new_grades: dict, old_grades: dict
+    bot: Bot, user_id: int, new_grades: dict, old_grades: dict
 ) -> None:
     """Проверяем изменения в оценках.
 
@@ -92,7 +91,7 @@ async def check_notify(
         await bot.send_message(user_id, msg_text, parse_mode="HTML")
 
 
-async def check_smart_notify(bot: Bot, user_id: UserId, new_grades: dict) -> None:
+async def check_smart_notify(bot: Bot, user_id: int, new_grades: dict) -> None:
     """Проверка наличия умных уведомлений."""
     logger.debug(f"Проверяю оценки для {user_id} по умному")
 
@@ -164,7 +163,7 @@ async def main() -> None:
             logger.error(DBFileNotFoundError(str(DB_NAME)))
 
         except Exception as e:  # noqa: BLE001
-            logger.error(UnknownError(e))
+            logger.error(DiaryParserError(str(e)))
 
         finally:
             await bot.session.close()

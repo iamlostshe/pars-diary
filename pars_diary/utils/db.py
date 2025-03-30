@@ -8,10 +8,10 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
-from pars_diary.utils.exceptions import (
+from pars_diary.parser.exceptions import (
     DBFileNotFoundError,
-    UnknownError,
-    UserNotAuthorizatedError,
+    DiaryParserError,
+    UserNotAuthorizedError,
     UserNotFoundError,
 )
 from pars_diary.utils.pars import check_cookie
@@ -62,7 +62,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def add_user_server_name(user_id: int | str, server_name: str) -> str:
@@ -92,7 +92,7 @@ def add_user_server_name(user_id: int | str, server_name: str) -> str:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def add_user_cookie(user_id: int | str, cookie: str) -> str:
@@ -133,7 +133,7 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def get_cookie(user_id: str | int) -> None | str | dict:
@@ -154,13 +154,13 @@ def get_cookie(user_id: str | int) -> None | str | dict:
 
     # Обработчики ошибок
     except KeyError as e:
-        raise UserNotAuthorizatedError from e
+        raise UserNotAuthorizedError from e
 
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
@@ -187,7 +187,7 @@ def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
@@ -227,7 +227,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def get_graph() -> None:
@@ -254,7 +254,7 @@ def get_graph() -> None:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 class GetStat:
@@ -321,7 +321,7 @@ class GetStat:
             raise DBFileNotFoundError(DB_NAME) from e
 
         except Exception as e:
-            raise UnknownError(e) from e
+            raise DiaryParserError(str(e)) from e
 
     def str_refer(self: Self) -> str:
         """Создаёт строковое представление источников прихода аудитории."""
@@ -364,7 +364,7 @@ def get_marks(user_id: str | int) -> dict | str:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def counter(user_id: str | int, counter_name: str) -> None:
@@ -401,7 +401,7 @@ def counter(user_id: str | int, counter_name: str) -> None:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e
 
 
 def get_server_name(user_id: int | str) -> str:
@@ -434,4 +434,4 @@ def get_server_name(user_id: int | str) -> str:
         raise DBFileNotFoundError(DB_NAME) from e
 
     except Exception as e:
-        raise UnknownError(e) from e
+        raise DiaryParserError(str(e)) from e

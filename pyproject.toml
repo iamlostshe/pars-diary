@@ -46,6 +46,7 @@ ignore = [
     "COM812",
     "D203",
     "D213",
+    "D107",
 
     # TODO (need issue link; )
     "TD003",
