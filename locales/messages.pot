@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-30 11:51+0400\n"
+"POT-Creation-Date: 2025-03-30 13:06+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,3 +24,20 @@ msgstr ""
 #: pars_diary/keyboards.py:30
 msgid "start"
 msgstr ""
+
+#: pars_diary/messages.py:51
+msgid "need auth for action"
+msgstr ""
+
+#: pars_diary/messages.py:90
+msgid "welcome, {first_name}! you need register."
+msgstr ""
+
+#: pars_diary/messages.py:95
+msgid "1. select_region"
+msgstr ""
+
+#: pars_diary/messages.py:100
+msgid "2. select cookie"
+msgstr ""
+

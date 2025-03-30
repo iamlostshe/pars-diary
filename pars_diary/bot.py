@@ -10,8 +10,8 @@ from loguru import logger
 
 from pars_diary.config import config, default
 from pars_diary.handlers import ROUTERS
+from pars_diary.messages import error_message
 from pars_diary.utils.db import check_db, counter
-from pars_diary.utils.messages import error
 
 # Константы
 # =========
@@ -55,9 +55,7 @@ async def catch_errors(event: ErrorEvent) -> None:
         message = None
 
     if message is not None:
-        await message.answer(
-            error(event.exception, message.from_user.language_code)
-        )
+        await message.answer(error_message(event.exception))
 
 
 # Главная функция

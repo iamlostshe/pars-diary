@@ -13,9 +13,9 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from pars_diary.keyboards import not_auth_keyboard
+from pars_diary.messages import not_auth
 from pars_diary.utils.db import get_cookie
 from pars_diary.utils.hw import hw
-from pars_diary.utils.messages import not_auth
 from pars_diary.utils.pars import Pars
 
 router = Router(name="Base commands")
@@ -36,7 +36,7 @@ async def simple_msg(msg: Message) -> None:
     if not get_cookie(user_id):
         # Выводим сообщение о необходимости регистрации и клавиатуру
         await msg.answer(
-            not_auth(msg.from_user.language_code),
+            not_auth(),
             reply_markup=not_auth_keyboard(msg.from_user.language_code),
         )
         return

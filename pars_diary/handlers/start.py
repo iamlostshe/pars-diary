@@ -4,8 +4,8 @@ from aiogram import Router
 from aiogram.types import Message
 
 from pars_diary.keyboards import not_auth_keyboard, reg_0
+from pars_diary.messages import registration_0, start_old_user
 from pars_diary.utils.db import add_user, get_cookie
-from pars_diary.utils.messages import registration_0, start_old_user
 
 router = Router(name="Message catcher")
 
@@ -21,9 +21,7 @@ async def command_start_handler(msg: Message) -> None:
     if get_cookie(msg.from_user.id):
         # Отвечаем пользователю
         await msg.answer(
-            start_old_user(
-                msg.from_user.first_name, msg.from_user.language_code
-            ),
+            start_old_user(msg.from_user.first_name),
             reply_markup=not_auth_keyboard(),
         )
 
@@ -31,10 +29,7 @@ async def command_start_handler(msg: Message) -> None:
     else:
         # Отвечаем пользователю
         await msg.answer(
-            registration_0(
-                msg.from_user.first_name, msg.from_user.language_code
-            ),
-            reply_markup=reg_0(),
+            registration_0(msg.from_user.first_name), reply_markup=reg_0()
         )
 
     # Получаем реферальные сведения

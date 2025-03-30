@@ -16,9 +16,9 @@ from aiogram.types import (
 )
 
 from pars_diary.keyboards import reg_1, reg_2
+from pars_diary.messages import registration_1, registration_2
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
-from pars_diary.utils.messages import registration_1, registration_2
 
 router = Router(name=__name__)
 
@@ -119,21 +119,11 @@ async def callback(call: CallbackQuery) -> None:
 
     # Регистрация в боте
     elif call.data == "reg_0":
-        await call.message.edit_text(
-            registration_1(
-                call.from_user.language_code,
-            ),
-            reply_markup=reg_1(),
-        )
+        await call.message.edit_text(registration_1(), reply_markup=reg_1())
 
     elif "reg_1_" in call.data:
         # Записываем server_name в бд
         server_name = "".join(call.data.split("_")[2:])
         db.add_user_server_name(call.from_user.id, server_name)
 
-        await call.message.edit_text(
-            registration_2(
-                call.from_user.language_code,
-            ),
-            reply_markup=reg_2(),
-        )
+        await call.message.edit_text(registration_2(), reply_markup=reg_2())

@@ -9,8 +9,8 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from pars_diary.keyboards import not_auth_keyboard
+from pars_diary.messages import not_auth
 from pars_diary.utils.db import get_cookie, get_notify
-from pars_diary.utils.messages import not_auth
 
 router = Router(name="Notify settings")
 
@@ -88,7 +88,4 @@ async def lessons_msg(msg: Message) -> None:
 
     else:
         # Выводим сообщение о необходимости регистрации и клавиатуру
-        await msg.answer(
-            not_auth(msg.from_user.language_code),
-            reply_markup=not_auth_keyboard(),
-        )
+        await msg.answer(not_auth(), reply_markup=not_auth_keyboard())
