@@ -4,7 +4,6 @@ import datetime
 import functools
 import operator
 from datetime import datetime as dt
-from typing import HomeworkIndex, UserId
 from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -92,7 +91,7 @@ def get_hw(
     return result, inline_keyboards
 
 
-async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
+async def chatgpt(user_id: int, index: str, firstname: str) -> str:
     """Функция для формирования запроса к GPT."""
     day = int(index.split("_")[1])
     subject_num = int(index.split("_")[2])
@@ -112,9 +111,7 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
 
 
 # Основная функция
-def hw(
-    user_id: UserId, index: HomeworkIndex
-) -> tuple[str, InlineKeyboardMarkup] | str:
+def hw(user_id: int, index: int) -> tuple[str, InlineKeyboardMarkup] | str:
     """Функция для получения Д/З.
 
     | index | функция                         |
