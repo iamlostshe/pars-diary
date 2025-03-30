@@ -35,7 +35,20 @@ Windows:
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**Запускаем:**
+
+**Устанавливаем зависимости**:
+
+``` bash
+uv sync
+```
+
+**Компилируем перевод**:
+
+```bash
+uv run pybabel compile -d locales -D messages
+```
+
+**Запускаем бота**:
 
 ```bash
 uv run python -m pars_diary
@@ -78,16 +91,36 @@ pybabel compile -d locales -D messages
 
 **Запускаем бота**:
 
-``` bash
-python -m pars_diary
-```
-
+``` bashpip install -r requirements.txt
 </details>
 
-## Перевод
+Для последующего запуска повторите шаги *активация виртуального окружения*
+(только для venv) и *запуск бота*.
+
+
+## Перевод / Translate
+
 Бот может работать на нескольких языках.
 
-Чтобы добавить перевод на др
+> Здесь будут примеры команд для `uv`.
+> В случае `venv`, просто убираем `uv run` из команды.
+
+Для начала извлекаем все переводимые строки:
+
+```sh
+uv run pybabel extract --input-dirs=. -o locales/messages.pot
+```
+
+Теперь, добавляем перевод для нужного языка. Например Русского (`ru`):
+
+```sh
+uv run pybabel init -i locales/messages.pot -d locales -D messages -l ru
+```
+
+Открываем файл `locales/ru/LC_MESSAGES/messages.po` и начинаем переводить
+все строки.
+
+Ну и наконец, компилируем полученный перевод:
 
 
 ## Поддержка / Contribute
