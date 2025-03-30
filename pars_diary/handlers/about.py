@@ -12,7 +12,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from pars_diary.messages import about
+from pars_diary.config import config
 
 router = Router(name="About bot")
 
@@ -20,4 +20,30 @@ router = Router(name="About bot")
 @router.message(Command("about"))
 async def about_bot(msg: Message) -> None:
     """Рассказывает о проекте."""
-    await msg.answer(about())
+    await msg.answer(
+        "<b>PARS-DIARY</b> - это проект с открытым исходным кодом, "
+        "направленный на улучшение успеваемости учеников "
+        "путем введения современных технологий.\n\n"
+        "Что отличает нас от конкурентов?\n\n"
+        "- <b>Бесплатно</b>\n"
+        "- <b>Открыто</b>\n"
+        "- <b>Безопасно</b>\n"
+        "- <b>Эффективно</b>\n"
+        "- <b>Есть функционал уведомлений</b>\n"
+        "- <b>Есть функционал умных уведомлений*</b>\n"
+        "- <b>Есть интеграции с AI и инструменты "
+        "для быстрого решения домашнего задания</b>\n\n\n"
+        "*<b>умные уведомления</b> - [в разработке] уникальная функция "
+        "для анализа оценок и простых уведомлений, например:\n\n"
+        "<blockquote>Спорная оценка по математике, "
+        "необходимо исправить, иначе может выйти 4!\n\n"
+        "Для настройки уведомлений используйте /notify\n"
+        "</blockquote>\n"
+        "или\n\n"
+        "<blockquote>Вам не хватает всего 0.25 балла до "
+        "оценки 5, стоит постараться!\n\n"
+        "Для настройки уведомлений используйте /notify\n"
+        "</blockquote>\n\n"
+        "Что-то сломалось? - пиши админу @iamlostshe\n\n"
+        f"<b>Исходный код</b>: {config.git_url}"
+    )
