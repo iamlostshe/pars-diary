@@ -96,9 +96,7 @@ class DBFileNotFoundError(Exception):
 
     def __init__(self, db_name: str) -> None:
         """Файл базы данных не найден."""
-        self.text = (
-            f"<b>Ошибка во время работы с базой данных:</b> Файл {db_name} не найден."
-        )
+        self.text = f"<b>Ошибка во время работы с базой данных:</b> Файл {db_name} не найден."
         super().__init__(self.text)
 
 
@@ -108,7 +106,9 @@ class DayIndexError(Exception):
 
     def __init__(self) -> None:
         """Неправильный индекс дня."""
-        self.text = "<b>Ошибка модуля работы с дз</b> Неправильно задан день недели"
+        self.text = (
+            "<b>Ошибка модуля работы с дз</b> Неправильно задан день недели"
+        )
 
 
 # ask_gpt.py

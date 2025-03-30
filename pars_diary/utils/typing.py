@@ -1,4 +1,4 @@
-from typing import TypeAlias, Union
+from typing import TypeAlias
 
-UserId: TypeAlias = Union[str, int]
-HomeworkIndex: TypeAlias = Union[str, int]
+UserId: TypeAlias = str | int
+HomeworkIndex: TypeAlias = str | int

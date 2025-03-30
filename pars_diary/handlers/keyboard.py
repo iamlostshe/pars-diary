@@ -9,7 +9,11 @@
 """
 
 from aiogram import Router
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
 
 from pars_diary.keyboards import reg_1, reg_2
 from pars_diary.utils import db
@@ -78,7 +82,6 @@ async def callback(call: CallbackQuery) -> None:
                 "Для настройки уведомлений используйте /notify\n"
                 "</blockquote>"
             ),
-            parse_mode="HTML",
             reply_markup=markup,
         )
 
@@ -93,7 +96,9 @@ async def callback(call: CallbackQuery) -> None:
 
             markup = InlineKeyboardMarkup(inline_keyboard=[result])
 
-            await call.message.edit_text("Выбери день недели:", reply_markup=markup)
+            await call.message.edit_text(
+                "Выбери день недели:", reply_markup=markup
+            )
 
         else:
             index = call.data.replace("hw_", "")
@@ -101,14 +106,15 @@ async def callback(call: CallbackQuery) -> None:
 
             await call.message.edit_text(
                 answer[0],
-                parse_mode="HTML",
                 reply_markup=answer[1],
             )
 
     # Нейросеть для помощи в учебе
     elif "chatgpt" in call.data:
         await call.message.edit_text("Chatgpt думает...")
-        send_text = chatgpt(call.from_user.id, call.data, call.from_user.first_name)
+        send_text = chatgpt(
+            call.from_user.id, call.data, call.from_user.first_name
+        )
         await call.message.edit_text(send_text)
 
     # Регистрация в боте

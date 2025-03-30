@@ -31,7 +31,9 @@ DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 
 # Вспомогательные функции
-def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
+def get_hw(
+    data: list[dict],
+) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
     week_data = WeekHomework()
     for day_data in data[:6]:
@@ -110,8 +112,10 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
 
 
 # Основная функция
-def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup] | str:
-    """Функция для парсинга Д/З.
+def hw(
+    user_id: UserId, index: HomeworkIndex
+) -> tuple[str, InlineKeyboardMarkup] | str:
+    """Функция для получения Д/З.
 
     | index | функция                         |
     | ----- | ------------------------------- |
@@ -193,7 +197,7 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
     else:
         raise DayIndexError
 
-    # Редактриуем клавиатуру
+    # Редактируем клавиатуру
     inline_keyboard.append(
         [
             InlineKeyboardButton(text="Дни недели", callback_data="hw_days"),
@@ -211,5 +215,5 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
     # Создаём клавиатуру
     markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
-    # Возвращаем тект сообщения и клавиатуру
+    # Возвращаем текст сообщения и клавиатуру
     return msg_text, markup

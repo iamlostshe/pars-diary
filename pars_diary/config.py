@@ -1,5 +1,6 @@
 """Глобальные настройки бота."""
 
+from aiogram.client.default import DefaultBotProperties
 from pydantic_settings import BaseSettings
 
 
@@ -24,3 +25,6 @@ config: Config = Config(_env_file=".env")
 
 # настройки часового пояса
 TIMEZONE = 3
+
+# Настройки бота по умолчанию
+default = DefaultBotProperties(parse_mode="html")

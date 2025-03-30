@@ -1,14 +1,14 @@
 """Main module to start telegram-bot."""
 
-from collections.abc import Awaitable
-from typing import Any, Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from loguru import logger
 
-from pars_diary.config import config
+from pars_diary.config import config, default
 from pars_diary.handlers import ROUTERS
 from pars_diary.utils.db import check_db, counter
 from pars_diary.utils.messages import error
@@ -56,7 +56,7 @@ async def catch_errors(event: ErrorEvent) -> None:
 
     if message is not None:
         await message.answer(
-            error(event.exception, message.from_user.language_code), "HTML"
+            error(event.exception, message.from_user.language_code)
         )
 
 
@@ -75,7 +75,7 @@ async def main() -> None:
     i18n = I18n(path="locales", default_locale="ru", domain="messages")
     dp.message.middleware(SimpleI18nMiddleware(i18n))
 
-    bot = Bot(token=config.telegram_token)
+    bot = Bot(token=config.telegram_token, default=default)
     # Connect handlers
     for router in ROUTERS:
         logger.debug("Include router: {} ...", router.name)

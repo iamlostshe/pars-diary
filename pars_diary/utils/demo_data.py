@@ -155,25 +155,35 @@ def hw(index: str | int) -> str:
         [
             [
                 InlineKeyboardButton(text="вт Геометрия", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_1_3"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_1_3"
+                ),
                 InlineKeyboardButton(
                     text="google",
-                    url=google_link_gen("п.4,п.7 выучить теоремы, повторить п.1-3,п.7"),
+                    url=google_link_gen(
+                        "п.4,п.7 выучить теоремы, повторить п.1-3,п.7"
+                    ),
                 ),
             ],
         ],
         [
             [
                 InlineKeyboardButton(text="ср Алгебра", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_2_0"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_2_0"
+                ),
                 InlineKeyboardButton(
                     text="google",
-                    url=google_link_gen("Алгебра ГДЗ п.4, п.7 - выучить теоремы"),
+                    url=google_link_gen(
+                        "Алгебра ГДЗ п.4, п.7 - выучить теоремы"
+                    ),
                 ),
             ],
             [
                 InlineKeyboardButton(text="ср Англ. Яз.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_2_3"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_2_3"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen("Иностранный язык (английский) ГДЗ"),
@@ -183,7 +193,9 @@ def hw(index: str | int) -> str:
         [
             [
                 InlineKeyboardButton(text="чт Алгебра", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_3_1"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_3_1"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -194,7 +206,9 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="чт ОБЗР", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_3_2"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_3_2"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -204,7 +218,9 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="чт Англ. Яз.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_3_4"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_3_4"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -217,15 +233,21 @@ def hw(index: str | int) -> str:
         [
             [
                 InlineKeyboardButton(text="пт Геометрия", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_4_0"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_4_0"
+                ),
                 InlineKeyboardButton(
                     text="google",
-                    url=google_link_gen("Геометрия ГДЗ п.5 выучить лемму и теорему"),
+                    url=google_link_gen(
+                        "Геометрия ГДЗ п.5 выучить лемму и теорему"
+                    ),
                 ),
             ],
             [
                 InlineKeyboardButton(text="пт Англ. Яз.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_4_2"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_4_2"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -236,7 +258,9 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="пт Литер.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_4_4"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_4_4"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -246,7 +270,9 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="пт Биология", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_4_5"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_4_5"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -256,7 +282,9 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="пт История", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_4_6"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_4_6"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen("История ГДЗ стр.114-122 изучить"),
@@ -265,8 +293,12 @@ def hw(index: str | int) -> str:
         ],
         [
             [
-                InlineKeyboardButton(text="сб Теор. Вер.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_5_2"),
+                InlineKeyboardButton(
+                    text="сб Теор. Вер.", callback_data="None"
+                ),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_5_2"
+                ),
                 InlineKeyboardButton(
                     text="google",
                     url=google_link_gen(
@@ -277,10 +309,14 @@ def hw(index: str | int) -> str:
             ],
             [
                 InlineKeyboardButton(text="сб Литер.", callback_data="None"),
-                InlineKeyboardButton(text="chatgpt", callback_data="chatgpt_5_3"),
+                InlineKeyboardButton(
+                    text="chatgpt", callback_data="chatgpt_5_3"
+                ),
                 InlineKeyboardButton(
                     text="google",
-                    url=google_link_gen("Литература ГДЗ Прочитать критические статьи"),
+                    url=google_link_gen(
+                        "Литература ГДЗ Прочитать критические статьи"
+                    ),
                 ),
             ],
         ],
@@ -290,7 +326,9 @@ def hw(index: str | int) -> str:
         text = hw_text[4]
         keyboard = hw_keyboard[4]
 
-        keyboard.append([InlineKeyboardButton(text="На неделю", callback_data="hw_w")])
+        keyboard.append(
+            [InlineKeyboardButton(text="На неделю", callback_data="hw_w")]
+        )
 
     elif index == "w":
         text = "\n\n".join("".join(map(str, hw)) for hw in hw_text)

@@ -68,7 +68,6 @@ async def lessons_msg(msg: Message) -> None:
                 "Для настройки уведомлений используйте /notify\n"
                 "</blockquote>"
             ),
-            parse_mode="HTML",
             reply_markup=markup,
         )
 
@@ -84,7 +83,6 @@ async def lessons_msg(msg: Message) -> None:
         )
         await msg.answer(
             "🔔 <b>Уведомления об изменении расписания</b>",
-            "HTML",
             reply_markup=markup,
         )
 
@@ -92,6 +90,5 @@ async def lessons_msg(msg: Message) -> None:
         # Выводим сообщение о необходимости регистрации и клавиатуру
         await msg.answer(
             not_auth(msg.from_user.language_code),
-            "HTML",
             reply_markup=not_auth_keyboard(),
         )

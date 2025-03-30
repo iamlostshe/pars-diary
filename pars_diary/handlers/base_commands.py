@@ -37,7 +37,6 @@ async def simple_msg(msg: Message) -> None:
         # Выводим сообщение о необходимости регистрации и клавиатуру
         await msg.answer(
             not_auth(msg.from_user.language_code),
-            "HTML",
             reply_markup=not_auth_keyboard(msg.from_user.language_code),
         )
         return
@@ -60,6 +59,6 @@ async def simple_msg(msg: Message) -> None:
 
     # Отвечаем пользователю
     if len(answer) == 2 and isinstance(answer, tuple):
-        await msg.answer(answer[0], "HTML", reply_markup=answer[1])
+        await msg.answer(answer[0], reply_markup=answer[1])
     else:
-        await msg.answer(answer, "HTML")
+        await msg.answer(answer)

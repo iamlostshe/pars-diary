@@ -203,7 +203,9 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
 
             # Меняем значение cookie пользователя на противоположное
             if index == "s":
-                data[user_id]["smart_notify"] = not data[user_id]["smart_notify"]
+                data[user_id]["smart_notify"] = not data[user_id][
+                    "smart_notify"
+                ]
             else:
                 data[user_id]["notify"] = not data[user_id]["notify"]
 
@@ -309,7 +311,9 @@ class GetStat:
                 self.command_marks += len(data_u.get("marks", []))
                 self.command_me += len(data_u.get("me", []))
                 self.command_new += len(data_u.get("new", []))
-                self.command_notify_settings += len(data_u.get("notify-settings", []))
+                self.command_notify_settings += len(
+                    data_u.get("notify-settings", [])
+                )
                 self.command_start += len(data_u.get("start", []))
 
         # Обработчики ошибок
@@ -325,7 +329,9 @@ class GetStat:
         count_dict = Counter(item for item in self.refer if item is not None)
 
         # Создаем список кортежей из словаря и сортируем его по убыванию
-        sorted_items = sorted(count_dict.items(), key=lambda x: x[1], reverse=True)
+        sorted_items = sorted(
+            count_dict.items(), key=lambda x: x[1], reverse=True
+        )
 
         # Формируем строку результата
         result = "\n".join(f"{item} - {count}" for item, count in sorted_items)

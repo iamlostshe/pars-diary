@@ -32,7 +32,6 @@ async def lessons_msg(msg: Message) -> None:
     if msg.text == "/chatgpt":
         await msg.answer(
             f'Команда работает так - <b>"/chatgpt {choice(examples)}"</b>',
-            "HTML",
         )
     else:
         # TODO @iamlostshe: answer_msg = await msg.answer('ChatGPT думает...')

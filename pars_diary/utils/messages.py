@@ -8,7 +8,6 @@
 # тг на английском и было бы приятнее получать
 # ответы на английском)
 
-# Modules need to be installed
 from loguru import logger
 
 from pars_diary.config import config
@@ -34,7 +33,9 @@ def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
     )
 
 
-def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> str:
+def error(
+    e: str, lang_code: str | None = "ru", notify: bool | None = False
+) -> str:
     """Сообщение об ошибке."""
     if lang_code != "ru":
         lang_code = "en"

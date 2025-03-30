@@ -59,5 +59,4 @@ async def new_msg(msg: Message) -> None:
             " (в порядке уменьшения выгоды):</b>\n\n"
             f"{stat.str_refer()}\n"
         ),
-        parse_mode="HTML",
     )

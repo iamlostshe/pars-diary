@@ -20,4 +20,4 @@ router = Router(name="About bot")
 @router.message(Command("about"))
 async def about_bot(msg: Message) -> None:
     """Рассказывает о проекте."""
-    await msg.answer(about(msg.from_user.language_code), "HTML")
+    await msg.answer(about(msg.from_user.language_code))

@@ -1,4 +1,4 @@
-"""Модуль для парсинга."""
+"""Модуль для получения данных."""
 
 import datetime as dt
 import json
@@ -118,7 +118,9 @@ def request(
         raise UnknownError(e) from e
 
 
-def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str]:
+def check_cookie(
+    cookie: str, server_name: str | None = None
+) -> tuple[bool, str]:
     """Функция для проверки cookie."""
     # Если используется демоверсия
     if cookie in ["demo", "демо"]:
@@ -258,7 +260,9 @@ class Pars:
 
     def marks(self, user_id: str | int) -> str:
         """Информация об оценках."""
-        url = f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
+        url = (
+            f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
+        )
         # data = request(url, user_id)
         data = {
             "subperiod": {"code": "Полугодие_2", "name": "2 Полугодие"},
@@ -904,7 +908,9 @@ class Pars:
             # Получаем правильные (рассчитанные) средние быллы по предметам,
             # потому что сервер иногда возвращает нули.
             len_marks = len(marks)
-            average_mark = "0.00" if not len_marks else f"{sum(marks) / len_marks:.2f}"
+            average_mark = (
+                "0.00" if not len_marks else f"{sum(marks) / len_marks:.2f}"
+            )
             float_average_mark = float(average_mark)
 
             # Добавляем средний балл по предмету в список
@@ -970,9 +976,9 @@ class Pars:
             for period_mark in discipline["period_marks"]:
                 # Получаем индекс и присваиваем значение
                 if period_mark["subperiod_code"] in subperiod_index:
-                    stroka[subperiod_index.index(period_mark["subperiod_code"])] = (
-                        period_mark["mark"]
-                    )
+                    stroka[
+                        subperiod_index.index(period_mark["subperiod_code"])
+                    ] = period_mark["mark"]
 
             msg_text += f"{' │ '.join(stroka)}"
 

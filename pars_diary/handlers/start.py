@@ -21,7 +21,9 @@ async def command_start_handler(msg: Message) -> None:
     if get_cookie(msg.from_user.id):
         # Отвечаем пользователю
         await msg.answer(
-            start_old_user(msg.from_user.first_name, msg.from_user.language_code),
+            start_old_user(
+                msg.from_user.first_name, msg.from_user.language_code
+            ),
             reply_markup=not_auth_keyboard(),
         )
 
@@ -29,7 +31,9 @@ async def command_start_handler(msg: Message) -> None:
     else:
         # Отвечаем пользователю
         await msg.answer(
-            registration_0(msg.from_user.first_name, msg.from_user.language_code),
+            registration_0(
+                msg.from_user.first_name, msg.from_user.language_code
+            ),
             reply_markup=reg_0(),
         )
 
