@@ -39,22 +39,3 @@ def error_message(e: str) -> str:
 def not_auth() -> str:
     """Если этот контент не доступен без авторизации."""
     return _("need auth for action")
-
-
-# Процесс регистрации
-# ===================
-
-
-def registration_0(first_name: str) -> str:
-    """Начало для новых пользователей."""
-    return _("welcome, {first_name}! you need register.").format(first_name)
-
-
-def registration_1() -> str:
-    """Начало для новых пользователей."""
-    return _("1. select_region")
-
-
-def registration_2() -> str:
-    """Начало для новых пользователей."""
-    return _("2. select cookie")

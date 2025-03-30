@@ -1,39 +1,48 @@
 """Приветственное сообщение."""
 
 from aiogram import Router
-from aiogram.types import Message
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from aiogram.utils.i18n import _
 
-from pars_diary.keyboards import not_auth_keyboard, reg_0
-from pars_diary.messages import registration_0, start_old_user
+from pars_diary.keyboards import not_auth_keyboard
+from pars_diary.messages import start_old_user
 from pars_diary.utils.db import add_user, get_cookie
 
 router = Router(name="Message catcher")
 
 
 @router.message()
-async def command_start_handler(msg: Message) -> None:
+async def command_start_handler(message: Message) -> None:
     """принимает все сообщения.
 
     Команды /start, /help, любое другое сообщение.
     Если предыдущие обработчики не сработали.
     """
     # Если пользователь зарегистрирован (если не пустой ответ)
-    if get_cookie(msg.from_user.id):
-        # Отвечаем пользователю
-        await msg.answer(
-            start_old_user(msg.from_user.first_name),
+    if get_cookie(message.from_user.id):
+        await message.answer(
+            start_old_user(message.from_user.first_name),
             reply_markup=not_auth_keyboard(),
         )
 
-    # Если пользователь не зарегистрирован
     else:
-        # Отвечаем пользователю
-        await msg.answer(
-            registration_0(msg.from_user.first_name), reply_markup=reg_0()
+        await message.answer(
+            _("welcome, {first_name}! you need register.").format(
+                Message.from_user.first_name
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text=_("start"), callback_data="start_reg"
+                        )
+                    ]
+                ],
+            ),
         )
 
     # Получаем реферальные сведения
-    refer = msg.text[7:] if msg.text.startswith("/start ") else None
+    refer = message.text[7:] if message.text.startswith("/start ") else None
 
     # Добавляем в базу данных пользователя или данные о его активности
-    add_user(msg.from_user.id, refer)
+    add_user(message.from_user.id, refer)

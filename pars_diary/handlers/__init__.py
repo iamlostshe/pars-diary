@@ -1,4 +1,4 @@
-"""Собирает все роутеры воедино.
+"""Собирает все маршруты воедино.
 
 - Публичные команды (в меню)
     - /about - О проекте
@@ -21,20 +21,20 @@ from pars_diary.handlers import (
     ch,
     chatgpt,
     keyboard,
-    new,
     notify,
+    register,
     start,
 )
 
 ROUTERS = (
     about.router,
-    notify.router,
+    admin.router,
     base_commands.router,
     ch.router,
     chatgpt.router,
-    admin.router,
-    new.router,
     keyboard.router,
+    notify.router,
+    register.router,
     start.router,
 )
 

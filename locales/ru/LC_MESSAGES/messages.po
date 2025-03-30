@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-30 13:06+0400\n"
+"POT-Creation-Date: 2025-03-30 13:59+0400\n"
 "PO-Revision-Date: 2025-03-30 13:06+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,26 +19,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.13.1\n"
 
-#: pars_diary/keyboards.py:18 pars_diary/keyboards.py:57
+#: pars_diary/handlers/register.py:81 pars_diary/keyboards.py:16
 msgid "instruction"
 msgstr "📖 Инструкция"
 
-#: pars_diary/keyboards.py:30
-msgid "start"
-msgstr "🌟 Начнём!"
-
-#: pars_diary/messages.py:51
+#: pars_diary/messages.py:41
 msgid "need auth for action"
 msgstr "🔑 Вам нужно авторизоваться для этого действий."
 
-#: pars_diary/messages.py:90
-msgid "welcome, {first_name}! you need register."
-msgstr "👋 Добро пожаловать, {first_name}!\n\n🔑 Для начала вам нужно пройти быструю регистрацию"
-
-#: pars_diary/messages.py:95
+#: pars_diary/handlers/register.py:52
 msgid "1. select_region"
 msgstr "1. 🔎 Выберите свой регион:"
 
-#: pars_diary/messages.py:100
+#: pars_diary/handlers/register.py:76
 msgid "2. select cookie"
 msgstr "2. 🍪 Укажите cookie:"
+
+#: pars_diary/handlers/start.py:30
+msgid "welcome, {first_name}! you need register."
+msgstr "👋 Добро пожаловать, {first_name}!\n\n🔑 Для начала вам нужно пройти быструю регистрацию"
+
+#: pars_diary/handlers/start.py:37
+msgid "start"
+msgstr "🌟 Начнём!"

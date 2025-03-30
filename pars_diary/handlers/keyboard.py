@@ -15,8 +15,6 @@ from aiogram.types import (
     InlineKeyboardMarkup,
 )
 
-from pars_diary.keyboards import reg_1, reg_2
-from pars_diary.messages import registration_1, registration_2
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
 
@@ -46,7 +44,6 @@ async def callback(call: CallbackQuery) -> None:
         # Отправляем сообщение
         await call.message.edit_text(
             "🔔 <b>Уведомления об изменении оценок</b>",
-            parse_mode="HTML",
             reply_markup=markup,
         )
 
@@ -116,14 +113,3 @@ async def callback(call: CallbackQuery) -> None:
             call.from_user.id, call.data, call.from_user.first_name
         )
         await call.message.edit_text(send_text)
-
-    # Регистрация в боте
-    elif call.data == "reg_0":
-        await call.message.edit_text(registration_1(), reply_markup=reg_1())
-
-    elif "reg_1_" in call.data:
-        # Записываем server_name в бд
-        server_name = "".join(call.data.split("_")[2:])
-        db.add_user_server_name(call.from_user.id, server_name)
-
-        await call.message.edit_text(registration_2(), reply_markup=reg_2())
