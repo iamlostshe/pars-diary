@@ -8,10 +8,10 @@ from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from loguru import logger
 
-from pars_diary.config import config, default
+from pars_diary.config import config, default, metrics
 from pars_diary.handlers import ROUTERS
 from pars_diary.messages import error_message
-from pars_diary.utils.db import check_db, counter
+from pars_diary.utils.db import check_db
 
 # Константы
 # =========
@@ -34,7 +34,9 @@ async def game_middleware(
         logger.info("[c] {}", event.callback_query.data)
     elif isinstance(event, Message):
         logger.debug("[m] {}", event.message.text)
-        counter(event.message.from_user.id, event.message.text.split()[0][1:])
+        metrics.use_command(
+            event.message.from_user.id, event.message.text.split()[0][1:]
+        )
     else:
         logger.warning("Unprocessed event {}", type(event))
 

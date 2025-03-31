@@ -230,6 +230,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
         raise DiaryParserError(str(e)) from e
 
 
+# TODO @milinuri: Ты будешь переписана, хы-хы.
 def get_graph() -> None:
     """Генерирует график для анализа прироста пользователей."""
     try:
@@ -264,25 +265,10 @@ class GetStat:
         """Возвращает статистику для (сис-) админов."""
         # Инициализируем переменные для хранения статистики
         self.refer = []
-
         self.cookie = 0
 
         self.notify = 0
         self.smart_notify = 0
-
-        self.command_about = 0
-        self.command_admin = 0
-        self.command_birthdays = 0
-        self.command_ch = 0
-        self.command_cs = 0
-        self.command_events = 0
-        self.command_hw = 0
-        self.command_i_marks = 0
-        self.command_marks = 0
-        self.command_me = 0
-        self.command_new = 0
-        self.command_notify_settings = 0
-        self.command_start = 0
 
         try:
             with Path.open(DB_NAME, "r", encoding="UTF-8") as f:
@@ -290,31 +276,11 @@ class GetStat:
 
             self.users_count = len(data)
 
-            for u in data:
-                data_u = data[u]
-
-                self.refer.append(data_u.get("refer"))
-
-                self.cookie += int(bool(data_u.get("cookie")))
-
-                self.notify += int(data_u.get("notify"))
-                self.smart_notify += int(data_u.get("smart_notify"))
-
-                self.command_about += len(data_u.get("about", []))
-                self.command_admin += len(data_u.get("admin", []))
-                self.command_birthdays += len(data_u.get("birthdays", []))
-                self.command_ch += len(data_u.get("ch", []))
-                self.command_cs += len(data_u.get("cs", []))
-                self.command_events += len(data_u.get("events", []))
-                self.command_hw += len(data_u.get("hw", []))
-                self.command_i_marks += len(data_u.get("i_marks", []))
-                self.command_marks += len(data_u.get("marks", []))
-                self.command_me += len(data_u.get("me", []))
-                self.command_new += len(data_u.get("new", []))
-                self.command_notify_settings += len(
-                    data_u.get("notify-settings", [])
-                )
-                self.command_start += len(data_u.get("start", []))
+            for u in data.values():
+                self.refer.append(u.get("refer"))
+                self.cookie += int(bool(u.get("cookie")))
+                self.notify += int(u.get("notify"))
+                self.smart_notify += int(u.get("smart_notify"))
 
         # Обработчики ошибок
         except FileNotFoundError as e:
@@ -358,43 +324,6 @@ def get_marks(user_id: str | int) -> dict | str:
             if data.get(user_id):
                 return data[user_id]["notify_marks"]
             raise UserNotFoundError
-
-    # Обработчики ошибок
-    except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise DiaryParserError(str(e)) from e
-
-
-def counter(user_id: str | int, counter_name: str) -> None:
-    """Счётчик для аналитики."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
-    try:
-        # Открываем файл для чтения
-        with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
-            # Загрузка и десериализация данных из файла
-            data = json.load(f)
-
-            # TODO @iamlostshe: Оптимизировать эту функцию
-            # (смотри ниже для примера)
-
-            # Работа со счётчиками
-            user = data.get(user_id)
-            if user:
-                if user.get(counter_name):
-                    user[counter_name].append(time.time())
-                else:
-                    user[counter_name] = [time.time()]
-            else:
-                raise UserNotFoundError
-
-            # Сохраняем изменения в json базе данных
-            f.seek(0)
-            f.truncate()
-            json.dump(data, f, indent=4, ensure_ascii=False)
 
     # Обработчики ошибок
     except FileNotFoundError as e:
