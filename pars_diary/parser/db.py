@@ -5,8 +5,10 @@ TODO @milinuri: Когда-нибудь надо переписать под б�
 
 import json
 import time
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypedDict
 
 from loguru import logger
 
@@ -19,13 +21,27 @@ DB_NAME = Path("users.json")
 # ===================
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class User:
     """Данные пользователя из базы.
 
     Доступны только для чтения.
     Для изменения воспользуйтесь методами базы данных.
     """
+
+    reg_time: int
+    ref_code: str
+    cookie: str | None
+    notify: bool
+    smart_notify: bool
+    # TODO @milinuri: По хорошему тут должны быть маленькие объекты
+    lesson_marks: list[str]
+    server_name: str | None
+
+
+# TODO @milinuri: С переходом на нормальную бд будет не нужен
+class UserDict(TypedDict):
+    """Представление пользователя в виде словаря."""
 
     reg_time: int
     ref_code: str
@@ -56,10 +72,13 @@ class UsersDataBase:
 
     def __init__(self, db_file: Path) -> None:
         self.db_file = db_file
-        self._file_data: dict[str, dict] | None = None
+        self._file_data: dict[str, UserDict] | None = None
+
+    # Работа с базой данных
+    # =====================
 
     @property
-    def data(self) -> dict[str, dict]:
+    def data(self) -> dict[str, UserDict]:
         """Загружает сырые данные из файла."""
         if self._file_data is None:
             try:
@@ -78,6 +97,50 @@ class UsersDataBase:
         with self.db_file.open("w") as f:
             f.write(json.dumps(self._file_data))
 
+    # Сериализация и десериализация
+    # =============================
+
+    def _to_user(self, user_data: UserDict) -> User:
+        return User(
+            reg_time=user_data["reg_time"],
+            ref_code=user_data["ref_code"],
+            cookie=user_data["cookie"],
+            notify=user_data["notify"],
+            smart_notify=user_data["smart_notify"],
+            lesson_marks=user_data["lesson_marks"],
+            server_name=user_data["server_name"],
+        )
+
+    def _to_dict(self, user: User) -> UserDict:
+        return {
+            "reg_time": user.reg_time,
+            "ref_code": user.ref_code,
+            "cookie": user.cookie,
+            "notify": user.notify,
+            "smart_notify": user.smart_notify,
+            "lesson_marks": user.lesson_marks,
+            "server_name": user.server_name,
+        }
+
+    # Прямая работа с данными пользователя
+    # ====================================
+
+    def get_user(self, user_id: int) -> User:
+        """получает пользователя из базы."""
+        try:
+            return self._to_user(self.data[str(user_id)])
+        except KeyError as e:
+            raise exceptions.UserNotAuthorizedError from e
+
+    def __iter__(self) -> Iterator[tuple(str, User)]:
+        """Проходится по всем пользователям из базы."""
+        for k, v in self.data.items():
+            yield k, self._to_user(v)
+
+    def update_user(self, user_id: int, user: User) -> None:
+        """Обновляет данные пользователя БЕЗ сохранения."""
+        self._file_data[str(user_id)] = self._to_dict(user)
+
     def add_user(self, user_id: int, ref_code: str) -> None:
         """Добавляет нового пользователя в базу.
 
@@ -91,7 +154,7 @@ class UsersDataBase:
                 "cookie": None,
                 "notify": True,
                 "smart_notify": True,
-                "notify_marks": [],
+                "lesson_marks": [],
                 "server_name": None,
             }
         else:
@@ -99,20 +162,35 @@ class UsersDataBase:
 
         self._write()
 
+    # TODO @milinuri: а может удалить их?
+    # Получение данных из БД
+    # ======================
+
     def get_server_name(self, user_id: int) -> str:
         """Получает имя сервера пользователя, если было установлено."""
-        try:
-            return self.data[str(user_id)]["server_name"]
-        except KeyError as e:
-            raise exceptions.UserNotAuthorizedError from e
+        return self.get_user(user_id)["server_name"]
+
+    def get_cookie(self, user_id: int) -> str | None:
+        """Получает печенье пользователя, если было установлено."""
+        return self.get_user(user_id)["cookie"]
+
+    def get_marks(self, user_id: str | int) -> list[str]:
+        """Возвращает оценки из базы данных (Если они прежде были записаны)."""
+        return self.get_user(user_id)["lesson_marks"]
+
+    def get_notify(self, user_id: int) -> NotifyStatus:
+        """Получает статус уведомлений пользователя."""
+        user = self.get_user(user_id)
+        return NotifyStatus(notify=user.notify, smart=user.smart_notify)
+
+    # Установка данных пользователя
+    # =============================
 
     def set_server_name(self, user_id: int, server_name: str) -> None:
         """Устанавливает сервер для пользователя."""
-        user_data = self.data.get(str(user_id))
-        if user_data is None:
-            raise exceptions.UserNotFoundError from None
-
-        self._file_data[str(user_id)]["server_name"] = server_name
+        user = self.get_user(user_id)
+        user.server_name = server_name
+        self.update_user(user_id, user)
         self._write()
 
     def set_cookie(self, user_id: int, cookie: str) -> str:
@@ -120,60 +198,28 @@ class UsersDataBase:
 
         Возвращает сообщение с результатом добавления печеньки.
         """
-        user_data = self.data.get(str(user_id))
-        if user_data is None:
-            raise exceptions.UserNotFoundError from None
-
-        server_name = user_data.get("server_name")
-        res, message = check_cookie(cookie, server_name)
+        user = self.get_user(user_id)
+        res, message = check_cookie(cookie, user.server_name)
 
         if res:
-            self._file_data[(str(user_id))]["cookie"] = cookie
+            user.cookie = cookie
+            self.update_user(user_id, user)
             self._write()
 
         return message
 
-    def get_cookie(self, user_id: int) -> str | None:
-        """Получает печенье пользователя, если было установлено."""
-        try:
-            return self.data[str(user_id)].get("cookie")
-        except KeyError as e:
-            raise exceptions.UserNotAuthorizedError from e
-
-    def get_notify(self, user_id: int) -> NotifyStatus:
-        """Получает статус уведомлений пользователя."""
-        user_data = self.data.get(str(user_id))
-        if user_data is None:
-            raise exceptions.UserNotFoundError from None
-
-        return NotifyStatus(
-            notify=user_data.get("notify"), smart=user_data.get("smart")
-        )
-
     def set_notify(self, user_id: int, status: NotifyStatus) -> NotifyStatus:
         """Обновляет статус уведомлений пользователя."""
-        user_data = self.data.get(str(user_id))
-        if user_data is None:
-            raise exceptions.UserNotFoundError from None
-
-        self._file_data[str(user_id)]["notify"] = status.notify
-        self._file_data[str(user_id)]["smart"] = status.smart
+        user = self.get_user(user_id)
+        user.notify = status.notify
+        user.smart_notify = status.smart_notify
+        self.update_user(user_id, user)
         self._write()
-
         return status
-
-    def get_marks(self, user_id: str | int) -> list[str]:
-        """Возвращает оценки из базы данных (Если они прежде были записаны)."""
-        try:
-            return self.data[str(user_id)].get("notify_marks")
-        except KeyError as e:
-            raise exceptions.UserNotAuthorizedError from e
 
     def set_marks(self, user_id: int, marks: list[str]) -> str:
         """Устанавливает новые оценки пользователя."""
-        user_data = self.data.get(str(user_id))
-        if user_data is None:
-            raise exceptions.UserNotFoundError from None
-
-        self._file_data[(str(user_id))]["cookie"] = marks
+        user = self.get_user(user_id)
+        user.lesson_marks = marks
+        self.update_user(user_id, user)
         self._write()
