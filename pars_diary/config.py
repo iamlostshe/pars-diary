@@ -5,6 +5,7 @@ from pathlib import Path
 from aiogram.client.default import DefaultBotProperties
 from pydantic_settings import BaseSettings
 
+from pars_diary.parser.db import UsersDataBase
 from pars_diary.services.metrics import MetricsDatabase
 
 
@@ -27,6 +28,7 @@ class Config(BaseSettings):
 
 
 config: Config = Config(_env_file=".env")
+users_db = UsersDataBase(Path("users.json"))
 metrics = MetricsDatabase(Path("metrics.json"))
 
 # настройки часового пояса

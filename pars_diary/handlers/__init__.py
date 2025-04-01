@@ -21,7 +21,6 @@ from pars_diary.handlers import (
     ch,
     chatgpt,
     keyboard,
-    notify,
     register,
     start,
 )
@@ -33,7 +32,6 @@ ROUTERS = (
     ch.router,
     chatgpt.router,
     keyboard.router,
-    notify.router,
     register.router,
     start.router,
 )

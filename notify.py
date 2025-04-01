@@ -1,36 +1,18 @@
 """Модуль для создания и отправки уведомлений."""
 
 import asyncio
-import json
-from dataclasses import dataclass
 from itertools import zip_longest
 
 from aiogram import Bot
 from loguru import logger
 
-from pars_diary.config import config
-from pars_diary.parser.exceptions import (
-    DBFileNotFoundError,
-    DiaryParserError,
-    UserNotFoundError,
-)
-from pars_diary.utils import db
-from pars_diary.utils.db import DB_NAME
+from pars_diary.config import config, users_db
+from pars_diary.parser.db import UsersDataBase
+from pars_diary.parser.exceptions import DiaryParserError, UserNotFoundError
 from pars_diary.utils.pars import Pars
 
 # Константы
 # =========
-
-
-@dataclass
-class User:
-    """Пользователь."""
-
-    cookie: str | None = None
-    notify: bool = False
-    smart_notify: bool = False
-    notify_marks: list[str] | None = None
-
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1
@@ -42,36 +24,30 @@ SMART_NOTIFY_DURATION = 24
 # ============================================
 
 
-async def update_users(bot: Bot, smart_notify: bool | None = False) -> None:  # noqa: FBT002
+async def update_users(
+    users_db: UsersDataBase, bot: Bot, smart_notify: bool | None = False
+) -> None:
     """Обновляет оценки пользователей."""
-    # Читаем список пользователей
-    with DB_NAME.open() as f:
-        users_db = json.load(f)
-
     # Обновляем базу данных пользователе
-    for user_id, user_data in users_db.items():
-        user = User(**user_data)
-
+    for user_id, user in users_db.data.items():
         # Нету куков, нету уведомлений
-        if user.cookie in (None, "demo"):
+        if user.get("cookie") in (None, "demo"):
             continue
 
-        old_grades = db.get_marks(user_id)
-        new_grades = Pars().marks(user_id).split("\n")[3:-1]
-        users_db[user_id]["notify_marks"] = new_grades
+        old_grades = users_db.get_marks(int(user_id))
+        new_grades = Pars().marks(int(user_id)).split("\n")[3:-1]
+        # TODO @milinuri: При каждом обновлении оценок перезаписывается файл
+        # Подумай над этим
+        users_db.set_marks(int(user_id), new_grades)
 
         # Есть уведомления? Уведомляем
-        if user.notify:
+        if user.get("notify"):
             await check_notify(bot, user_id, new_grades, old_grades)
 
         # Если нужно отправить умное уведомление
         # и у пользователя включены умные уведомления
         if smart_notify and user.smart_notify:
             await check_smart_notify(bot, user_id, new_grades)
-
-    # Время записать изменения
-    with DB_NAME.open("w", encoding="UTF-8") as f:
-        json.dump(users_db, f, indent=4, ensure_ascii=False)
 
 
 async def check_notify(
@@ -96,8 +72,8 @@ async def check_notify(
     # Если есть изменения => Отправляем
     if len(diff_grades) > 0:
         msg_text = (
-            "У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>"
-            f"{'\n'.join(diff_grades)}</pre>"
+            "У Вас изменились оценки (управление уведомлениями - /notify):\n"
+            f"<pre>{'\n'.join(diff_grades)}</pre>"
         )
         await bot.send_message(user_id, msg_text, parse_mode="HTML")
 
@@ -165,13 +141,10 @@ async def main() -> None:
             count = 0
 
         try:
-            await update_users(bot, smart_notify=smart_notify)
+            await update_users(users_db, bot, smart_notify=smart_notify)
 
         except KeyError:
             logger.error(UserNotFoundError())
-
-        except FileNotFoundError:
-            logger.error(DBFileNotFoundError(str(DB_NAME)))
 
         except Exception as e:  # noqa: BLE001
             logger.error(DiaryParserError(str(e)))

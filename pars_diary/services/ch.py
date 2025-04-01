@@ -52,10 +52,11 @@ def ch() -> ClassHourData:
         except NoDataForThisDayError:
             count += 1
 
+    day = "следующему" if count == 0 else "последнему"
     return ClassHourData(
         image_url=data.plakat_url,
         description=(
-            f"Данные по {'следующему' if count == 0 else 'последнему'} классному часу:\n\n"
+            f"Данные по {day} классному часу:\n\n"
             f"<b>{data.title}</b>\n\n"
             f"{data.str_date}"
         ),

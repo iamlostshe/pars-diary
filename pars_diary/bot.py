@@ -8,15 +8,14 @@ from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from loguru import logger
 
-from pars_diary.config import config, default, metrics
+from pars_diary.config import config, default, metrics, users_db
 from pars_diary.handlers import ROUTERS
 from pars_diary.messages import error_message
-from pars_diary.utils.db import check_db
 
 # Константы
 # =========
 
-dp = Dispatcher()
+dp = Dispatcher(db=users_db)
 
 # Корневые обработчики
 # ====================
@@ -67,9 +66,6 @@ async def catch_errors(event: ErrorEvent) -> None:
 async def main() -> None:
     """Основная функция запуска бота."""
     logger.add("log.log")
-
-    # Checking for the existence database
-    check_db()
 
     logger.info("Setup I18n context")
     i18n = I18n(path="locales", default_locale="ru", domain="messages")

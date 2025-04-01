@@ -13,7 +13,7 @@ from aiogram.types import Message
 
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import not_auth
-from pars_diary.utils.db import get_cookie
+from pars_diary.parser.db import UsersDataBase
 from pars_diary.utils.pars import Pars
 
 router = Router(name="Base commands")
@@ -26,12 +26,9 @@ router = Router(name="Base commands")
         commands=["marks", "i_marks", "me", "events", "birthdays"],
     ),
 )
-async def simple_msg(msg: Message) -> None:
+async def simple_msg(msg: Message, db: UsersDataBase) -> None:
     """Отвечает за /marks, /i_marks, /me, /events, /birthdays."""
-    user_id = msg.from_user.id
-
-    # Проверяем зарегистрирован ли пользователь
-    if not get_cookie(user_id):
+    if db.get_cookie(msg.from_user.id) is None:
         # Выводим сообщение о необходимости регистрации и клавиатуру
         await msg.answer(
             not_auth(),
@@ -52,7 +49,7 @@ async def simple_msg(msg: Message) -> None:
     }
 
     # Создаем ответ
-    answer = commands[msg.text](user_id)
+    answer = commands[msg.text](msg.from_user.id)
 
     # Отвечаем пользователю
     if len(answer) == 2 and isinstance(answer, tuple):
