@@ -49,7 +49,7 @@ class MetricsDatabase:
 
         return self._file_data
 
-    def _write(self) -> None:
+    def write(self) -> None:
         """Записывает изменения в файл."""
         with self.db_file.open("w") as f:
             f.write(json.dumps(self._file_data, ensure_ascii=False))
@@ -66,7 +66,7 @@ class MetricsDatabase:
             user_data[command] = [int(time.time())]
 
         self._file_data[str(user_id)] = user_data
-        self._write()
+        self.write()
 
     def count_commands(self) -> Counter[str]:
         """Подсчитывается использованные пользователями команды."""

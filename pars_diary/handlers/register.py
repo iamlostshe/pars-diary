@@ -17,7 +17,7 @@ from aiogram.types import (
 )
 from aiogram.utils.i18n import gettext as _
 
-from pars_diary.parser.db import UsersDataBase
+from pars_diary.parser.db import User, UsersDataBase
 from pars_diary.utils.pars import get_regions
 
 router = Router(name="User registration")
@@ -67,10 +67,14 @@ class RegionCallback(CallbackData, prefix="reg_region"):
 
 @router.callback_query(RegionCallback.filter())
 async def select_region(
-    query: CallbackQuery, callback_data: RegionCallback, db: UsersDataBase
+    query: CallbackQuery,
+    callback_data: RegionCallback,
+    db: UsersDataBase,
+    user: User,
 ) -> None:
     """Выбирает регион пользователя при регистрации."""
-    db.set_server_name(query.from_user.id, callback_data.region)
+    user.server_name = callback_data.region
+    db.update_user(query.from_user.id, user)
     await query.message.edit_text(
         _("2. select cookie"),
         reply_markup=InlineKeyboardMarkup(

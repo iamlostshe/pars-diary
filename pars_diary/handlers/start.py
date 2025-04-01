@@ -6,20 +6,22 @@ from aiogram.utils.i18n import _
 
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import start_old_user
-from pars_diary.parser.db import UsersDataBase
+from pars_diary.parser.db import User, UsersDataBase
 
 router = Router(name="Message catcher")
 
 
 @router.message()
-async def command_start_handler(message: Message, db: UsersDataBase) -> None:
+async def command_start_handler(
+    message: Message, user: User, db: UsersDataBase
+) -> None:
     """принимает все сообщения.
 
     Команды /start, /help, любое другое сообщение.
     Если предыдущие обработчики не сработали.
     """
     # Если пользователь зарегистрирован (если не пустой ответ)
-    if db.get_cookie(message.from_user.id):
+    if user.cookie is None:
         await message.answer(
             start_old_user(message.from_user.first_name),
             reply_markup=not_auth_keyboard(),

@@ -17,7 +17,7 @@ from aiogram.types import (
 
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import not_auth
-from pars_diary.parser.db import NotifyStatus, UsersDataBase
+from pars_diary.parser.db import NotifyStatus, User, UsersDataBase
 
 router = Router(name="Notify settings")
 
@@ -43,16 +43,16 @@ _SMART_NOTIFY = (
 )
 
 
-def _notify_markup(status: NotifyStatus) -> InlineKeyboardMarkup:
+def _notify_markup(user: User) -> InlineKeyboardMarkup:
     """Получает клавиатуру для настройки уведомлений."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
             InlineKeyboardButton(
-                text="🔔 Оценки" if status.notify else "🔕 Оценки",
+                text="🔔 Оценки" if user.notify else "🔕 Оценки",
                 callback_data="n_n",
             ),
             InlineKeyboardButton(
-                text="🔔 Умные" if status.smart else "🔕 Умные",
+                text="🔔 Умные" if user.smart_notify else "🔕 Умные",
                 callback_data="n_s",
             ),
             [
@@ -69,14 +69,12 @@ def _notify_markup(status: NotifyStatus) -> InlineKeyboardMarkup:
 
 
 @router.message(Command("notify"))
-async def notify_settings(msg: Message, db: UsersDataBase) -> None:
+async def notify_settings(msg: Message, user: User) -> None:
     """Настройки для уведомлений."""
-    if db.get_cookie(msg.from_user.id) is None:
+    if user.cookie is None:
         await msg.answer(not_auth(), reply_markup=not_auth_keyboard())
         return
-
-    notify = db.get_notify(Message.from_user.id)
-    await msg.answer(_SMART_NOTIFY, reply_markup=_notify_markup(notify))
+    await msg.answer(_SMART_NOTIFY, reply_markup=_notify_markup(user))
 
 
 # Обработчики кнопок
@@ -84,26 +82,20 @@ async def notify_settings(msg: Message, db: UsersDataBase) -> None:
 
 
 @router.callback_query(F.data == "n_n")
-async def call_set_notify(query: CallbackQuery, db: UsersDataBase) -> None:
+async def call_set_notify(
+    query: CallbackQuery, user: User, db: UsersDataBase
+) -> None:
     """Отвечает за все callback кнопки."""
-    notify = db.get_notify(query.from_user.id)
-    notify = db.set_notify(
-        query.from_user.id, NotifyStatus(not notify.notify, notify.smart)
-    )
-    await query.message.answer(
-        _SMART_NOTIFY, reply_markup=_notify_markup(notify)
-    )
+    user.notify = not user.notify
+    db.update_user(Message.from_user.id, user)
+    await query.message.answer(_SMART_NOTIFY, reply_markup=_notify_markup(user))
 
 
 @router.callback_query(F.data == "n_s")
 async def call_set_smart_notify(
-    query: CallbackQuery, db: UsersDataBase
+    query: CallbackQuery, user: User, db: UsersDataBase
 ) -> None:
     """Изменение состояния умных уведомлений."""
-    notify = db.get_notify(query.from_user.id)
-    notify = db.set_notify(
-        query.from_user.id, NotifyStatus(notify.notify, not notify.smart)
-    )
-    await query.message.answer(
-        _SMART_NOTIFY, reply_markup=_notify_markup(notify)
-    )
+    user.smart_notify = not user.smart_notify
+    db.update_user(Message.from_user.id, user)
+    await query.message.answer(_SMART_NOTIFY, reply_markup=_notify_markup(user))

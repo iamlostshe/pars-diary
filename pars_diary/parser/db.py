@@ -92,7 +92,7 @@ class UsersDataBase:
 
         return self._file_data
 
-    def _write(self) -> None:
+    def write(self) -> None:
         """Записывает изменения в файл."""
         with self.db_file.open("w") as f:
             f.write(json.dumps(self._file_data))
@@ -160,38 +160,11 @@ class UsersDataBase:
         else:
             self._file_data[str(user_id)] = int(time.time())
 
-        self._write()
-
-    # TODO @milinuri: а может удалить их?
-    # Получение данных из БД
-    # ======================
-
-    def get_server_name(self, user_id: int) -> str:
-        """Получает имя сервера пользователя, если было установлено."""
-        return self.get_user(user_id)["server_name"]
+        self.write()
 
     def get_cookie(self, user_id: int) -> str | None:
         """Получает печенье пользователя, если было установлено."""
         return self.get_user(user_id)["cookie"]
-
-    def get_marks(self, user_id: str | int) -> list[str]:
-        """Возвращает оценки из базы данных (Если они прежде были записаны)."""
-        return self.get_user(user_id)["lesson_marks"]
-
-    def get_notify(self, user_id: int) -> NotifyStatus:
-        """Получает статус уведомлений пользователя."""
-        user = self.get_user(user_id)
-        return NotifyStatus(notify=user.notify, smart=user.smart_notify)
-
-    # Установка данных пользователя
-    # =============================
-
-    def set_server_name(self, user_id: int, server_name: str) -> None:
-        """Устанавливает сервер для пользователя."""
-        user = self.get_user(user_id)
-        user.server_name = server_name
-        self.update_user(user_id, user)
-        self._write()
 
     def set_cookie(self, user_id: int, cookie: str) -> str:
         """Устанавливает печенье для пользователя.
@@ -204,22 +177,6 @@ class UsersDataBase:
         if res:
             user.cookie = cookie
             self.update_user(user_id, user)
-            self._write()
+            self.write()
 
         return message
-
-    def set_notify(self, user_id: int, status: NotifyStatus) -> NotifyStatus:
-        """Обновляет статус уведомлений пользователя."""
-        user = self.get_user(user_id)
-        user.notify = status.notify
-        user.smart_notify = status.smart_notify
-        self.update_user(user_id, user)
-        self._write()
-        return status
-
-    def set_marks(self, user_id: int, marks: list[str]) -> str:
-        """Устанавливает новые оценки пользователя."""
-        user = self.get_user(user_id)
-        user.lesson_marks = marks
-        self.update_user(user_id, user)
-        self._write()

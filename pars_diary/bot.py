@@ -23,7 +23,7 @@ dp = Dispatcher(db=users_db)
 
 @dp.message.middleware()
 @dp.callback_query.middleware()
-async def game_middleware(
+async def db_middleware(
     handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
     event: Update,
     data: dict[str, Any],
@@ -31,11 +31,13 @@ async def game_middleware(
     """Логирование для сообщений и подсчёт использованных команд."""
     if isinstance(event, CallbackQuery):
         logger.info("[c] {}", event.callback_query.data)
+        data["user"] = users_db.get_user(event.callback_query.from_user.id)
     elif isinstance(event, Message):
         logger.debug("[m] {}", event.message.text)
         metrics.use_command(
             event.message.from_user.id, event.message.text.split()[0][1:]
         )
+        data["user"] = users_db.get_user(event.message.from_user.id)
     else:
         logger.warning("Unprocessed event {}", type(event))
 
