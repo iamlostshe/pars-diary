@@ -1,13 +1,25 @@
-# [PARS-DIARY](https://t.me/pars_diary_bot)
+# Pars diary (Telegram bot)
+
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![License: AGPL v3](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+![GitHub Repo stars](https://img.shields.io/github/stars/iamlostshe/pars-diary)
+
 
 Проект для упрощения жизни школьников.
+Позволяет просматривать информацию из школьного дневника.
 
-Бот запущен и вы можете пользоваться им здесь:
-[@pars_diary_bot](https://t.me/pars_diary_bot)
+**Основные функции**:
+- Автоматические уведомления об изменениях.
+- Просмотр текущих и итоговых оценок.
+- Совместимость с Bars API.
+
+> Бот запущен и вы можете пользоваться им здесь:
+[@pars_diary_bot](https://t.me/pars_diary_bot?start=from_github_repo)
 
 ## Установка / Installation
+Для того чтобы запустить бота локально.
 
-1. Клонируем репозиторий:
+1. Клонируем репозиторий.
 
 ``` bash
 git clone https://github.com/iamlostshe/PARS-DIARY
@@ -91,7 +103,9 @@ pybabel compile -d locales -D messages
 
 **Запускаем бота**:
 
-``` bashpip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+```
 </details>
 
 Для последующего запуска повторите шаги *активация виртуального окружения*
