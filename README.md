@@ -1,33 +1,37 @@
-# [PARS-DIARY](https://t.me/pars_diary_bot)
+# Pars diary (Telegram bot)
+
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![License: AGPL v3](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+![GitHub Repo stars](https://img.shields.io/github/stars/iamlostshe/pars-diary)
+
 
 Проект для упрощения жизни школьников.
+Позволяет просматривать информацию из школьного дневника.
 
-Бот запущен и вы можете пользоваться им здесь:
+**Основные функции**:
+- Автоматические уведомления об изменениях.
+- Просмотр текущих и итоговых оценок.
+- Совместимость с Bars API.
 
-https://t.me/pars_diary_bot
+> Бот запущен и вы можете пользоваться им здесь:
+[@pars_diary_bot](https://t.me/pars_diary_bot?start=from_github_repo)
 
-### Установка / Installation
+## Установка / Installation
+Для того чтобы запустить бота локально.
 
-1. **Клонируем репозиторий:**
+1. Клонируем репозиторий.
 
 ``` bash
 git clone https://github.com/iamlostshe/PARS-DIARY
-```
-
-2. **Переходим в дирректорию с проектом:**
-
-``` bash
 cd PARS-DIARY
 ```
 
-3. **Заполняем поля в `.env.dist` и переименовываем его в `.env`**
+2. копируем `.env.dist` в `.env` и заполняем поля.
 
-4. **Устанавливаем зависимости и запускаем бота:**
+3. **Устанавливаем зависимости** и запускаем бота:
 
 <details>
-<summary>
-Через uv (рекомендуется)
-</summary>
+<summary>Через uv (рекомендуется)</summary>
 
 **Устанавливаем `uv` (если еще не установлен):**
 
@@ -43,47 +47,100 @@ Windows:
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**Запускаем:**
+
+**Устанавливаем зависимости**:
+
+``` bash
+uv sync
+```
+
+**Компилируем перевод**:
 
 ```bash
-uv run bot.py
+uv run pybabel compile -d locales -D messages
+```
+
+**Запускаем бота**:
+
+```bash
+uv run python -m pars_diary
 ```
 
 </details>
 
 <details>
-<summary>
-Через `requirements.txt`
-</summary>
+<summary>Через venv + `requirements.txt`</summary>
 
-**Создаём виртуальное окружение:**
+**Создаём виртуальное окружение**:
 
 ``` bash
-python3 -m venv venv
+python -m venv .venv
 ```
 
-**Активируем виртуальное окружение:**
+**Активируем виртуальное окружение**:
 
 ``` bash
-. venv/bin/activate
+. .venv/bin/activate
 ```
 
 > Последняя команда для Windows:
 >
 > ``` bash
-> venv\Scripts\activate
+> .venv\Scripts\activate
 > ```
 
-**Устанавливаем зависимости:**
+**Устанавливаем зависимости**:
 
 ``` bash
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-**Запускаем бота:**
+**Компилируем перевод**:
 
-``` bash
-python3 bot.py
+```bash
+pybabel compile -d locales -D messages
 ```
 
+**Запускаем бота**:
+
+```bash
+pip install -r requirements.txt
+```
 </details>
+
+Для последующего запуска повторите шаги *активация виртуального окружения*
+(только для venv) и *запуск бота*.
+
+
+## Перевод / Translate
+
+Бот может работать на нескольких языках.
+
+> Здесь будут примеры команд для `uv`.
+> В случае `venv`, просто убираем `uv run` из команды.
+
+Для начала извлекаем все переводимые строки:
+
+```sh
+uv run pybabel extract --input-dirs=. -o locales/messages.pot
+```
+
+Теперь, добавляем перевод для нужного языка. Например Русского (`ru`):
+
+```sh
+uv run pybabel init -i locales/messages.pot -d locales -D messages -l ru
+```
+
+Открываем файл `locales/ru/LC_MESSAGES/messages.po` и начинаем переводить
+все строки.
+
+Ну и наконец, компилируем полученный перевод:
+
+
+## Поддержка / Contribute
+
+Если вам понравился проект, можете отметить репозиторий звёздочкой.
+
+При возникновении проблем/вопросов можете обращаться в issue.
+
+Также вы можете сделать форк проекта со своими улучшениями.
