@@ -13,7 +13,6 @@ from typing import TypedDict
 from loguru import logger
 
 from pars_diary.parser import exceptions
-from pars_diary.utils.pars import check_cookie
 
 DB_NAME = Path("users.json")
 
@@ -165,18 +164,3 @@ class UsersDataBase:
     def get_cookie(self, user_id: int) -> str | None:
         """Получает печенье пользователя, если было установлено."""
         return self.get_user(user_id)["cookie"]
-
-    def set_cookie(self, user_id: int, cookie: str) -> str:
-        """Устанавливает печенье для пользователя.
-
-        Возвращает сообщение с результатом добавления печеньки.
-        """
-        user = self.get_user(user_id)
-        res, message = check_cookie(cookie, user.server_name)
-
-        if res:
-            user.cookie = cookie
-            self.update_user(user_id, user)
-            self.write()
-
-        return message

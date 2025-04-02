@@ -6,10 +6,10 @@ from itertools import zip_longest
 from aiogram import Bot
 from loguru import logger
 
-from pars_diary.config import config, users_db
+from pars_diary.config import config, parser, users_db
 from pars_diary.parser.db import UsersDataBase
 from pars_diary.parser.exceptions import DiaryParserError, UserNotFoundError
-from pars_diary.utils.pars import Pars
+from pars_diary.parser.parser import DiaryParser
 
 # Константы
 # =========
@@ -25,7 +25,10 @@ SMART_NOTIFY_DURATION = 24
 
 
 async def update_users(
-    users_db: UsersDataBase, bot: Bot, smart_notify: bool | None = False
+    parser: DiaryParser,
+    users_db: UsersDataBase,
+    bot: Bot,
+    smart_notify: bool | None = False,
 ) -> None:
     """Обновляет оценки пользователей."""
     # Обновляем базу данных пользователе
@@ -35,9 +38,7 @@ async def update_users(
             continue
 
         old_grades = user.marks
-        new_grades = Pars().marks(int(user_id)).split("\n")[3:-1]
-        # TODO @milinuri: При каждом обновлении оценок перезаписывается файл
-        # Подумай над этим
+        new_grades = parser.marks(user).split("\n")[3:-1]
         user.marks = new_grades
         users_db.update_user(int(user_id), user)
 
@@ -144,7 +145,7 @@ async def main() -> None:
             count = 0
 
         try:
-            await update_users(users_db, bot, smart_notify=smart_notify)
+            await update_users(parser, users_db, bot, smart_notify=smart_notify)
 
         except KeyError:
             logger.error(UserNotFoundError())

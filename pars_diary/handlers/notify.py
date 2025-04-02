@@ -88,6 +88,7 @@ async def call_set_notify(
     """Отвечает за все callback кнопки."""
     user.notify = not user.notify
     db.update_user(Message.from_user.id, user)
+    db.write()
     await query.message.answer(_SMART_NOTIFY, reply_markup=_notify_markup(user))
 
 
@@ -98,4 +99,5 @@ async def call_set_smart_notify(
     """Изменение состояния умных уведомлений."""
     user.smart_notify = not user.smart_notify
     db.update_user(Message.from_user.id, user)
+    db.write()
     await query.message.answer(_SMART_NOTIFY, reply_markup=_notify_markup(user))

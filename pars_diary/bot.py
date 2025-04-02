@@ -8,14 +8,14 @@ from aiogram.types import CallbackQuery, ErrorEvent, Message, Update
 from aiogram.utils.i18n import I18n, SimpleI18nMiddleware
 from loguru import logger
 
-from pars_diary.config import config, default, metrics, users_db
+from pars_diary.config import config, default, metrics, parser, users_db
 from pars_diary.handlers import ROUTERS
 from pars_diary.messages import error_message
 
 # Константы
 # =========
 
-dp = Dispatcher(db=users_db)
+dp = Dispatcher(db=users_db, parser=parser)
 
 # Корневые обработчики
 # ====================

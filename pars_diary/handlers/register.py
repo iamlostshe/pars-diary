@@ -18,7 +18,7 @@ from aiogram.types import (
 from aiogram.utils.i18n import gettext as _
 
 from pars_diary.parser.db import User, UsersDataBase
-from pars_diary.utils.pars import get_regions
+from pars_diary.parser.parser import DiaryParser, check_cookie
 
 router = Router(name="User registration")
 
@@ -28,14 +28,23 @@ router = Router(name="User registration")
 
 @router.message(Command("new"))
 async def new_msg(
-    msg: Message, command: CommandObject, db: UsersDataBase
+    msg: Message,
+    command: CommandObject,
+    db: UsersDataBase,
+    user: User,
 ) -> None:
     """Вход в новую учебную запись при помощи cookie."""
     if command.args is None:
         await msg.answer('Команда работает так - "/new sessionid=xxx..."')
         return
 
-    await msg.answer(db.set_cookie(msg.from_user.id, command.args.strip()))
+    res, message = check_cookie(command.args, user.server_name)
+    if res:
+        user.cookie = command.args
+        db.update_user(user)
+        db.write()
+
+    await msg.answer(message)
 
 
 # callback обработчики
@@ -43,7 +52,10 @@ async def new_msg(
 
 
 @router.callback_query(F.data == "start_reg")
-async def start_register_user(query: CallbackQuery) -> None:
+async def start_register_user(
+    query: CallbackQuery,
+    parser: DiaryParser,
+) -> None:
     """Начало регистрации нового пользователя.
 
     Предлагает выбрать один из доступных регионов.
@@ -53,7 +65,7 @@ async def start_register_user(query: CallbackQuery) -> None:
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text=r, callback_data=f"reg_region:{u}")]
-                for r, u in get_regions().items()
+                for r, u in parser.get_regions().items()
             ]
         ),
     )
