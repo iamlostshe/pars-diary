@@ -18,7 +18,7 @@ from aiogram.types import (
 from aiogram.utils.i18n import gettext as _
 
 from pars_diary.parser.db import User, UsersDataBase
-from pars_diary.parser.parser import DiaryParser, check_cookie
+from pars_diary.parser.parser import DiaryParser
 
 router = Router(name="User registration")
 
@@ -27,24 +27,25 @@ router = Router(name="User registration")
 
 
 @router.message(Command("new"))
-async def new_msg(
-    msg: Message,
+async def register_new_session(
+    message: Message,
     command: CommandObject,
     db: UsersDataBase,
     user: User,
+    parser: DiaryParser,
 ) -> None:
     """Вход в новую учебную запись при помощи cookie."""
     if command.args is None:
-        await msg.answer('Команда работает так - "/new sessionid=xxx..."')
+        await message.answer('Команда работает так - "/new sessionid=xxx..."')
         return
 
-    res, message = check_cookie(command.args, user.server_name)
+    res, reg_msg = await parser.check_cookie(command.args, user.server_name)
     if res:
         user.cookie = command.args
-        db.update_user(user)
+        db.update_user(message.from_user.id, user)
         db.write()
 
-    await msg.answer(message)
+    await message.answer(reg_msg)
 
 
 # callback обработчики
@@ -65,7 +66,7 @@ async def start_register_user(
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text=r, callback_data=f"reg_region:{u}")]
-                for r, u in parser.get_regions().items()
+                for r, u in (await parser.get_regions()).items()
             ]
         ),
     )

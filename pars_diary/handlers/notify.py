@@ -17,7 +17,7 @@ from aiogram.types import (
 
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import not_auth
-from pars_diary.parser.db import NotifyStatus, User, UsersDataBase
+from pars_diary.parser.db import User, UsersDataBase
 
 router = Router(name="Notify settings")
 
@@ -47,14 +47,16 @@ def _notify_markup(user: User) -> InlineKeyboardMarkup:
     """Получает клавиатуру для настройки уведомлений."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            InlineKeyboardButton(
-                text="🔔 Оценки" if user.notify else "🔕 Оценки",
-                callback_data="n_n",
-            ),
-            InlineKeyboardButton(
-                text="🔔 Умные" if user.smart_notify else "🔕 Умные",
-                callback_data="n_s",
-            ),
+            [
+                InlineKeyboardButton(
+                    text="🔔 Оценки" if user.notify else "🔕 Оценки",
+                    callback_data="n_n",
+                ),
+                InlineKeyboardButton(
+                    text="🔔 Умные" if user.smart_notify else "🔕 Умные",
+                    callback_data="n_s",
+                ),
+            ],
             [
                 InlineKeyboardButton(
                     text="🔔 В расписании", url="https://t.me/mili_sp_bot"
@@ -82,9 +84,7 @@ async def notify_settings(msg: Message, user: User) -> None:
 
 
 @router.callback_query(F.data == "n_n")
-async def call_set_notify(
-    query: CallbackQuery, user: User, db: UsersDataBase
-) -> None:
+async def call_set_notify(query: CallbackQuery, user: User, db: UsersDataBase) -> None:
     """Отвечает за все callback кнопки."""
     user.notify = not user.notify
     db.update_user(Message.from_user.id, user)

@@ -23,7 +23,7 @@ def start_old_user(first_name: str) -> str:
     )
 
 
-def error_message(e: str) -> str:
+def error_message(e: Exception) -> str:
     """Сообщение об ошибке."""
     return (
         "Произошла непредвиденная ошибка, возможно "

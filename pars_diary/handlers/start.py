@@ -2,7 +2,7 @@
 
 from aiogram import Router
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from aiogram.utils.i18n import _
+from aiogram.utils.i18n import gettext as _
 
 from pars_diary.keyboards import not_auth_keyboard
 from pars_diary.messages import start_old_user
@@ -34,11 +34,7 @@ async def command_start_handler(
             ),
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text=_("start"), callback_data="start_reg"
-                        )
-                    ]
+                    [InlineKeyboardButton(text=_("start"), callback_data="start_reg")]
                 ],
             ),
         )

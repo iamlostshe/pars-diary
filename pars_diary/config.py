@@ -1,6 +1,7 @@
 """Глобальные настройки бота."""
 
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from aiogram.client.default import DefaultBotProperties
 from pydantic_settings import BaseSettings
@@ -30,11 +31,11 @@ class Config(BaseSettings):
 
 config: Config = Config(_env_file=".env")
 users_db = UsersDataBase(Path("users.json"))
-metrics = MetricsDatabase(Path("metrics.json"))
+metrics = MetricsDatabase(Path("metrics.json"), users_db)
 parser = DiaryParser()
 
 # настройки часового пояса
-TIMEZONE = 3
+TIMEZONE = ZoneInfo("Europe/Moscow")
 
 # Настройки бота по умолчанию
 default = DefaultBotProperties(parse_mode="html")

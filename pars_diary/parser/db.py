@@ -29,7 +29,7 @@ class User:
     """
 
     reg_time: int
-    ref_code: str
+    ref_code: str | None
     cookie: str | None
     notify: bool
     smart_notify: bool
@@ -43,7 +43,7 @@ class UserDict(TypedDict):
     """Представление пользователя в виде словаря."""
 
     reg_time: int
-    ref_code: str
+    ref_code: str | None
     cookie: str | None
     notify: bool
     smart_notify: bool
@@ -131,7 +131,7 @@ class UsersDataBase:
         except KeyError as e:
             raise exceptions.UserNotAuthorizedError from e
 
-    def __iter__(self) -> Iterator[tuple(str, User)]:
+    def __iter__(self) -> Iterator[tuple[str, User]]:
         """Проходится по всем пользователям из базы."""
         for k, v in self.data.items():
             yield k, self._to_user(v)
@@ -140,7 +140,7 @@ class UsersDataBase:
         """Обновляет данные пользователя БЕЗ сохранения."""
         self._file_data[str(user_id)] = self._to_dict(user)
 
-    def add_user(self, user_id: int, ref_code: str) -> None:
+    def add_user(self, user_id: int, ref_code: str | None) -> None:
         """Добавляет нового пользователя в базу.
 
         Если пользователь уже существует, обновляет время регистрации.
@@ -148,7 +148,7 @@ class UsersDataBase:
         user_data = self.data.get(str(user_id))
         if user_data is None:
             self._file_data[str(user_id)] = {
-                "reg_time": int(time),
+                "reg_time": int(time.time()),
                 "ref_code": ref_code,
                 "cookie": None,
                 "notify": True,

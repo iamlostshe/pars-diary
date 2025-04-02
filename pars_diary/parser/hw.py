@@ -3,14 +3,13 @@
 import functools
 import operator
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pars_diary.config import TIMEZONE
 from pars_diary.services import demo
-from pars_diary.services.ask_gpt import ask_gpt
+from pars_diary.services.gpt import ask_gpt
 from pars_diary.utils.pars import minify_lesson_title, request
 
 SPACES_AFTER_SUBJECT = 10
@@ -27,9 +26,7 @@ DAYS = [
 
 DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
-_WEEKDAYS_BUTTON = (
-    InlineKeyboardButton(text="Дни недели", callback_data="hw_days"),
-)
+_WEEKDAYS_BUTTON = InlineKeyboardButton(text="Дни недели", callback_data="hw_days")
 
 
 # Определение донных домашнего задания
@@ -79,49 +76,58 @@ def _construct_homework(raw_data: list[dict]) -> WeekHomework:
 # =======================
 
 
-def get_hw(
-    raw_data: list[dict],
-) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
+@dataclass(frozen=True)
+class _GetHomeworkResult:
+    """Результат получения домашнего задания из парсера."""
+
+    message: list[str]
+    markup: list[list[list[InlineKeyboardButton]]]
+
+
+def get_hw(raw_data: list[dict]) -> _GetHomeworkResult:
     """Функция для получения Д/З по дню недели."""
-    inline_keyboards = []
+    markup = []
     result = []
 
     for d_i, day_hw in enumerate(_construct_homework(raw_data).days):
         date_str = day_hw.date.strftime("%d.%m.%Y")
         msg_text = f"Д/З на {date_str} {DAYS[d_i]}\n\n"
-        inline_keyboard = []
+        markup_line = []
 
-        if day_hw.homeworks:
-            for hw_i, hw in enumerate(day_hw.homeworks):
-                subject = minify_lesson_title(hw.discipline)
-                subject = subject.ljust(SPACES_AFTER_SUBJECT)
-                msg_text += f"{hw_i + 1}. {subject} │ {hw.homework}\n"
-
-                if hw.homework:
-                    link = quote(f"ГДЗ {hw.discipline}: {hw.homework}")
-                    inline_keyboard.append(
-                        [
-                            InlineKeyboardButton(
-                                text=f"{DAYS_SHORT[d_i]} {subject.strip()}",
-                                callback_data="None",
-                            ),
-                            InlineKeyboardButton(
-                                text="chatgpt",
-                                callback_data=f"chatgpt_{d_i}_{hw_i}",
-                            ),
-                            InlineKeyboardButton(
-                                text="google",
-                                url=f"https://www.google.com/search?q={link}",
-                            ),
-                        ],
-                    )
-        else:
+        if not day_hw.homeworks:
             msg_text += "На этот день не указано д/з"
+            continue
+
+        for hw_i, hw in enumerate(day_hw.homeworks):
+            subject = minify_lesson_title(hw.discipline)
+            subject = subject.ljust(SPACES_AFTER_SUBJECT)
+            msg_text += f"{hw_i + 1}. {subject} │ {hw.homework}\n"
+
+            if not hw.homework:
+                continue
+
+            link = quote(f"ГДЗ {hw.discipline}: {hw.homework}")
+            markup_line.append(
+                [
+                    InlineKeyboardButton(
+                        text=f"{DAYS_SHORT[d_i]} {subject.strip()}",
+                        callback_data="None",
+                    ),
+                    InlineKeyboardButton(
+                        text="chatgpt",
+                        callback_data=f"chatgpt_{d_i}_{hw_i}",
+                    ),
+                    InlineKeyboardButton(
+                        text="google",
+                        url=f"https://www.google.com/search?q={link}",
+                    ),
+                ],
+            )
 
         result.append(msg_text)
-        inline_keyboards.append(inline_keyboard)
+        markup.append(markup_line)
 
-    return result, inline_keyboards
+    return _GetHomeworkResult(result, markup)
 
 
 async def chatgpt(user_id: int, day: int, index: int, first_name: str) -> str:
@@ -140,13 +146,13 @@ async def chatgpt(user_id: int, day: int, index: int, first_name: str) -> str:
 
 def _get_normalized_date() -> date:
     # Подбираем следующий понедельник (специфика апи)
-    now_date = datetime.now(tz=TIMEZONE)
+    now_date = datetime.now(tz=UTC)
 
     if now_date.weekday() == 6:  # noqa: PLR2004
-        now_date += datetime.timedelta(days=1)
+        now_date += timedelta(days=1)
 
     while now_date.weekday() != 0:
-        now_date -= datetime.timedelta(days=1)
+        now_date -= timedelta(days=1)
 
     return now_date.date()
 
@@ -171,14 +177,14 @@ class Homework:
 
         # TODO @milinuri: Тут бы глобальные функции сделать
         # TODO @milinuri: Подключить к общей БД пользователя
-        if demo_mode:
-            self.homework = demo.hw()
-        else:
-            self.homework_data = request(
-                f"/api/HomeworkService/GetHomeworkFromRange?date={_get_normalized_date()}",
-                self.user_id,
-            )
-            self.homework = get_hw(self.homework_data)
+        # if demo_mode:
+        #     self.homework = demo.hw()
+        # else:
+        self.homework_data = request(
+            f"/api/HomeworkService/GetHomeworkFromRange?date={_get_normalized_date()}",
+            self.user_id,
+        )
+        self.homework = get_hw(self.homework_data)
 
     def _to_result(
         self, message: str, markup: list[list[InlineKeyboardButton]]
@@ -204,40 +210,36 @@ class Homework:
 
         День нужно указывать в диапазоне от 0 до 5.
         """
-        markup = self.homework[1][day]
+        markup = self.homework.markup[day]
         markup.append(
             [
-                InlineKeyboardButton(
-                    text="На завтра", callback_data="hw_tomorrow"
-                ),
+                InlineKeyboardButton(text="На завтра", callback_data="hw_tomorrow"),
                 InlineKeyboardButton(text="На неделю", callback_data="hw_week"),
             ],
         )
-        return self._to_result(self.homework[0][day], markup)
+        return self._to_result(self.homework.message[day], markup)
 
     def tomorrow(self) -> HomeworkResult:
         """Получает домашнее задние на неделю."""
-        day = (
-            datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
-        ).weekday()
+        day = (datetime.now(tz=UTC) + timedelta(days=1)).weekday()
 
         if day == 6:  # noqa: PLR2004
             day = 0
 
-        markup = self.homework[1][day]
+        markup = self.homework.markup[day]
         markup.append(
             [
                 InlineKeyboardButton(text="На неделю", callback_data="hw_w"),
             ],
         )
-        return self._to_result(self.homework[0][day], markup)
+        return self._to_result(self.homework.message[day], markup)
 
     def week(self) -> HomeworkResult:
         """Получает домашнее задание на всю неделю."""
-        markup = functools.reduce(operator.iadd, self.homework[1], [])
+        markup = functools.reduce(operator.iadd, self.homework.markup, [])
         markup.append(
             [
                 InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
             ],
         )
-        return self._to_result("\n\n".join(self.homework[0]), markup)
+        return self._to_result("\n\n".join(self.homework.message), markup)

@@ -3,11 +3,9 @@
 Посмотреть как работает проект, без обращения к API.
 """
 
-import functools
-import operator
 from urllib.parse import quote
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton
 
 # Вспомогательные функции
 # =======================

@@ -7,7 +7,7 @@ TODO @milinuri: Декомпозируй логику, отдельно парс
 
 import json
 import re
-from datetime import date
+from datetime import UTC, datetime
 
 import aiohttp
 from loguru import logger
@@ -74,7 +74,8 @@ class DiaryParser:
     ) -> dict:
         """Выполняет запрос к дневнику."""
         if self._session is None:
-            raise exceptions.DiaryParserError("Неактивная сессия") from None
+            err = "Inactive session. Before using parser you need to connect"
+            raise exceptions.DiaryParserError(err) from None
 
         try:
             res = await self._session.request(
@@ -225,10 +226,9 @@ class DiaryParser:
         if user.cookie == "demo":
             data = demo.marks()
         else:
+            today = datetime.now(tz=UTC).date()
             data = self._user_request(
-                "POST",
-                f"/api/MarkService/GetSummaryMarks?date={date.today()}",
-                user,
+                "POST", f"/api/MarkService/GetSummaryMarks?date={today}", user
             )
 
         if not data.get("discipline_marks"):
@@ -246,10 +246,7 @@ class DiaryParser:
 
             # Получаем правильные (рассчитанные) средние баллы по предметам,
             # потому что сервер иногда возвращает нули.
-            if len(marks) > 0:
-                av_marks = round(sum(marks) / len(marks), 2)
-            else:
-                av_marks = 0.0
+            av_marks = round(sum(marks) / len(marks), 2) if len(marks) > 0 else 0.0
 
             user_av_marks.append(av_marks)
             av_color = COLOR_MARKERS[round(av_marks)]
@@ -259,8 +256,7 @@ class DiaryParser:
             message += f"{av_color} {d:10}│ {av_marks} │ {marks_line}\n"
 
         message += (
-            "\nОбщий средний балл: "
-            f"{sum(user_av_marks) / len(user_av_marks):.2f}"
+            f"\nОбщий средний балл: {sum(user_av_marks) / len(user_av_marks):.2f}"
         )
 
         return f"Оценки:\n\n<pre>{message}</pre>"
@@ -271,9 +267,7 @@ class DiaryParser:
             data = demo.i_marks()
 
         else:
-            data = self._user_request(
-                "post", "/api/MarkService/GetTotalMarks", user
-            )
+            data = self._user_request("post", "/api/MarkService/GetTotalMarks", user)
 
         if data.get("discipline_marks") is None:
             return (
@@ -297,17 +291,15 @@ class DiaryParser:
 
         subperiod_index = list(subperiods.keys())
         for discipline in data["discipline_marks"]:
-            d = _SHORT_LESSONS.get(
-                discipline["discipline"], discipline["discipline"]
-            )
+            d = _SHORT_LESSONS.get(discipline["discipline"], discipline["discipline"])
             msg_text += f"\n{d:10} │ "
             line = ["-"] * len_subperiods_names
             for period_mark in discipline["period_marks"]:
                 # Получаем индекс и присваиваем значение
                 if period_mark["subperiod_code"] in subperiod_index:
-                    line[
-                        subperiod_index.index(period_mark["subperiod_code"])
-                    ] = period_mark["mark"]
+                    line[subperiod_index.index(period_mark["subperiod_code"])] = (
+                        period_mark["mark"]
+                    )
 
             msg_text += f"{' │ '.join(line)} │"
         return f"{msg_text}</pre>"

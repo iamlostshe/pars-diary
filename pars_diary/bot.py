@@ -29,15 +29,17 @@ async def db_middleware(
     data: dict[str, Any],
 ) -> Callable[[Update, dict[str, Any]], Awaitable[Any]]:
     """Логирование для сообщений и подсчёт использованных команд."""
-    if isinstance(event, CallbackQuery):
+    if isinstance(event, CallbackQuery) and event.callback_query is not None:
         logger.info("[c] {}", event.callback_query.data)
-        data["user"] = users_db.get_user(event.callback_query.from_user.id)
-    elif isinstance(event, Message):
+        if event.callback_query.from_user is not None:
+            data["user"] = users_db.get_user(event.callback_query.from_user.id)
+    elif isinstance(event, Message) and event.message is not None:
         logger.debug("[m] {}", event.message.text)
-        metrics.use_command(
-            event.message.from_user.id, event.message.text.split()[0][1:]
-        )
-        data["user"] = users_db.get_user(event.message.from_user.id)
+        if event.message.from_user is not None and event.message.text is not None:
+            metrics.use_command(
+                event.message.from_user.id, event.message.text.split()[0][1:]
+            )
+            data["user"] = users_db.get_user(event.message.from_user.id)
     else:
         logger.warning("Unprocessed event {}", type(event))
 
@@ -73,7 +75,10 @@ async def main() -> None:
     i18n = I18n(path="locales", default_locale="ru", domain="messages")
     dp.message.middleware(SimpleI18nMiddleware(i18n))
 
+    logger.info("Setup bot and parser")
     bot = Bot(token=config.telegram_token, default=default)
+    await parser.connect()
+
     # Connect handlers
     for router in ROUTERS:
         logger.debug("Include router: {} ...", router.name)

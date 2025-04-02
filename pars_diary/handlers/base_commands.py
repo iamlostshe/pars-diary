@@ -28,12 +28,9 @@ router = Router(name="Base commands")
 )
 async def simple_msg(msg: Message, user: User, parser: DiaryParser) -> None:
     """Отвечает за /marks, /i_marks, /me, /events, /birthdays."""
-    if user.cookie is None:
+    if user.cookie is None or msg.text is None:
         # Выводим сообщение о необходимости регистрации и клавиатуру
-        await msg.answer(
-            not_auth(),
-            reply_markup=not_auth_keyboard(msg.from_user.language_code),
-        )
+        await msg.answer(not_auth(), reply_markup=not_auth_keyboard())
         return
 
     # Создаем объект класса
@@ -46,11 +43,10 @@ async def simple_msg(msg: Message, user: User, parser: DiaryParser) -> None:
         "/marks": parser.marks,
     }
 
-    # Создаем ответ
-    answer = commands[msg.text](user)
-
-    # Отвечаем пользователю
-    if len(answer) == 2 and isinstance(answer, tuple):
+    # Создаем ответ и отправляем пользователю
+    # TODO @milinuri: Тут лучше создать конкретный датакласс
+    answer = await commands[msg.text](user)
+    if isinstance(answer, tuple):
         await msg.answer(answer[0], reply_markup=answer[1])
     else:
         await msg.answer(answer)

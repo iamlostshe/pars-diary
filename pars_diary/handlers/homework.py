@@ -15,8 +15,7 @@ from aiogram.types import (
     Message,
 )
 
-from pars_diary.parser.hw import Homework, chatgpt
-from pars_diary.utils.hw import DAYS_SHORT
+from pars_diary.parser.hw import DAYS_SHORT, Homework, chatgpt
 
 router = Router(name="Homework")
 
@@ -28,14 +27,14 @@ router = Router(name="Homework")
 async def get_tomorrow_hw(message: Message) -> None:
     """получает домашнее задание на завтра."""
     hw = Homework(message.from_user.id).tomorrow()
-    await message.answer(hw.message, hw.markup)
+    await message.answer(hw.message, reply_markup=hw.markup)
 
 
 @router.message(Command("hw_week"))
 async def get_week_hw(message: Message) -> None:
     """получает домашнее задание на неделю."""
     hw = Homework(message.from_user.id).week()
-    await message.answer(hw.message, hw.markup)
+    await message.answer(hw.message, reply_markup=hw.markup)
 
 
 # Callback обработчики
@@ -46,14 +45,14 @@ async def get_week_hw(message: Message) -> None:
 async def call_tomorrow_hw(query: CallbackQuery) -> None:
     """получает домашнее задание на завтра."""
     hw = Homework(query.from_user.id).tomorrow()
-    await query.message.answer(hw.message, hw.markup)
+    await query.message.answer(hw.message, reply_markup=hw.markup)
 
 
 @router.message(F.data == "hw_week")
 async def call_week_hw(query: CallbackQuery) -> None:
     """получает домашнее задание на неделю."""
     hw = Homework(query.from_user.id).week()
-    await query.message.answer(hw.message, hw.markup)
+    await query.message.answer(hw.message, reply_markup=hw.markup)
 
 
 # Домашнее задание на выбранный день
@@ -86,7 +85,7 @@ class DayHomework(CallbackData, prefix="hw"):
 async def call_day_hw(query: CallbackQuery, callback_data: DayHomework) -> None:
     """получает домашнее задание на завтра."""
     hw = Homework(query.from_user.id).on_day(callback_data.day)
-    await query.message.answer(hw.message, hw.markup)
+    await query.message.answer(hw.message, reply_markup=hw.markup)
 
 
 # Помощь с дз от AI
@@ -101,13 +100,11 @@ class ChatHomework(CallbackData, prefix="chatgpt"):
 
 
 @router.message(ChatHomework.filter())
-async def call_gpt_hw(
-    query: CallbackQuery, callback_data: ChatHomework
-) -> None:
+async def call_gpt_hw(query: CallbackQuery, callback_data: ChatHomework) -> None:
     """Отправляет сообщение для GPT чтобы он подсказал с заданием."""
     await query.message.edit_text("Chatgpt думает...")
     await query.message.edit_text(
-        chatgpt(
+        await chatgpt(
             query.from_user.id,
             callback_data.day,
             callback_data.index,

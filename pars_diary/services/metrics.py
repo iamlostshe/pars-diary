@@ -39,11 +39,11 @@ class MetricsDatabase:
         """Загружает сырые данные из файла."""
         if self._file_data is None:
             try:
-                with self.db_file.open() as f:
+                with self.db_path.open() as f:
                     self._file_data = json.loads(f.read())
             except FileExistsError:
-                logger.warning("File {} not found, creating new", self.db_file)
-                with self.db_file.open("w") as f:
+                logger.warning("File {} not found, creating new", self.db_path)
+                with self.db_path.open("w") as f:
                     f.write("{}\n")
                 self._file_data = {}
 
@@ -51,7 +51,7 @@ class MetricsDatabase:
 
     def write(self) -> None:
         """Записывает изменения в файл."""
-        with self.db_file.open("w") as f:
+        with self.db_path.open("w") as f:
             f.write(json.dumps(self._file_data, ensure_ascii=False))
 
     def use_command(self, user_id: int, command: str) -> None:
@@ -65,22 +65,23 @@ class MetricsDatabase:
         except KeyError:
             user_data[command] = [int(time.time())]
 
+        if self._file_data is None:
+            raise exceptions.DatabaseError(str(self.db_path)) from None
+
         self._file_data[str(user_id)] = user_data
         self.write()
 
     def count_commands(self) -> Counter[str]:
         """Подсчитывается использованные пользователями команды."""
-        counter = Counter()
-
+        counter: Counter[str] = Counter()
         for u in self.data.values():
-            for cmd, usage_times in u:
+            for cmd, usage_times in u.items():
                 counter[cmd] += len(usage_times)
-
         return counter
 
     def save_graph(self) -> None:
         """Генерирует график для анализа прироста пользователей."""
-        times = [int(user["start"]) for user in self.users_db.data.values]
+        times = [user.reg_time for _, user in self.users_db]
         users = list(range(len(self.users_db.data)))
         plt.plot(times, users)
         plt.ylabel("Пользователи")
@@ -90,9 +91,9 @@ class MetricsDatabase:
 
     def get_ref_stats(self) -> str:
         """Расписывает откуда приходит аудитория."""
-        ref_cnt = Counter()
-        for u in self.users_db.data.values():
-            ref_cnt[u["ref_code"]] += 1
+        ref_cnt: Counter[str | None] = Counter()
+        for _, u in self.users_db:
+            ref_cnt[u.ref_code] += 1
 
         res = ""
         for k, v in sorted(ref_cnt.items(), key=lambda x: x[1], reverse=True):
@@ -107,12 +108,12 @@ class MetricsDatabase:
         notify = 0
         smart_notify = 0
 
-        for u in self.users_db.data.values():
-            if u.get("cookie"):
+        for _, u in self.users_db:
+            if u.cookie is not None:
                 cookie += 1
-            if u.get("notify"):
+            if u.notify:
                 notify += 1
-            if u.get("smart_notify"):
+            if u.smart_notify:
                 smart_notify += 1
 
         return UserStats(users, cookie, notify, smart_notify)

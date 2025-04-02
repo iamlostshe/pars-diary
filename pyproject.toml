@@ -27,9 +27,6 @@ dev = [
 # Configure Ruff -------------------------------------------------------
 
 [tool.ruff]
-line-length = 80
-indent-width = 4
-
 # Assume Python 3.11
 target-version = "py311"
 
@@ -52,9 +49,3 @@ ignore = [
     "TD003",
     "FIX002",
 ]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
