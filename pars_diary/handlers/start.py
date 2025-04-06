@@ -20,7 +20,7 @@ async def command_start_handler(
     Команды /start, /help, любое другое сообщение.
     Если предыдущие обработчики не сработали.
     """
-    # Если пользователь зарегистрирован (если не пустой ответ)
+    # Если пользователь зарегистрирован
     if user.cookie is None:
         await message.answer(
             start_old_user(message.from_user.first_name),

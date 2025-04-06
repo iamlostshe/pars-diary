@@ -10,11 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypedDict
 
-from loguru import logger
-
 from pars_diary.parser import exceptions
-
-DB_NAME = Path("users.json")
 
 # Данные пользователя
 # ===================
@@ -79,21 +75,19 @@ class UsersDataBase:
     @property
     def data(self) -> dict[str, UserDict]:
         """Загружает сырые данные из файла."""
-        if self._file_data is None:
-            try:
-                with self.db_file.open() as f:
-                    self._file_data = json.loads(f.read())
-            except FileExistsError:
-                logger.warning("File {} not found, creating new", self.db_file)
-                with self.db_file.open("w") as f:
-                    f.write("{}\n")
-                self._file_data = {}
+        if not self.db_path.exists():
+            with self.db_path.open("w", encoding="utf-8") as f:
+                f.write("{}\n")
+                self.write()
+
+        with self.db_path.open(encoding="utf-8") as f:
+            self._file_data = json.loads(f.read())
 
         return self._file_data
 
     def write(self) -> None:
         """Записывает изменения в файл."""
-        with self.db_file.open("w") as f:
+        with self.db_file.open("w", encoding="utf-8") as f:
             f.write(json.dumps(self._file_data))
 
     # Сериализация и десериализация
@@ -125,15 +119,15 @@ class UsersDataBase:
     # ====================================
 
     def get_user(self, user_id: int) -> User:
-        """получает пользователя из базы."""
+        """Получает пользователя из базы."""
         try:
-            return self._to_user(self.data[str(user_id)])
+            return self._to_user(self._file_data[str(user_id)])
         except KeyError as e:
             raise exceptions.UserNotAuthorizedError from e
 
     def __iter__(self) -> Iterator[tuple[str, User]]:
         """Проходится по всем пользователям из базы."""
-        for k, v in self.data.items():
+        for k, v in self._file_data.items():
             yield k, self._to_user(v)
 
     def update_user(self, user_id: int, user: User) -> None:
@@ -145,10 +139,10 @@ class UsersDataBase:
 
         Если пользователь уже существует, обновляет время регистрации.
         """
-        user_data = self.data.get(str(user_id))
+        user_data = self._file_data.get(str(user_id))
         if user_data is None:
             self._file_data[str(user_id)] = {
-                "reg_time": int(time.time()),
+                "reg_time": [int(time.time())],
                 "ref_code": ref_code,
                 "cookie": None,
                 "notify": True,
@@ -157,7 +151,7 @@ class UsersDataBase:
                 "server_name": None,
             }
         else:
-            self._file_data[str(user_id)] = int(time.time())
+            self._file_data[str(user_id)].append(int(time.time()))
 
         self.write()
 

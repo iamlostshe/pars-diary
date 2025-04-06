@@ -33,13 +33,13 @@ async def db_middleware(
         logger.info("[c] {}", event.callback_query.data)
         if event.callback_query.from_user is not None:
             data["user"] = users_db.get_user(event.callback_query.from_user.id)
-    elif isinstance(event, Message) and event.message is not None:
-        logger.debug("[m] {}", event.message.text)
-        if event.message.from_user is not None and event.message.text is not None:
+    elif isinstance(event, Message) and event.text is not None:
+        logger.debug("[m] {}", event.text)
+        if event.from_user is not None and event.text is not None:
             metrics.use_command(
-                event.message.from_user.id, event.message.text.split()[0][1:]
+                event.from_user.id, event.text.split()[0][1:]
             )
-            data["user"] = users_db.get_user(event.message.from_user.id)
+            data["user"] = users_db.get_user(event.from_user.id)
     else:
         logger.warning("Unprocessed event {}", type(event))
 

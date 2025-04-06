@@ -6,7 +6,7 @@ from itertools import zip_longest
 from aiogram import Bot
 from loguru import logger
 
-from pars_diary.config import config, parser, users_db
+from pars_diary.config import config, default, parser, users_db
 from pars_diary.parser.db import UsersDataBase
 from pars_diary.parser.exceptions import DiaryParserError, UserNotFoundError
 from pars_diary.parser.parser import DiaryParser
@@ -79,7 +79,7 @@ async def check_notify(
             "У Вас изменились оценки (управление уведомлениями - /notify):\n"
             f"<pre>{'\n'.join(diff_grades)}</pre>"
         )
-        await bot.send_message(user_id, msg_text, parse_mode="HTML")
+        await bot.send_message(user_id, msg_text)
 
 
 async def check_smart_notify(bot: Bot, user_id: int, new_grades: dict) -> None:
@@ -124,7 +124,7 @@ async def check_smart_notify(bot: Bot, user_id: int, new_grades: dict) -> None:
             )
 
         message += "\nУправление уведомлениями -> /notify"
-        await bot.send_message(user_id, message, parse_mode="HTML")
+        await bot.send_message(user_id, message)
 
 
 # Главная функция
@@ -133,7 +133,7 @@ async def check_smart_notify(bot: Bot, user_id: int, new_grades: dict) -> None:
 
 async def main() -> None:
     """Запуск проверки уведомлений."""
-    bot = Bot(token=config.tg_token)
+    bot = Bot(token=config.tg_token, default=default)
     time_counter = SMART_NOTIFY_DURATION
 
     while True:

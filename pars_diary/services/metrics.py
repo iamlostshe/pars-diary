@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import TypeAlias
 
 import matplotlib.pyplot as plt
-from loguru import logger
 
 from pars_diary.parser import exceptions
 from pars_diary.parser.db import UsersDataBase
@@ -37,21 +36,19 @@ class MetricsDatabase:
     @property
     def data(self) -> MetricData:
         """Загружает сырые данные из файла."""
-        if self._file_data is None:
-            try:
-                with self.db_path.open() as f:
-                    self._file_data = json.loads(f.read())
-            except FileExistsError:
-                logger.warning("File {} not found, creating new", self.db_path)
-                with self.db_path.open("w") as f:
-                    f.write("{}\n")
-                self._file_data = {}
+        if not self.db_path.exists():
+            with self.db_path.open("w", encoding="utf-8") as f:
+                f.write("{}\n")
+                self.write()
+
+        with self.db_path.open(encoding="utf-8") as f:
+            self._file_data = json.loads(f.read())
 
         return self._file_data
 
     def write(self) -> None:
         """Записывает изменения в файл."""
-        with self.db_path.open("w") as f:
+        with self.db_path.open("w", encoding="utf-8") as f:
             f.write(json.dumps(self._file_data, ensure_ascii=False))
 
     def use_command(self, user_id: int, command: str) -> None:

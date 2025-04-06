@@ -23,7 +23,6 @@ AGGREGATOR_URL = "http://aggregator-obr.bars-open.ru/my_diary"
 SPAN_CLEANER = re.compile(r"<span[^>]*>(.*?)</span>")
 
 # Маркеры, в зависимости от балла
-# TODO @milinuri: Цветовая палитра в виде датакласса?
 COLOR_MARKERS = "🟥🟥🟥🟧🟨🟩"
 
 # Сокращения для слишком длинных названия уроков
@@ -179,8 +178,8 @@ class DiaryParser:
             msg_text += f"Номер телефона - {number}"
 
         for n, i in data["children_persons"]:
-            name = " ".join(i["fullname"].split(" ")[0:-1])
-            dr = i["fullname"].split(" ")[-1]
+            name = " ".join(i["fullname"].split()[0:-1])
+            dr = i["fullname"].split()[-1]
             school = i["school"]
             class_year = i["classyear"]
 

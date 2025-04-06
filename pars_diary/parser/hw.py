@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pars_diary.parser.parser import _SHORT_LESSONS, request
+from pars_diary.parser.parser import _SHORT_LESSONS, DiaryParser
 from pars_diary.services.gpt import ask_gpt
 
 SPACES_AFTER_SUBJECT = 10
@@ -98,7 +98,7 @@ def get_hw(raw_data: list[dict]) -> _GetHomeworkResult:
             continue
 
         for hw_i, hw in enumerate(day_hw.homeworks):
-            subject = _SHORT_LESSONS[hw.discipline]
+            subject = _SHORT_LESSONS.get(hw.discipline, hw.discipline)
             subject = subject.ljust(SPACES_AFTER_SUBJECT)
             msg_text += f"{hw_i + 1}. {subject} │ {hw.homework}\n"
 
@@ -131,8 +131,10 @@ def get_hw(raw_data: list[dict]) -> _GetHomeworkResult:
 
 async def chatgpt(user_id: int, day: int, index: int, first_name: str) -> str:
     """Функция для формирования запроса к GPT."""
+    # TODO @imlostshe: Починить chatgpt
     url = "/api/HomeworkService/GetHomeworkFromRange"
-    data = request(url, user_id)
+
+    data = DiaryParser()._request(url, user_id)
     day_hw = data[day]["homeworks"]
     description = day_hw[index]["homework"]
     subject_name = day_hw[index]["discipline"]
@@ -176,10 +178,12 @@ class Homework:
 
         # TODO @milinuri: Тут бы глобальные функции сделать
         # TODO @milinuri: Подключить к общей БД пользователя
-        # if demo_mode:
-        #     self.homework = demo.hw()
-        # else:
-        self.homework_data = request(
+        """
+        if demo_mode:
+            self.homework = demo.hw()
+        else:
+        """
+        self.homework_data = DiaryParser()._request(
             f"/api/HomeworkService/GetHomeworkFromRange?date={_get_normalized_date()}",
             self.user_id,
         )

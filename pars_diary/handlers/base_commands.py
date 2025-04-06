@@ -44,8 +44,8 @@ async def simple_msg(msg: Message, user: User, parser: DiaryParser) -> None:
     }
 
     # Создаем ответ и отправляем пользователю
-    # TODO @milinuri: Тут лучше создать конкретный датакласс
-    answer = await commands[msg.text](user)
+    # TODO(@milinuri): Тут лучше создать конкретный датакласс
+    answer = await commands[msg.text.split()[0]](user)
     if isinstance(answer, tuple):
         await msg.answer(answer[0], reply_markup=answer[1])
     else:

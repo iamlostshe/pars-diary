@@ -1,3 +1,5 @@
+"""Запуск бота."""
+
 import asyncio
 
 from pars_diary.bot import main
