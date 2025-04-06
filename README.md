@@ -1,9 +1,8 @@
 # Pars diary (Telegram bot)
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![License: AGPL v3](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 ![GitHub Repo stars](https://img.shields.io/github/stars/iamlostshe/pars-diary)
-
 
 Проект для упрощения жизни школьников.
 Позволяет просматривать информацию из школьного дневника.
@@ -135,7 +134,6 @@ uv run pybabel init -i locales/messages.pot -d locales -D messages -l ru
 все строки.
 
 Ну и наконец, компилируем полученный перевод:
-
 
 ## Поддержка / Contribute
 

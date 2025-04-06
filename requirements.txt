@@ -8,7 +8,6 @@ loguru>=0.7.3
 
 # bot.py
 aiogram[i18n]>=3.19.0
-python-dotenv>=1.1.0
 
 # class hours
 conversations-about-important-api>=0.1.0

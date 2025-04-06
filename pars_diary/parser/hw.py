@@ -8,9 +8,8 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pars_diary.services import demo
+from pars_diary.parser.parser import _SHORT_LESSONS, request
 from pars_diary.services.gpt import ask_gpt
-from pars_diary.utils.pars import minify_lesson_title, request
 
 SPACES_AFTER_SUBJECT = 10
 
@@ -99,7 +98,7 @@ def get_hw(raw_data: list[dict]) -> _GetHomeworkResult:
             continue
 
         for hw_i, hw in enumerate(day_hw.homeworks):
-            subject = minify_lesson_title(hw.discipline)
+            subject = _SHORT_LESSONS[hw.discipline]
             subject = subject.ljust(SPACES_AFTER_SUBJECT)
             msg_text += f"{hw_i + 1}. {subject} │ {hw.homework}\n"
 

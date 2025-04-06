@@ -76,7 +76,7 @@ async def main() -> None:
     dp.message.middleware(SimpleI18nMiddleware(i18n))
 
     logger.info("Setup bot and parser")
-    bot = Bot(token=config.telegram_token, default=default)
+    bot = Bot(token=config.tg_token, default=default)
     await parser.connect()
 
     # Connect handlers

@@ -21,7 +21,7 @@ router = Router(name="Admin commands")
 async def new_msg(msg: Message) -> None:
     """Отвечает за /admin."""
     # Если пользователь не админ - кусаемся
-    if str(msg.from_user.id) not in config.admins:
+    if str(msg.from_user.id) not in config.admins_tg:
         logger.warning("{} try to use /admin", msg.from_user.id)
         return
 

@@ -16,16 +16,16 @@ class Config(BaseSettings):
 
     Подгружаются один раз при запуске бота из .env файла.
 
-    - telegram_token: От какого бота будут происходить действия.
-    - admins: Список ID администраторов бота.
+    - tg_token: От какого бота будут происходить действия.
+    - admins_tg: Список ID администраторов бота.
     - git_url: Ссылка на репозиторий с исходным кодом проекта.
     - hf_token: Токен для Hugging Face LLM модели.
     """
 
-    telegram_token: str
-    admins: list[str]
-    git_url: str
+    tg_token: str
+    admins_tg: int
     hf_token: str
+    git_url: str
     demo_mode: bool
 
 
@@ -34,7 +34,7 @@ users_db = UsersDataBase(Path("users.json"))
 metrics = MetricsDatabase(Path("metrics.json"), users_db)
 parser = DiaryParser()
 
-# настройки часового пояса
+# Настройки часового пояса
 TIMEZONE = ZoneInfo("Europe/Moscow")
 
 # Настройки бота по умолчанию

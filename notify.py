@@ -133,7 +133,7 @@ async def check_smart_notify(bot: Bot, user_id: int, new_grades: dict) -> None:
 
 async def main() -> None:
     """Запуск проверки уведомлений."""
-    bot = Bot(token=config.telegram_token)
+    bot = Bot(token=config.tg_token)
     time_counter = SMART_NOTIFY_DURATION
 
     while True:
