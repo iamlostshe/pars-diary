@@ -30,7 +30,7 @@ def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
         "/me - Данные о тебе\n"
         "/ch - Классные часы\n"
         "/events - Ивенты\n"
-        "/birtdays - Дни рождения\n"
+        "/birthdays - Дни рождения\n"
         "/marks - Оценки\n"
         "/i_marks - Итоговые оценки\n"
         "/hw - Домашнее задание\n\n"

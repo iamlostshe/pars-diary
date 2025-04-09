@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from datetime import date
 
 @dataclass
 class User:
@@ -15,7 +14,7 @@ class Homework:
 
 @dataclass 
 class DayHomework:
-    date: date 
+    date: str
     homeworks: list[Homework] = field(default_factory=list)
 
 @dataclass

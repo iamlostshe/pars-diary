@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import datetime
 import functools
+import html
 import operator
 from datetime import datetime as dt
+from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from models import DayHomework, Homework, WeekHomework
 from utils import demo_data
 from utils.ask_gpt import ask_gpt
 from utils.exceptions import DayIndexError
 from utils.pars import minify_lesson_title, request
-from utils.typing import UserId, HomeworkIndex
-from models import WeekHomework, DayHomework, Homework
+
+if TYPE_CHECKING:
+    from utils.typing import HomeworkIndex, UserId
 
 SPACES_AFTER_SUBJECT = 10
 
@@ -38,13 +42,13 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
     week_data = WeekHomework()
     for day_data in data[:6]:
         day = DayHomework(
-            date=datetime.strptime(day_data["date"], "%Y-%m-%d").date(),
+            date=html.escape(day_data["date"]).replace("-", "."),
             homeworks=[
                 Homework(
-                    discipline=hw["discipline"],
-                    homework=hw["homework"]
+                    discipline=html.escape(hw["discipline"]),
+                    homework=html.escape(hw["homework"]),
                 ) for hw in day_data["homeworks"]
-            ]
+            ],
         )
         week_data.days.append(day)
 
@@ -53,8 +57,7 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
 
     for day_index, day in enumerate(week_data.days):
         count = 1
-        date_str = day.date.strftime("%d.%m.%Y")
-        msg_text = f"Д/З на {date_str} {DAYS[day_index]}\n\n"
+        msg_text = f"Д/З на {day.date} {DAYS[day_index]}\n\n"
         inline_keyboard = []
 
         if day.homeworks:
