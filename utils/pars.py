@@ -219,9 +219,9 @@ class Pars:
         if number:
             msg_text += f"Номер телефона - {number}"
 
-        for n, i in data["children_persons"]:
-            name = " ".join(i["fullname"].split(" ")[0:-1])
-            dr = i["fullname"].split(" ")[-1]
+        for n, i in enumerate(data["children_persons"]):
+            name = " ".join(i["fullname"].split()[:-1])
+            dr = i["fullname"].split()[-1]
             school = i["school"]
             classyear = i["classyear"]
 
