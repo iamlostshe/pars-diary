@@ -16,12 +16,10 @@ from models import DayHomework, Homework, WeekHomework
 from utils import demo_data
 from utils.ask_gpt import ask_gpt
 from utils.exceptions import DayIndexError
-from utils.pars import minify_lesson_title, request
+from utils.pars import MINIFY_LESSON_TITLE, request
 
 if TYPE_CHECKING:
     from utils.typing import HomeworkIndex, UserId
-
-SPACES_AFTER_SUBJECT = 10
 
 DAYS = [
     "понедельник",
@@ -56,20 +54,27 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
     result = []
 
     for day_index, day in enumerate(week_data.days):
-        count = 1
         msg_text = f"Д/З на {day.date} {DAYS[day_index]}\n\n"
         inline_keyboard = []
 
+        try:
+            space_len = max(len(MINIFY_LESSON_TITLE.get(
+                hw.discipline, hw.discipline,
+            )) for hw in day.homeworks if day.homeworks) + 1
+        except ValueError:
+            space_len = 0
+
         if day.homeworks:
-            for hw in day.homeworks:
-                subject = minify_lesson_title(hw.discipline)
-                subject = subject.ljust(SPACES_AFTER_SUBJECT)
-                msg_text += f"{count}. {subject} │ {hw.homework}\n"
+            for count, hw in enumerate(day.homeworks):
+                subject = MINIFY_LESSON_TITLE.get(
+                    hw.discipline, hw.discipline,
+                ).ljust(space_len)
+                msg_text += f"{count + 1}. {subject} │ {hw.homework}\n"
 
                 if hw.homework:
                     link = quote(f"ГДЗ {hw.discipline}: {hw.homework}")
                     google_url = f"https://www.google.com/search?q={link}"
-                    ask_gpt_text = f"chatgpt_{day_index}_{count - 1}"
+                    ask_gpt_text = f"chatgpt_{day_index}_{count}"
 
                     inline_keyboard.append(
                         [
@@ -84,7 +89,6 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
                             InlineKeyboardButton(text="google", url=google_url),
                         ],
                     )
-                count += 1
         else:
             msg_text += "На этот день не указано д/з"
 
@@ -178,7 +182,7 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
         )
 
     # Д/З на определённый день недели
-    elif str(index) in "0123456":
+    elif index in range(6):
         # Получем Д/З
         homework = get_hw(data)
 

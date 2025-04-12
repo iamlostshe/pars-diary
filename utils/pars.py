@@ -13,7 +13,6 @@ from utils import demo_data
 from utils.exceptions import (
     MyTimeoutError,
     UnexpectedStatusCodeError,
-    UnknownError,
     UserNotAuthenticatedError,
     ValidationError,
 )
@@ -37,52 +36,62 @@ MARK_STR_TO_FLOAT = {
     "2+": 2.5,
 }
 
+# Сокращённые названия некоторых уроков
+MINIFY_LESSON_TITLE = {
+    "Иностранный язык (английский)": "Англ. Яз.",
+    "Иностранный язык: английский": "Англ. Яз.",
+    "Физическая культура": "Физ-ра",
+    "Литература": "Литер.",
+    "Технология": "Техн.",
+    "Информатика": "Информ.",
+    "Обществознание": "Обществ.",
+    "Русский язык": "Рус. Яз.",
+    "Математика": "Матем.",
+    "Основы безопасности и защиты Родины": "ОБЗР",
+    "Вероятность и статистика": "Теор. Вер.",
+    "Индивидуальный проект": "Инд. пр.",
+    'Факультатив "Функциональная грамотность"': "Функ. Гр.",
+    'Факультатив "Основы 1С Предприятие"': "Фак. 1С",
+}
+
 # Вспомогательные функции
 def get_regions() -> dict:
     """Получаем все доступные регионы."""
-    try:
-        r = requests.get(AGGREGATOR_URL, timeout=20)
+    r = requests.get(AGGREGATOR_URL, timeout=20)
 
-        # Проверяем какой статус-код вернул сервер
-        if r.status_code != 200:
-            raise UnexpectedStatusCodeError(r.status_code)
+    # Проверяем какой статус-код вернул сервер
+    if r.status_code != 200:
+        raise UnexpectedStatusCodeError(r.status_code)
 
-        data = r.json()
-        result = {}
+    data = r.json()
+    result = {}
 
-        if data.get("success") and data.get("data"):
-            for region in r.json()["data"]:
-                name = region.get("name")
-                url = region.get("url")
-                if name and url:
-                    if url[-1] == "/":
-                        url = url[:-1]
-                    result[name] = url
-                else:
-                    # TODO @iamlostshe: Сделать специальное исключение
-                    raise UnexpectedStatusCodeError(data.get("success"))
-            return result
-        # TODO @iamlostshe: Сделать специальное исключение
-        raise UnexpectedStatusCodeError(data.get("success"))
-
-    # Обработка ошибок
-    except Exception as e:
-        raise UnknownError(e) from e
+    if data.get("success") and data.get("data"):
+        for region in r.json()["data"]:
+            name = region.get("name")
+            url = region.get("url")
+            if name and url:
+                if url[-1] == "/":
+                    url = url[:-1]
+                result[name] = url
+            else:
+                # TODO @iamlostshe: Сделать специальное исключение
+                raise UnexpectedStatusCodeError(data.get("success"))
+        return result
+    # TODO @iamlostshe: Сделать специальное исключение
+    raise UnexpectedStatusCodeError(data.get("success"))
 
 
 def request(
         url: str,
-        user_id: str | int | None = None,
-        cookie: str | None = None,
-    ) -> dict:
+        user_id: str | int,
+    ) -> dict | str:
     """Функция для осуществеления запроса по id пользователя и url."""
     from utils import db
 
     try:
-        # Получаем cookie по user_id
-        if cookie is None and user_id is not None:
-            # Получаем cookie из json базы данных
-            cookie = db.get_cookie(user_id)
+        # Получаем cookie из json базы данных
+        cookie = db.get_cookie(user_id)
 
         if cookie in ["demo", "демо"]:
             return "demo"
@@ -118,15 +127,11 @@ def request(
         # Выводим лог в консоль
         logger.debug(data)
 
-        return data
-
-    # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout as e:
         raise MyTimeoutError from e
 
-    # Обработка других ошибок
-    except Exception as e:
-        raise UnknownError(e) from e
+    else:
+        return data
 
 
 def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str]:
@@ -165,32 +170,14 @@ def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str
     )
 
 
-def minify_lesson_title(title: str) -> str:
-    """Функция для сокращения названий уроков.
-
-    `minify_lesson_title('Физическая культура')`
-    >>> 'Физ-ра'
-    """
-    a = {
-        "Иностранный язык (английский)": "Англ. Яз.",
-        "Иностранный язык: английский": "Англ. Яз.",
-        "Физическая культура": "Физ-ра",
-        "Литература": "Литер.",
-        "Технология": "Техн.",
-        "Информатика": "Информ.",
-        "Обществознание": "Обществ.",
-        "Русский язык": "Рус. Яз.",
-        "Математика": "Матем.",
-        "Основы безопасности и защиты Родины": "ОБЗР",
-        "Вероятность и статистика": "Теор. Вер.",
-        "Индивидуальный проект": "Инд. пр.",
-        'Факультатив "Функциональная грамотность"': "Функ. Гр.",
-        'Факультатив "Основы 1С Предприятие"': "Фак. 1С",
-    }.get(title)
-
-    if a:
-        return a
-    return title
+def get_space_len(child: str, parent: dict) -> int:
+    """Возвращает кол-во симовлов, для отступов."""
+    try:
+        return max(len(MINIFY_LESSON_TITLE.get(
+            s[child], s[child],
+        )) for s in parent) + 1
+    except ValueError:
+        return 0
 
 
 # Класс с основными функциями
@@ -285,12 +272,13 @@ class Pars:
         msg_text = ""
         for_midle_marks = []
 
+        space_len = get_space_len("discipline", data["discipline_marks"])
+
         for subject in data["discipline_marks"]:
             # Получаем название предмета
-            g = minify_lesson_title(subject["discipline"])
-
-            # Приводим название предмета к единой длинне
-            g += " " * (10 - len(g))
+            g = MINIFY_LESSON_TITLE.get(
+                subject["discipline"], subject["discipline"],
+            ).ljust(space_len)
 
             # Получаем список оценок по предмету
             marks = []
@@ -307,7 +295,7 @@ class Pars:
             # Получаем правильные (рассчитанные) средние быллы по предметам,
             # потому что сервер иногда возвращает нули.
             len_marks = len(marks)
-            average_mark = "0.00" if not len_marks else f"{sum(marks) / len_marks:.2f}"
+            average_mark = f"{sum(marks) / len_marks:.2f}" if len_marks else "0.00"
             float_average_mark = float(average_mark)
 
             # Добавляем средний балл по предмету в список
@@ -351,7 +339,10 @@ class Pars:
 
         subperiods_names_first_letter = [i[0] for i in subperiods_names]
 
-        explanation = [f"{subperiods_names_first_letter[i]} - {subperiods_names[i]}" for i, _ in enumerate(subperiods_names)]
+        explanation = [
+            f"{subperiods_names_first_letter[i]} - {subperiods_names[i]}"\
+            for i, _ in enumerate(subperiods_names)
+        ]
 
         msg_text = (
             f'Итоговые оценки:\n\n{"\n".join(explanation)}\n\n<pre>\n'
@@ -360,13 +351,13 @@ class Pars:
         )
 
         subperiod_index = list(subperiods.keys())
+        space_len = get_space_len("discipline", data["discipline_marks"])
 
         for discipline in data["discipline_marks"]:
             stroka = list("-" * len_subperiods_names)
-            g = minify_lesson_title(discipline["discipline"])
-
-            while len(g) < 10:
-                g += " "
+            g = MINIFY_LESSON_TITLE.get(
+                discipline["discipline"], discipline["discipline"],
+            ).ljust(space_len)
 
             msg_text += f"{g} │ "
 
