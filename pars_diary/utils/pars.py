@@ -56,6 +56,11 @@ MINIFY_LESSON_TITLE = {
     'Факультатив "Основы 1С Предприятие"': "Фак. 1С",
 }
 
+NO_I_MARKS_DATA = (
+    "Информация об итоговых оценках отсутствует\n\n"
+    "Кажется, вам пока не поставили ни одной("
+)
+
 # Вспомогательные функции
 def get_regions() -> dict:
     """Получаем все доступные регионы."""
@@ -328,13 +333,18 @@ class Pars:
         if data == "demo":
             return demo_data.i_marks()
 
-        if not data.get("discipline_marks"):
-            return (
-                "Информация об итоговых оценках отсутствует\n\n"
-                "Кажется, вам пока не поставили ни одной("
-            )
+        try:
+            total_marks_data = data["total_marks_data"][0]
 
-        subperiods = {i["code"]:i["name"] for i in data["subperiods"]}
+            subperiods_data = total_marks_data["subperiods"]
+            discipline_marks_data = total_marks_data["discipline_marks"]
+        except KeyError:
+            return NO_I_MARKS_DATA
+
+        if not discipline_marks_data:
+            return NO_I_MARKS_DATA
+
+        subperiods = {i["code"]: i["name"] for i in subperiods_data}
 
         subperiods_names = list(subperiods.values())
         len_subperiods_names = len(subperiods_names)
@@ -346,22 +356,24 @@ class Pars:
             for i, _ in enumerate(subperiods_names)
         ]
 
+        space_len = get_space_len("discipline", discipline_marks_data)
+
         msg_text = (
             f'Итоговые оценки:\n\n{"\n".join(explanation)}\n\n<pre>\n'
-            f'Предмет    │ {" | ".join(subperiods_names_first_letter)} |\n'
-            f'───────────┼{("───┼" * len_subperiods_names)[:-1]}┤\n'
+            f'{"Предмет".ljust(space_len)}│ '
+            f'{" | ".join(subperiods_names_first_letter)} |\n'
+            f'{space_len * "─"}┼{("───┼" * len_subperiods_names)[:-1]}┤\n'
         )
 
         subperiod_index = list(subperiods.keys())
-        space_len = get_space_len("discipline", data["discipline_marks"])
 
-        for discipline in data["discipline_marks"]:
+        for discipline in discipline_marks_data:
             stroka = list("-" * len_subperiods_names)
             g = MINIFY_LESSON_TITLE.get(
                 discipline["discipline"], discipline["discipline"],
             ).ljust(space_len)
 
-            msg_text += f"{g} │ "
+            msg_text += f"{g}│ "
 
             for period_mark in discipline["period_marks"]:
                 # Получаем индекс и присваиваем значение

@@ -46,8 +46,6 @@ def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> 
 
     text_e = f"Ошибка во время отправки уведомления ({e})" if notify else e
 
-    logger.error(e)
-
     return (
         "Произошла непредвиденная ошибка, возможно "
         "информация ниже поможет вам понять в чем дело:\n\n"
