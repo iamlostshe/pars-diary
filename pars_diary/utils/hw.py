@@ -10,14 +10,15 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from models import DayHomework, Homework, WeekHomework
-from utils import demo_data
-from utils.ask_gpt import ask_gpt
-from utils.exceptions import DayIndexError
-from utils.pars import MINIFY_LESSON_TITLE, request
+from pars_diary.models import DayHomework, Homework, WeekHomework
+
+from . import demo_data
+from .ask_gpt import ask_gpt
+from .exceptions import DayIndexError
+from .pars import MINIFY_LESSON_TITLE, request
 
 if TYPE_CHECKING:
-    from utils.typing import HomeworkIndex, UserId
+    from .typing import HomeworkIndex, UserId
 
 DAYS = [
     "понедельник",

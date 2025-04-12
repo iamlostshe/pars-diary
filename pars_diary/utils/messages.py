@@ -1,26 +1,29 @@
-"""Билдеры сообщений."""
+"""Билдеры сообщений.
 
 # TODO @iamlostshe: Додель поддержку английского языка
 
-# Врядли ботом будет пользоваться не говорящий
-# по русски человек. Эта функция нужна больше
-# для эстетики, ибо у меня, думаю как и у многих
-# тг на английском и было бы приятнее получать
-# ответы на английском)
+Врядли ботом будет пользоваться не говорящий
+по русски человек. Эта функция нужна больше
+для эстетики, ибо у меня, думаю как и у многих
+тг на английском и было бы приятнее получать
+ответы на английском)
+"""
 
 from __future__ import annotations
 
-# Modules need to be installed
 from loguru import logger
 
-# Writed by me modules
-from utils.load_env import GIT_URL
+from .config import GIT_URL
+
+
+def _get_user_lang(lang_code: str | None) -> str:
+    """Определение языка пользователя."""
+    return "ru" if lang_code in [None, "ru"] else "en"
 
 
 def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
     """Начало для старых пользователей."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return (
         f"👾 Здравствуйте, {first_name}!\n\n"
@@ -39,8 +42,7 @@ def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
 
 def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> str:
     """Сообщение об ошибке."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     text_e = f"Ошибка во время отправки уведомления ({e})" if notify else e
 
@@ -59,16 +61,14 @@ def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> 
 
 def not_auth(lang_code: None = "ru") -> str:
     """Если этот контент не доступен без авторизациия."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return "Для выполнения этого действия вам необходимо зарегистрироваться."
 
 
 def about(lang_code: None = "ru") -> str:
     """Информация о боте."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return (
         "<b>PARS-DIARY</b> - это проект с открытым исходным кодом, направленный "
@@ -100,8 +100,7 @@ def about(lang_code: None = "ru") -> str:
 
 def registration_0(first_name: int | str, lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return (
         f"👾 Добро пожаловать, {first_name}!\n\n"
@@ -111,15 +110,13 @@ def registration_0(first_name: int | str, lang_code: str | None = "ru") -> str:
 
 def registration_1(lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return "1. Укажите Ваш регион:"
 
 
 def registration_2(lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
-    if lang_code != "ru":
-        lang_code = "en"
+    # "ru" if lang_code in [None, "ru"] else "en"
 
     return "2. Укажите Ваши cookie:\n\n"

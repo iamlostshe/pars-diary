@@ -1,13 +1,11 @@
 """Main module to start telegram-bot."""
 
-import asyncio
-
 from aiogram import Bot, Dispatcher
 from loguru import logger
 
-from handlers import routers
-from utils.db import check_db
-from utils.load_env import TOKEN
+from .handlers import routers
+from .utils.config import TOKEN
+from .utils.db import check_db
 
 
 # Starting bot
@@ -34,7 +32,3 @@ async def main() -> None:
     # Starting
     logger.info("Bot start polling...")
     await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -12,8 +12,8 @@ from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
 from loguru import logger
 
-from utils.db import GRAPH_NAME, GetStat, counter, get_graph
-from utils.load_env import ADMINS_TG
+from pars_diary.utils.config import ADMINS_TG
+from pars_diary.utils.db import GRAPH_NAME, GetStat, counter, get_graph
 
 router = Router(name=__name__)
 

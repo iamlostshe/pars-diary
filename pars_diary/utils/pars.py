@@ -9,8 +9,8 @@ import re
 import requests
 from loguru import logger
 
-from utils import demo_data
-from utils.exceptions import (
+from . import demo_data
+from .exceptions import (
     MyTimeoutError,
     UnexpectedStatusCodeError,
     UserNotAuthenticatedError,
@@ -40,9 +40,11 @@ MARK_STR_TO_FLOAT = {
 MINIFY_LESSON_TITLE = {
     "Иностранный язык (английский)": "Англ. Яз.",
     "Иностранный язык: английский": "Англ. Яз.",
+    "Изобразительное искусство": "ИЗО",
     "Физическая культура": "Физ-ра",
     "Литература": "Литер.",
     "Технология": "Техн.",
+    "Труд (технология)": "Техн.",
     "Информатика": "Информ.",
     "Обществознание": "Обществ.",
     "Русский язык": "Рус. Яз.",
@@ -87,7 +89,7 @@ def request(
         user_id: str | int,
     ) -> dict | str:
     """Функция для осуществеления запроса по id пользователя и url."""
-    from utils import db
+    from . import db
 
     try:
         # Получаем cookie из json базы данных

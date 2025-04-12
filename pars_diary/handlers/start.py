@@ -4,9 +4,9 @@ from aiogram import Router
 from aiogram.types import Message
 from loguru import logger
 
-from utils.db import add_user, get_cookie
-from utils.keyboards import not_auth_keyboard, reg_0
-from utils.messages import error, registration_0, start_old_user
+from pars_diary.utils.db import add_user, get_cookie
+from pars_diary.utils.keyboards import not_auth_keyboard, reg_0
+from pars_diary.utils.messages import error, registration_0, start_old_user
 
 router = Router(name=__name__)
 

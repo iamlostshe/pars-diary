@@ -5,19 +5,24 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from aiogram import Bot
 from loguru import logger
-
 from models import User
 
-# Writed by me modules
-from utils import db
-from utils.db import DB_NAME
-from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundError
-from utils.load_env import TOKEN
-from utils.pars import Pars
-from utils.typing import UserId
+from pars_diary.utils import db
+from pars_diary.utils.config import TOKEN
+from pars_diary.utils.db import DB_NAME
+from pars_diary.utils.exceptions import (
+    DBFileNotFoundError,
+    UnknownError,
+    UserNotFoundError,
+)
+from pars_diary.utils.pars import Pars
+
+if TYPE_CHECKING:
+    from .utils.typing import UserId
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1

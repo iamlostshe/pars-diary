@@ -10,13 +10,13 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
-from utils.exceptions import (
+from .exceptions import (
     DBFileNotFoundError,
     UnknownError,
     UserNotAuthorizatedError,
     UserNotFoundError,
 )
-from utils.pars import check_cookie
+from .pars import check_cookie
 
 DB_NAME = "users.json"
 GRAPH_NAME = "stat_img.png"
@@ -429,6 +429,3 @@ def get_server_name(user_id: int | str) -> str:
     # Обработчики ошибок
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e

@@ -12,17 +12,12 @@ https://t.me/pars_diary_bot
 
 ``` bash
 git clone https://github.com/iamlostshe/PARS-DIARY
-```
-
-2. **Переходим в дирректорию с проектом:**
-
-``` bash
 cd PARS-DIARY
 ```
 
-3. **Заполняем поля в `.env.dist` и переименовываем его в `.env`**
+2. **Заполняем поля в `.env.dist` и переименовываем его в `.env`**
 
-4. **Устанавливаем зависимости и запускаем бота:**
+3. **Устанавливаем зависимости и запускаем бота:**
 
 <details>
 <summary>
@@ -46,7 +41,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 **Запускаем:**
 
 ```bash
-uv run bot.py
+uv run -m pars_diary
 ```
 
 </details>
@@ -83,7 +78,7 @@ pip3 install -r requirements.txt
 **Запускаем бота:**
 
 ``` bash
-python3 bot.py
+python3 -m pars_diary
 ```
 
 </details>

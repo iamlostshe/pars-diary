@@ -5,9 +5,9 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from loguru import logger
 
-from utils.ch import ch
-from utils.db import counter
-from utils.messages import error
+from pars_diary.utils.ch import ch
+from pars_diary.utils.db import counter
+from pars_diary.utils.messages import error
 
 router = Router(name=__name__)
 

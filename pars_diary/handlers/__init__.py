@@ -14,7 +14,7 @@
 """
 
 # Импортируем все обработчики
-from handlers import (
+from . import (
     about,
     admin,
     base_commands,

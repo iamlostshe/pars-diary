@@ -9,9 +9,9 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from loguru import logger
 
-from utils.db import counter, get_cookie, get_notify
-from utils.keyboards import not_auth_keyboard
-from utils.messages import error, not_auth
+from pars_diary.utils.db import counter, get_cookie, get_notify
+from pars_diary.utils.keyboards import not_auth_keyboard
+from pars_diary.utils.messages import error, not_auth
 
 router = Router(name=__name__)
 
