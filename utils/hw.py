@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import html
-import operator
 from datetime import datetime as dt
 from typing import TYPE_CHECKING
 from urllib.parse import quote
@@ -54,13 +52,13 @@ def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]
     result = []
 
     for day_index, day in enumerate(week_data.days):
-        msg_text = f"Д/З на {day.date} {DAYS[day_index]}\n\n"
+        msg_text = f"Д/З на {day.date} ({DAYS[day_index]})\n\n"
         inline_keyboard = []
 
         try:
             space_len = max(len(MINIFY_LESSON_TITLE.get(
                 hw.discipline, hw.discipline,
-            )) for hw in day.homeworks if day.homeworks) + 1
+            )) for hw in day.homeworks if day.homeworks)
         except ValueError:
             space_len = 0
 
@@ -148,17 +146,12 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
     if index == "w":
         # Получем Д/З
         homework = get_hw(data)
-
         msg_text = "\n\n".join(homework[0])
 
-        inline_keyboard = functools.reduce(operator.iadd, homework[1], [])
-
         # Редактируем клавиатуру
-        inline_keyboard.append(
-            [
+        inline_keyboard = [[
                 InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
-            ],
-        )
+            ]]
 
     # Д/З на завтра
     elif index == "t":
