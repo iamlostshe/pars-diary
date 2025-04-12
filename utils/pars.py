@@ -101,25 +101,24 @@ def request(
         if "Server.UserNotAuthenticatedError" in r.text:
             raise UserNotAuthenticatedError
 
-        elif "Client.ValidationError" in r.text:
+        if "Client.ValidationError" in r.text:
             raise ValidationError
 
         # Проверяем какой статус-код вернул сервер
-        elif r.status_code != 200:
+        if r.status_code != 200:
             raise UnexpectedStatusCodeError(r.status_code)
 
         # Если нет ошибок
-        else:
-            # Фильруем ответ
-            text = re.sub(SPAN_CLEANER, r"\1", r.text.replace("\u200b", ""))
+        # Фильруем ответ
+        text = re.sub(SPAN_CLEANER, r"\1", r.text.replace("\u200b", ""))
 
-            # Преобразуем в json
-            data = json.loads(text)
+        # Преобразуем в json
+        data = json.loads(text)
 
-            # Выводим лог в консоль
-            logger.debug(data)
+        # Выводим лог в консоль
+        logger.debug(data)
 
-            return data
+        return data
 
     # На случай долгого ожидания ответа сервера (при нагрузке бывает)
     except requests.exceptions.Timeout as e:

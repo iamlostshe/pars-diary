@@ -9,6 +9,8 @@ from pathlib import Path
 from aiogram import Bot
 from loguru import logger
 
+from models import User
+
 # Writed by me modules
 from utils import db
 from utils.db import DB_NAME
@@ -16,7 +18,6 @@ from utils.exceptions import DBFileNotFoundError, UnknownError, UserNotFoundErro
 from utils.load_env import TOKEN
 from utils.pars import Pars
 from utils.typing import UserId
-from models import User
 
 # Задержка между обычными уведомлениями (в часах, целое число)
 NOTIFY_DURATION = 1

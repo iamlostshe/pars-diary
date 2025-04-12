@@ -1,13 +1,16 @@
 # Python
 __pycache__
 venv
+
 .venv
+uv.lock
+.python-version
+
+.mypy_cache
+.ruff_cache
 
 # Logs
 *.log
-
-# uv
-uv.lock
 
 # IDE
 .idea/

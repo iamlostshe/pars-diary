@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 
+
 @dataclass
 class User:
-    cookie: str | None = None 
+    cookie: str | None = None
     notify: bool = False
     smart_notify: bool = False
     notify_marks: list[str] | None = None
@@ -12,7 +13,7 @@ class Homework:
     discipline: str
     homework: str = ""
 
-@dataclass 
+@dataclass
 class DayHomework:
     date: str
     homeworks: list[Homework] = field(default_factory=list)
