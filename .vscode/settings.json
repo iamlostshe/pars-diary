@@ -1,0 +1,10 @@
+{
+    "editor.rulers": [88],
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "uv.lock": true,
+        ".venv": true,
+    },
+}
