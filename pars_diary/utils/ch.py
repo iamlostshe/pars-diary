@@ -9,7 +9,7 @@ from conversations_about_important_api.pars import NoDataForThisDayError
 
 
 # Вспомогательные функции
-def get_next_date(minus_week: int | None = None) -> str:
+async def _get_next_date(minus_week: int | None = None) -> str:
     """Получаем ссылку для парсинга."""
     # Получаем параметр сдвига
     if not minus_week:
@@ -27,7 +27,8 @@ def get_next_date(minus_week: int | None = None) -> str:
     # Переводим дату в строку и возвращаем её
     return now.strftime("%d-%m-%Y")
 
-def ch() -> str:
+
+async def ch() -> str:
     """Информация о классных часах."""
     # Инициализируем объект парсера
     parser = CAIParser()
@@ -35,7 +36,7 @@ def ch() -> str:
 
     while True:
         try:
-            date = get_next_date(count)
+            date = await _get_next_date(count)
             data = parser.get_info(date)
             break
 

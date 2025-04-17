@@ -36,13 +36,13 @@ async def simple_msg(msg: Message) -> None:
     # Проверяем ошибки
     try:
         # Обновляем значение счётчика
-        counter(msg.from_user.id, msg.text.split()[0][1:])
+        await counter(msg.from_user.id, msg.text.split()[0][1:])
 
         # Получаем user_id пользователя
         user_id = msg.from_user.id
 
         # Проверяем зарегестирован ли пользователь
-        if get_cookie(user_id):
+        if await get_cookie(user_id):
             # Создаем объект класса
             pars = Pars()
 
@@ -57,7 +57,7 @@ async def simple_msg(msg: Message) -> None:
             }
 
             # Создаем ответ
-            answer = commands[msg.text](user_id)
+            answer = await commands[msg.text](user_id)
 
             # Отвечаем пользователю
             if len(answer) == 2 and isinstance(answer, tuple):
@@ -68,14 +68,14 @@ async def simple_msg(msg: Message) -> None:
         else:
             # Выводим сообщение о необходимости регестрации и клавиатуру
             await msg.answer(
-                not_auth(msg.from_user.language_code),
+                await not_auth(msg.from_user.language_code),
                 "HTML",
-                reply_markup=not_auth_keyboard(msg.from_user.language_code),
+                reply_markup=await not_auth_keyboard(msg.from_user.language_code),
             )
 
     except Exception as e:
         # Овечаем пользователю
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
+        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
 
         # Выводим лог
         logger.error(e)

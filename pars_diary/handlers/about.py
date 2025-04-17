@@ -29,10 +29,10 @@ async def lessons_msg(msg: Message) -> None:
     # Проверяем ошибки
     try:
         # Обновляем значение счётчика
-        counter(msg.from_user.id, msg.text.split()[0][1:])
+        await counter(msg.from_user.id, msg.text.split()[0][1:])
 
         # Отвечаем пользователю
-        await msg.answer(about(msg.from_user.language_code), "HTML")
+        await msg.answer(await about(msg.from_user.language_code), "HTML")
 
     except Exception as e:
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
+        await msg.answer(await error(e, msg.from_user.language_code), "HTML")

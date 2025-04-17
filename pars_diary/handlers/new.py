@@ -19,7 +19,7 @@ async def new_msg(msg: Message) -> None:
     logger.debug("[m] {}", msg.text)
 
     # Обновляем значение счётчика
-    counter(msg.from_user.id, msg.text.split()[0][1:])
+    await counter(msg.from_user.id, msg.text.split()[0][1:])
 
     # Проверяем ошибки
     try:
@@ -29,11 +29,11 @@ async def new_msg(msg: Message) -> None:
         else:
             # Добавляем cookie пользователя в дб и отвечаем пользователю
             await msg.answer(
-                add_user_cookie(
+                await add_user_cookie(
                     msg.from_user.id,
                     "".join("".join(msg.text[5:].split()).split("\n")),
                 ),
             )
 
     except Exception as e:
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
+        await msg.answer(await error(e, msg.from_user.language_code), "HTML")

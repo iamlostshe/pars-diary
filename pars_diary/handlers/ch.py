@@ -22,10 +22,10 @@ async def ch_msg(msg: Message) -> None:
     # Проверяем ошибки
     try:
         # Обновляем значение счётчика
-        counter(msg.from_user.id, msg.text.split()[0][1:])
+        await counter(msg.from_user.id, msg.text.split()[0][1:])
 
         # Создаем ответ
-        answer = ch()
+        answer = await ch()
 
         # Отвечаем пользователю
         await msg.answer_photo(
@@ -39,7 +39,7 @@ async def ch_msg(msg: Message) -> None:
 
     except Exception as e:
         # Отвечаем пользователю
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
+        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
 
         # Выводим лог
         logger.error(e)

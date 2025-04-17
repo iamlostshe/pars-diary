@@ -18,17 +18,17 @@ router = Router(name=__name__)
 
 # Настройки для уведомлений
 @router.message(Command("notify"))
-async def lessons_msg(msg: Message) -> None:
+async def notify_msg(msg: Message) -> None:
     """Отвечает за /notify."""
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
     # Обновляем значение счётчика
-    counter(msg.from_user.id, f"{msg.text.split()[0][1:]}-settings")
+    await counter(msg.from_user.id, f"{msg.text.split()[0][1:]}-settings")
 
     # Проверяем ошибки
     try:
-        if get_cookie(msg.from_user.id):
+        if await get_cookie(msg.from_user.id):
             await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
 
             markup = InlineKeyboardMarkup(
@@ -36,7 +36,7 @@ async def lessons_msg(msg: Message) -> None:
                     [
                         InlineKeyboardButton(
                             text="❌ Отключить"
-                            if get_notify(msg.from_user.id)
+                            if await get_notify(msg.from_user.id)
                             else "✅ Включить",
                             callback_data="n_n",
                         ),
@@ -55,7 +55,7 @@ async def lessons_msg(msg: Message) -> None:
                     [
                         InlineKeyboardButton(
                             text="❌ Отключить"
-                            if get_notify(msg.from_user.id, index="s")
+                            if await get_notify(msg.from_user.id, index="s")
                             else "✅ Включить",
                             callback_data="n_s",
                         ),
@@ -101,10 +101,10 @@ async def lessons_msg(msg: Message) -> None:
         else:
             # Выводим сообщение о необходимости регестрации и клавиатуру
             await msg.answer(
-                not_auth(msg.from_user.language_code),
+                await not_auth(msg.from_user.language_code),
                 "HTML",
-                reply_markup=not_auth_keyboard(msg.from_user.language_code),
+                reply_markup=await not_auth_keyboard(msg.from_user.language_code),
             )
 
     except Exception as e:
-        await msg.answer(error(e, msg.from_user.language_code), "HTML")
+        await msg.answer(await error(e, msg.from_user.language_code), "HTML")

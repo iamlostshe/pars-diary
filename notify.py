@@ -44,10 +44,10 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
                 if user.cookie not in [None, "demo"]:
                     # Получаем новые оценки
                     pars = Pars()
-                    new_data = pars.marks(user_id).split("\n")[3:-1]
+                    new_data = await pars.marks(user_id).split("\n")[3:-1]
 
                     # Получаем старые оценки
-                    old_data = db.get_marks(user_id)
+                    old_data = await db.get_marks(user_id)
 
                     # Регестрируем изменения
                     user.notify_marks = new_data

@@ -13,7 +13,7 @@ from aiogram.types import FSInputFile, Message
 from loguru import logger
 
 from pars_diary.utils.config import ADMINS_TG
-from pars_diary.utils.db import GRAPH_NAME, GetStat, counter, get_graph
+from pars_diary.utils.db import GRAPH_NAME, Stat, counter, get_graph
 
 router = Router(name=__name__)
 
@@ -27,15 +27,16 @@ async def new_msg(msg: Message) -> None:
 
     # Проверяем ошибки
     # Обновляем значение счётчика
-    counter(msg.from_user.id, msg.text.split()[0][1:])
+    await counter(msg.from_user.id, msg.text.split()[0][1:])
 
     # Если пользователь - админ
     if str(msg.from_user.id) in ADMINS_TG:
         # Обновляем график
-        get_graph()
+        await get_graph()
 
         # Получаем значения
-        stat = GetStat()
+        s = Stat()
+        stat = await s.get_stat()
 
         # Отвечаем пользователю
         await msg.answer_photo(
@@ -67,7 +68,7 @@ async def new_msg(msg: Message) -> None:
 
                 "<b>Источники прихода аудитории (рефералы)"
                 " (в порядке уменьшения выгоды):</b>\n\n"
-                f"{stat.str_refer()}\n"
+                f"{await stat.str_refer()}\n"
             ),
             parse_mode="HTML",
         )

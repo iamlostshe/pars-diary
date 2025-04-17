@@ -34,7 +34,7 @@ DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 
 # Вспомогательные функции
-def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
+async def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
     week_data = WeekHomework()
     for day_data in data[:6]:
@@ -103,7 +103,7 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
     subject_num = int(index.split("_")[2])
 
     url = "/api/HomeworkService/GetHomeworkFromRange"
-    data = request(url, user_id)
+    data = await request(url, user_id)
 
     day_hw = data[day]["homeworks"]
 
@@ -117,7 +117,7 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
 
 
 # Основная функция
-def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup] | str:
+async def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup] | str:
     """Функция для парсинга Д/З.
 
     | index | функция                         |
@@ -137,16 +137,16 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
 
     # Получаем данные из api
     url = f"/api/HomeworkService/GetHomeworkFromRange?date={date.date()}"
-    data = request(url, user_id)
+    data = await request(url, user_id)
 
     # Проверяем не включена ли демо-версия
     if data == "demo":
-        return demo_data.hw(index)
+        return await demo_data.hw(index)
 
     # Д/З на неделю
     if index == "w":
         # Получем Д/З
-        homework = get_hw(data)
+        homework = await get_hw(data)
         msg_text = "\n\n".join(homework[0])
 
         # Редактируем клавиатуру
@@ -163,7 +163,7 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
             day = 0
 
         # Получем Д/З
-        homework = get_hw(data)
+        homework = await get_hw(data)
 
         msg_text = homework[0][day]
         inline_keyboard = homework[1][day]
@@ -178,7 +178,7 @@ def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup
     # Д/З на определённый день недели
     elif index in range(6):
         # Получем Д/З
-        homework = get_hw(data)
+        homework = await get_hw(data)
 
         msg_text = homework[0][int(index)]
         inline_keyboard = homework[1][int(index)]

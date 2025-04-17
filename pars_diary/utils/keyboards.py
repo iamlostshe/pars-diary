@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from .pars import get_regions
 
 
-def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:
+async def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:
     """Если этот контент не доступен без авторизациия (клавиатура)."""
     if land_code != "ru":
         land_code = "en"
@@ -24,7 +24,7 @@ def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:
     )
 
 
-def reg_0(land_code: str | None = None) -> InlineKeyboardMarkup:
+async def reg_0(land_code: str | None = None) -> InlineKeyboardMarkup:
     """Нулевая стадия регистрации."""
     if land_code != "ru":
         land_code = "en"
@@ -34,13 +34,13 @@ def reg_0(land_code: str | None = None) -> InlineKeyboardMarkup:
     )
 
 
-def reg_1(land_code: str | None = None) -> InlineKeyboardMarkup:
+async def reg_1(land_code: str | None = None) -> InlineKeyboardMarkup:
     """Нулевая стадия регистрации."""
     if land_code != "ru":
         land_code = "en"
 
     result = []
-    regions = get_regions()
+    regions = await get_regions()
 
     for r, u in regions.items():
         result.append(
@@ -55,7 +55,7 @@ def reg_1(land_code: str | None = None) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=result)
 
 
-def reg_2(land_code: str | None = None) -> InlineKeyboardMarkup:
+async def reg_2(land_code: str | None = None) -> InlineKeyboardMarkup:
     """Нулевая стадия регистрации."""
     if land_code != "ru":
         land_code = "en"

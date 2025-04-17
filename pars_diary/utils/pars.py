@@ -62,7 +62,7 @@ NO_I_MARKS_DATA = (
 )
 
 # Вспомогательные функции
-def get_regions() -> dict:
+async def get_regions() -> dict:
     """Получаем все доступные регионы."""
     r = requests.get(AGGREGATOR_URL, timeout=20)
 
@@ -89,7 +89,7 @@ def get_regions() -> dict:
     raise UnexpectedStatusCodeError(data.get("success"))
 
 
-def request(
+async def request(
         url: str,
         user_id: str | int,
     ) -> dict | str:
@@ -98,13 +98,13 @@ def request(
 
     try:
         # Получаем cookie из json базы данных
-        cookie = db.get_cookie(user_id)
+        cookie = await db.get_cookie(user_id)
 
         if cookie in ["demo", "демо"]:
             return "demo"
 
         # Получаем server_name из бд
-        server_name = db.get_server_name(user_id)
+        server_name = await db.get_server_name(user_id)
 
         # Преобразуем url
         url = server_name + url
@@ -141,7 +141,7 @@ def request(
         return data
 
 
-def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str]:
+async def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str]:
     """Функция для проверки cookie."""
     # Если используется демоверсия
     if cookie in ["demo", "демо"]:
@@ -177,7 +177,7 @@ def check_cookie(cookie: str, server_name: str | None = None) -> tuple[bool, str
     )
 
 
-def get_space_len(child: str, parent: dict) -> int:
+async def get_space_len(child: str, parent: dict) -> int:
     """Возвращает кол-во симовлов, для отступов."""
     try:
         return max(len(MINIFY_LESSON_TITLE.get(
@@ -191,13 +191,13 @@ def get_space_len(child: str, parent: dict) -> int:
 class Pars:
     """Парсинг."""
 
-    def me(self, user_id: str | int) -> str:
+    async def me(self, user_id: str | int) -> str:
         """Информация о пользователе."""
         url = "/api/ProfileService/GetPersonData"
-        data = request(url, user_id)
+        data = await request(url, user_id)
 
         if data == "demo":
-            return demo_data.me()
+            return await demo_data.me()
 
         if not data.get("children_persons"):
             # Logged in on children account
@@ -236,39 +236,39 @@ class Pars:
 
         return msg_text
 
-    def events(self, user_id: str | int) -> str:
+    async def events(self, user_id: str | int) -> str:
         """Информация о ивентах."""
         url = "/api/WidgetService/getEvents"
-        data = request(url, user_id)
+        data = await request(url, user_id)
 
         if data == "demo":
-            return demo_data.events()
+            return await demo_data.events()
 
         if not data:
             return "Кажется, ивентов не намечается)"
 
         return f"{data}"
 
-    def birthdays(self, user_id: str | int) -> str:
+    async def birthdays(self, user_id: str | int) -> str:
         """Информация о днях рождения."""
         url = "/api/WidgetService/getBirthdays"
-        data = request(url, user_id)
+        data = await request(url, user_id)
 
         if data == "demo":
-            return demo_data.birthdays()
+            return await demo_data.birthdays()
 
         if not data:
             return "Кажется, дней рождений не намечается)"
 
         return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
 
-    def marks(self, user_id: str | int) -> str:
+    async def marks(self, user_id: str | int) -> str:
         """Информация об оценках."""
         url = f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
-        data = request(url, user_id)
+        data = await request(url, user_id)
 
         if data == "demo":
-            return demo_data.marks()
+            return await demo_data.marks()
 
         if not data.get("discipline_marks"):
             return (
@@ -279,7 +279,7 @@ class Pars:
         msg_text = ""
         for_midle_marks = []
 
-        space_len = get_space_len("discipline", data["discipline_marks"])
+        space_len = await get_space_len("discipline", data["discipline_marks"])
 
         for subject in data["discipline_marks"]:
             # Получаем название предмета
@@ -325,13 +325,13 @@ class Pars:
 
         return f"Оценки:\n\n<pre>{msg_text}</pre>"
 
-    def i_marks(self, user_id: str | int) -> str:
+    async def i_marks(self, user_id: str | int) -> str:
         """Информация об итоговых оценках."""
         url = "/api/MarkService/GetTotalMarks"
-        data = request(url, user_id)
+        data = await request(url, user_id)
 
         if data == "demo":
-            return demo_data.i_marks()
+            return await demo_data.i_marks()
 
         try:
             total_marks_data = data["total_marks_data"][0]
@@ -356,7 +356,7 @@ class Pars:
             for i, _ in enumerate(subperiods_names)
         ]
 
-        space_len = get_space_len("discipline", discipline_marks_data)
+        space_len = await get_space_len("discipline", discipline_marks_data)
 
         msg_text = (
             f'Итоговые оценки:\n\n{"\n".join(explanation)}\n\n<pre>\n'

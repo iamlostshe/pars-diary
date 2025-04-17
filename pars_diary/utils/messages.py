@@ -11,17 +11,15 @@
 
 from __future__ import annotations
 
-from loguru import logger
-
 from .config import GIT_URL
 
 
-def _get_user_lang(lang_code: str | None) -> str:
+async def _get_user_lang(lang_code: str | None) -> str:
     """Определение языка пользователя."""
     return "ru" if lang_code in [None, "ru"] else "en"
 
 
-def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
+async def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
     """Начало для старых пользователей."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -40,7 +38,7 @@ def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
     )
 
 
-def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> str:
+async def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> str:
     """Сообщение об ошибке."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -57,14 +55,14 @@ def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> 
     )
 
 
-def not_auth(lang_code: None = "ru") -> str:
+async def not_auth(lang_code: str | None = None) -> str:
     """Если этот контент не доступен без авторизациия."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
     return "Для выполнения этого действия вам необходимо зарегистрироваться."
 
 
-def about(lang_code: None = "ru") -> str:
+async def about(lang_code: None = "ru") -> str:
     """Информация о боте."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -96,7 +94,7 @@ def about(lang_code: None = "ru") -> str:
     )
 
 
-def registration_0(first_name: int | str, lang_code: str | None = "ru") -> str:
+async def registration_0(first_name: int | str, lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -106,14 +104,14 @@ def registration_0(first_name: int | str, lang_code: str | None = "ru") -> str:
     )
 
 
-def registration_1(lang_code: str | None = "ru") -> str:
+async def registration_1(lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
     return "1. Укажите Ваш регион:"
 
 
-def registration_2(lang_code: str | None = "ru") -> str:
+async def registration_2(lang_code: str | None = "ru") -> str:
     """Начало для новых пользоватлей."""
     # "ru" if lang_code in [None, "ru"] else "en"
 

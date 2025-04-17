@@ -22,7 +22,7 @@ DB_NAME = "users.json"
 GRAPH_NAME = "stat_img.png"
 
 
-def check_db() -> None:
+async def check_db() -> None:
     """Проверяет наличие базы данных."""
     if not Path.is_file(Path(DB_NAME)):
         # and creating if it does not exist
@@ -30,7 +30,7 @@ def check_db() -> None:
             f.write("{}\n")
 
 
-def add_user(user_id: int | str, refer: str) -> None | dict:
+async def add_user(user_id: int | str, refer: str) -> None | dict:
     """Добавляет пользователя в json базу данных."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -67,7 +67,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
         raise UnknownError(e) from e
 
 
-def add_user_server_name(user_id: int | str, server_name: str) -> str:
+async def add_user_server_name(user_id: int | str, server_name: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -97,7 +97,7 @@ def add_user_server_name(user_id: int | str, server_name: str) -> str:
         raise UnknownError(e) from e
 
 
-def add_user_cookie(user_id: int | str, cookie: str) -> str:
+async def add_user_cookie(user_id: int | str, cookie: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -117,7 +117,7 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
             server_name = user.get("server_name")
 
             # Проверяем cookie пользователя
-            c_c = check_cookie(cookie, server_name)
+            c_c = await check_cookie(cookie, server_name)
             if c_c[0]:
                 # Записываем cookie в базу данных
                 user["cookie"] = cookie
@@ -138,7 +138,7 @@ def add_user_cookie(user_id: int | str, cookie: str) -> str:
         raise UnknownError(e) from e
 
 
-def get_cookie(user_id: str | int) -> None | str | dict:
+async def get_cookie(user_id: str | int) -> None | str | dict:
     """Возвращает куки из базы данных (Если они прежде были записаны)."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -165,7 +165,7 @@ def get_cookie(user_id: str | int) -> None | str | dict:
         raise UnknownError(e) from e
 
 
-def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
+async def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
     """Возвращает значение уведомлений."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -192,7 +192,7 @@ def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
         raise UnknownError(e) from e
 
 
-def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
+async def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
     """Меняет значение уведомлений (вкл -> выкл | выкл -> вкл)."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -230,7 +230,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
         raise UnknownError(e) from e
 
 
-def get_graph() -> None:
+async def get_graph() -> None:
     """Генерирует график для анализа прироста пользователей."""
     try:
         with Path.open(DB_NAME, "r", encoding="UTF-8") as file:
@@ -257,10 +257,101 @@ def get_graph() -> None:
         raise UnknownError(e) from e
 
 
-class GetStat:
+async def get_marks(user_id: str | int) -> dict | str:
+    """Возвращает оценки из базы данных (Если они прежде были записаны)."""
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения
+        with Path.open(DB_NAME, encoding="UTF-8") as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # Возвращаем оценки пользователя
+            if data.get(user_id):
+                return data[user_id]["notify_marks"]
+            raise UserNotFoundError
+
+    # Обработчики ошибок
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
+    except Exception as e:
+        raise UnknownError(e) from e
+
+
+async def counter(user_id: str | int, counter_name: str) -> None:
+    """Счётчик для аналитики."""
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения
+        with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # TODO @iamlostshe: Оптимизировать эту функцию
+            # (смотри ниже для примера)
+
+            # Работа со счётчиками
+            user = data.get(user_id)
+            if user:
+                if user.get(counter_name):
+                    user[counter_name].append(time.time())
+                else:
+                    user[counter_name] = [time.time()]
+            else:
+                raise UserNotFoundError
+
+            # Сохраняем изменения в json базе данных
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+    # Обработчики ошибок
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
+    except Exception as e:
+        raise UnknownError(e) from e
+
+
+async def get_server_name(user_id: int | str) -> str:
+    """Возвращает server_name по user_id."""
+    # Конвертируем id пользователя в строку
+    user_id = str(user_id)
+
+    try:
+        # Открываем файл для чтения
+        with Path.open(DB_NAME, "r", encoding="UTF-8") as f:
+            # Загрузка и десериализация данных из файла
+            data = json.load(f)
+
+            # Возвращаем server_name
+            user = data.get(user_id)
+
+            if user:
+                server_name = data[user_id].get("server_name")
+
+                if server_name:
+                    return server_name
+
+                # TODO @iamlostshe: Сделать специальное исключение
+                msg = "Не указан регион."
+                raise FileNotFoundError(msg)
+            raise UserNotFoundError
+
+    # Обработчики ошибок
+    except FileNotFoundError as e:
+        raise DBFileNotFoundError(DB_NAME) from e
+
+
+class Stat:
     """Возвращает статистику для (сис-) админов."""
 
-    def __init__(self: Self) -> tuple[int, str]:
+    async def get_stat(self: Self) -> tuple[int, str]:
         """Возвращает статистику для (сис-) админов."""
         # Инициализируем переменные для хранения статистики
         self.refer = []
@@ -322,7 +413,7 @@ class GetStat:
             raise UnknownError(e) from e
 
 
-    def str_refer(self: Self) -> str:
+    async def str_refer(self: Self) -> str:
         """Создаёт строковое представление источников прихода аудитории."""
         # Создаем Counter для подсчета вхождений каждого элемента
         count_dict = Counter(item for item in self.refer if item is not None)
@@ -338,94 +429,3 @@ class GetStat:
 
         # Возвращаем результат в виде строки
         return result
-
-
-def get_marks(user_id: str | int) -> dict | str:
-    """Возвращает оценки из базы данных (Если они прежде были записаны)."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
-    try:
-        # Открываем файл для чтения
-        with Path.open(DB_NAME, encoding="UTF-8") as f:
-            # Загрузка и десериализация данных из файла
-            data = json.load(f)
-
-            # Возвращаем оценки пользователя
-            if data.get(user_id):
-                return data[user_id]["notify_marks"]
-            raise UserNotFoundError
-
-    # Обработчики ошибок
-    except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
-
-
-def counter(user_id: str | int, counter_name: str) -> None:
-    """Счётчик для аналитики."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
-    try:
-        # Открываем файл для чтения
-        with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
-            # Загрузка и десериализация данных из файла
-            data = json.load(f)
-
-            # TODO @iamlostshe: Оптимизировать эту функцию
-            # (смотри ниже для примера)
-
-            # Работа со счётчиками
-            user = data.get(user_id)
-            if user:
-                if user.get(counter_name):
-                    user[counter_name].append(time.time())
-                else:
-                    user[counter_name] = [time.time()]
-            else:
-                raise UserNotFoundError
-
-            # Сохраняем изменения в json базе данных
-            f.seek(0)
-            f.truncate()
-            json.dump(data, f, indent=4, ensure_ascii=False)
-
-    # Обработчики ошибок
-    except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
-
-
-def get_server_name(user_id: int | str) -> str:
-    """Возвращает server_name по user_id."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
-    try:
-        # Открываем файл для чтения
-        with Path.open(DB_NAME, "r", encoding="UTF-8") as f:
-            # Загрузка и десериализация данных из файла
-            data = json.load(f)
-
-            # Возвращаем server_name
-            user = data.get(user_id)
-
-            if user:
-                server_name = data[user_id].get("server_name")
-
-                if server_name:
-                    return server_name
-
-                # TODO @iamlostshe: Сделать специальное исключение
-                msg = "Не указан регион."
-                raise FileNotFoundError(msg)
-            raise UserNotFoundError
-
-    # Обработчики ошибок
-    except FileNotFoundError as e:
-        raise DBFileNotFoundError(DB_NAME) from e

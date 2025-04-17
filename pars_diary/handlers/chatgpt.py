@@ -38,7 +38,7 @@ async def lessons_msg(msg: Message) -> None:
     # Проверяем ошибки
     try:
         # Обновляем значение счётчика
-        counter(msg.from_user.id, msg.text.split()[0][1:])
+        await counter(msg.from_user.id, msg.text.split()[0][1:])
 
         if msg.text == "/chatgpt":
             await msg.answer(
@@ -57,4 +57,4 @@ async def lessons_msg(msg: Message) -> None:
             await msg.answer(send_text)
 
     except Exception as e:
-        await msg.edit_text(error(e, msg.from_user.language_code), parse_mode="HTML")
+        await msg.edit_text(await error(e, msg.from_user.language_code), parse_mode="HTML")

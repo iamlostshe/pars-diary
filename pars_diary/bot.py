@@ -15,7 +15,7 @@ async def main() -> None:
     logger.add("log.log")
 
     # Checking for the existence database
-    check_db()
+    await check_db()
 
     # Initializating dp and bot
     dp = Dispatcher()

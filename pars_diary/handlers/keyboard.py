@@ -37,7 +37,7 @@ async def callback(call: CallbackQuery) -> None:
                     [
                         InlineKeyboardButton(
                             text="❌ Отключить"
-                            if db.swith_notify(call.from_user.id)
+                            if await db.swith_notify(call.from_user.id)
                             else "✅ Включить",
                             callback_data="n_n",
                         ),
@@ -60,7 +60,7 @@ async def callback(call: CallbackQuery) -> None:
                     [
                         InlineKeyboardButton(
                             text="❌ Отключить"
-                            if db.swith_notify(call.from_user.id, index="s")
+                            if await db.swith_notify(call.from_user.id, index="s")
                             else "✅ Включить",
                             callback_data="n_s",
                         ),
@@ -103,7 +103,7 @@ async def callback(call: CallbackQuery) -> None:
 
             else:
                 index = call.data.replace("hw_", "")
-                answer = hw(call.from_user.id, index)
+                answer = await hw(call.from_user.id, index)
 
                 await call.message.edit_text(
                     answer[0],
@@ -120,23 +120,23 @@ async def callback(call: CallbackQuery) -> None:
         # Регистрация в боте
         elif call.data == "reg_0":
             await call.message.edit_text(
-                registration_1(
+                await registration_1(
                     call.from_user.language_code,
                 ),
-                reply_markup=reg_1(),
+                reply_markup=await reg_1(),
             )
 
         elif "reg_1_" in call.data:
             # Записываем server_name в бд
             server_name = "".join(call.data.split("_")[2:])
-            db.add_user_server_name(call.from_user.id, server_name)
+            await db.add_user_server_name(call.from_user.id, server_name)
 
             await call.message.edit_text(
-                registration_2(
+                await registration_2(
                     call.from_user.language_code,
                 ),
-                reply_markup=reg_2(),
+                reply_markup=await reg_2(),
             )
 
     except Exception as e:
-        await call.message.edit_text(error(e, call.from_user.language_code))
+        await call.message.edit_text(await error(e, call.from_user.language_code))
