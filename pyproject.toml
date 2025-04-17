@@ -7,12 +7,13 @@ license = "MIT"
 readme = "README.md"
 
 dependencies = [
-    "matplotlib>=3.10.0, <4.0",
-    "gradio_client>=1.3.0, <2.0",
-    "loguru>=0.7.3, <0.8",
-    "aiogram>=3.19.0, <4.0",
-    "python-dotenv>=1.1.0, < 2.0",
+    "aiogram==3.20.0",
     "conversations-about-important-api==0.1.0",
+    "fake-useragent==2.2.0",
+    "gradio_client==1.3.0",
+    "loguru==0.7.3",
+    "matplotlib==3.10.0",
+    "python-dotenv==1.1.0",
 ]
 
 [tool.ruff.lint]
@@ -27,8 +28,6 @@ ignore = [
     # TODO
     "TD003",
     "FIX002",
-    # Обработка ошибок
-    "BLE001",
     # Cравнение магических значений
     "PLR2004",
     # ?

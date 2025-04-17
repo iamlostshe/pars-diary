@@ -8,6 +8,7 @@ import re
 from typing import Self
 
 from aiohttp import ClientSession
+from fake_useragent import UserAgent
 from loguru import logger
 
 from pars_diary.utils import demo_data
@@ -33,6 +34,7 @@ class Parser:
     async def init(self: Self) -> None:
         """Инициализация парсера."""
         self.session = ClientSession()
+        self.ua = UserAgent()
 
     async def _get_space_len(self: Self, child: str, parent: dict) -> int:
         """Возвращает кол-во симовлов, для отступов."""
@@ -93,7 +95,10 @@ class Parser:
             return False, "Укажите ваш регион -> /start"
 
         # Тест путем запроса к серверу
-        headers = {"cookie": cookie}
+        headers = {
+            "cookie": cookie,
+            "user-agent": self.ua.random,
+        }
         r = self.session.get(
             f"{server_name}/api/ProfileService/GetPersonData",
             headers=headers,
@@ -131,6 +136,7 @@ class Parser:
         # Отпраляем запрос
         headers = {
             "cookie": cookie,
+            "user-agent": self.ua.random,
         }
 
         async with self.session.post(url, headers=headers) as r:
