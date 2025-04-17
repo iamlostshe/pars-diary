@@ -12,14 +12,13 @@ from loguru import logger
 from models import User
 
 from pars_diary.utils import db
-from pars_diary.utils.config import TOKEN
+from pars_diary.utils.config import TOKEN, parser
 from pars_diary.utils.db import DB_NAME
 from pars_diary.utils.exceptions import (
     DBFileNotFoundError,
     UnknownError,
     UserNotFoundError,
 )
-from pars_diary.utils.pars import Pars
 
 if TYPE_CHECKING:
     from .utils.typing import UserId
@@ -42,9 +41,7 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
                 user = User(**data[user_id])
                 # Проверяем указаны ли у пользователя cookie
                 if user.cookie not in [None, "demo"]:
-                    # Получаем новые оценки
-                    pars = Pars()
-                    new_data = await pars.marks(user_id).split("\n")[3:-1]
+                    new_data = await parser.marks(user_id).split("\n")[3:-1]
 
                     # Получаем старые оценки
                     old_data = await db.get_marks(user_id)

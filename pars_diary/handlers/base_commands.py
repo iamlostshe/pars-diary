@@ -13,11 +13,11 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from loguru import logger
 
+from pars_diary.utils.config import parser
 from pars_diary.utils.db import counter, get_cookie
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import error, not_auth
-from pars_diary.utils.pars import Pars
 
 router = Router(name=__name__)
 
@@ -34,48 +34,37 @@ async def simple_msg(msg: Message) -> None:
     logger.debug("[m] {}", msg.text)
 
     # Проверяем ошибки
-    try:
-        # Обновляем значение счётчика
-        await counter(msg.from_user.id, msg.text.split()[0][1:])
+    # Обновляем значение счётчика
+    await counter(msg.from_user.id, msg.text.split()[0][1:])
 
-        # Получаем user_id пользователя
-        user_id = msg.from_user.id
+    # Получаем user_id пользователя
+    user_id = msg.from_user.id
 
-        # Проверяем зарегестирован ли пользователь
-        if await get_cookie(user_id):
-            # Создаем объект класса
-            pars = Pars()
+    # Проверяем зарегестирован ли пользователь
+    if await get_cookie(user_id):
+        # Выбираем функцию, в зависимости от комманды
+        commands = {
+            "/me": parser.me,
+            "/events": parser.events,
+            "/birthdays": parser.birthdays,
+            "/i_marks": parser.i_marks,
+            "/marks": parser.marks,
+            "/hw": lambda user_id: hw(user_id, "t"),
+        }
 
-            # Выбираем функцию, в зависимости от комманды
-            commands = {
-                "/me": pars.me,
-                "/events": pars.events,
-                "/birthdays": pars.birthdays,
-                "/i_marks": pars.i_marks,
-                "/marks": pars.marks,
-                "/hw": lambda user_id: hw(user_id, "t"),
-            }
+        # Создаем ответ
+        answer = await commands[msg.text](user_id)
 
-            # Создаем ответ
-            answer = await commands[msg.text](user_id)
-
-            # Отвечаем пользователю
-            if len(answer) == 2 and isinstance(answer, tuple):
-                await msg.answer(answer[0], "HTML", reply_markup=answer[1])
-            else:
-                await msg.answer(answer, "HTML")
-
+        # Отвечаем пользователю
+        if len(answer) == 2 and isinstance(answer, tuple):
+            await msg.answer(answer[0], "HTML", reply_markup=answer[1])
         else:
-            # Выводим сообщение о необходимости регестрации и клавиатуру
-            await msg.answer(
-                await not_auth(msg.from_user.language_code),
-                "HTML",
-                reply_markup=await not_auth_keyboard(msg.from_user.language_code),
-            )
+            await msg.answer(answer, "HTML")
 
-    except Exception as e:
-        # Овечаем пользователю
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
-
-        # Выводим лог
-        logger.error(e)
+    else:
+        # Выводим сообщение о необходимости регестрации и клавиатуру
+        await msg.answer(
+            await not_auth(msg.from_user.language_code),
+            "HTML",
+            reply_markup=await not_auth_keyboard(msg.from_user.language_code),
+        )

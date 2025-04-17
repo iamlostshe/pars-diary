@@ -14,8 +14,9 @@ from pars_diary.models import DayHomework, Homework, WeekHomework
 
 from . import demo_data
 from .ask_gpt import ask_gpt
+from .config import parser
 from .exceptions import DayIndexError
-from .pars import MINIFY_LESSON_TITLE, request
+from .pars.consts import MINIFY_LESSON_TITLE
 
 if TYPE_CHECKING:
     from .typing import HomeworkIndex, UserId
@@ -103,7 +104,7 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
     subject_num = int(index.split("_")[2])
 
     url = "/api/HomeworkService/GetHomeworkFromRange"
-    data = await request(url, user_id)
+    data = await parser.request(url, user_id)
 
     day_hw = data[day]["homeworks"]
 
@@ -137,7 +138,7 @@ async def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboard
 
     # Получаем данные из api
     url = f"/api/HomeworkService/GetHomeworkFromRange?date={date.date()}"
-    data = await request(url, user_id)
+    data = await parser.request(url, user_id)
 
     # Проверяем не включена ли демо-версия
     if data == "demo":

@@ -1,11 +1,13 @@
 """Классификация ошибок."""
 
+from typing import Self
+
 
 # unknown error
 class UnknownError(Exception):
     """Неизвестная ошибка."""
 
-    def __init__(self, e: Exception) -> None:
+    def __init__(self: Self, e: Exception) -> None:
         """Неизвестная ошибка."""
         self.text = f"Неизвестная ошибка ({e})"
         super().__init__(self.text)
@@ -15,7 +17,7 @@ class UnknownError(Exception):
 class UserNotAuthenticatedError(Exception):
     """Пользователь не найден."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Пользователь не найден."""
         self.text = (
             "<b>Ошибка во время парсинга:</b> "
@@ -29,7 +31,7 @@ class UserNotAuthenticatedError(Exception):
 class ValidationError(Exception):
     """Ошибка валидации."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Ошибка валидации."""
         self.text = (
             "<b>Ошибка во время парсинга:</b> "
@@ -39,24 +41,10 @@ class ValidationError(Exception):
         super().__init__(self.text)
 
 
-class MyTimeoutError(Exception):
-    """Превышено время ожидания ответа сервера."""
-
-    def __init__(self) -> None:
-        """Превышено время ожидания ответа сервера."""
-        self.text = (
-            "<b>Ошибка во время парсинга:</b> "
-            "Превышено время ожидания отклика сервера, "
-            "ошибка на стороне сервера дневника, и не зависит "
-            "от нас. Для исправления ситуации попробуйте повторить запрос чуть позже."
-        )
-        super().__init__(self.text)
-
-
 class UnexpectedStatusCodeError(Exception):
     """Неожиданный статус-код."""
 
-    def __init__(self, status_code: int) -> None:
+    def __init__(self: Self, status_code: int) -> None:
         """Неожиданный статус-код."""
         self.text = (
             "<b>Ошибка во время парсинга:</b> Сервер вернул неожиданный статус-код "
@@ -69,7 +57,7 @@ class UnexpectedStatusCodeError(Exception):
 class UserNotAuthorizatedError(Exception):
     """Пользователь не авторизован."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Пользователь не авторизован."""
         self.text = (
             "Для выполнения этого действия необходимо авторизоваться в боте.\n\n"
@@ -81,7 +69,7 @@ class UserNotAuthorizatedError(Exception):
 class UserNotFoundError(Exception):
     """Пользователь не найден."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Пользователь не найден."""
         self.text = (
             "<b>Ошибка во время работы с базой данных:</b> "
@@ -94,7 +82,7 @@ class UserNotFoundError(Exception):
 class DBFileNotFoundError(Exception):
     """Файл базы данных не найден."""
 
-    def __init__(self, db_name: str) -> None:
+    def __init__(self: Self, db_name: str) -> None:
         """Файл базы данных не найден."""
         self.text = (
             f"<b>Ошибка во время работы с базой данных:</b> Файл {db_name} не найден."
@@ -106,7 +94,7 @@ class DBFileNotFoundError(Exception):
 class DayIndexError(Exception):
     """Неправильный индекс дня."""
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Неправильный индекс дня."""
         self.text = "<b>Ошибка модуля работы с дз</b> Неправильно задан день недели"
 
@@ -115,6 +103,6 @@ class DayIndexError(Exception):
 class ChatGPTError(Exception):
     """Ошибка при работе с нейросетью."""
 
-    def __init__(self, text: str) -> None:
+    def __init__(self: Self, text: str) -> None:
         """Ошибка при работе с нейросетью."""
         self.text = f"<b>Ошибка при работе с неросетью</b> {text}"

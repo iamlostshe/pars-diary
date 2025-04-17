@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from .pars import get_regions
+from .config import parser
 
 
 async def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:
@@ -40,7 +40,7 @@ async def reg_1(land_code: str | None = None) -> InlineKeyboardMarkup:
         land_code = "en"
 
     result = []
-    regions = await get_regions()
+    regions = await parser.get_regions()
 
     for r, u in regions.items():
         result.append(

@@ -10,13 +10,13 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
+from .config import parser
 from .exceptions import (
     DBFileNotFoundError,
     UnknownError,
     UserNotAuthorizatedError,
     UserNotFoundError,
 )
-from .pars import check_cookie
 
 DB_NAME = "users.json"
 GRAPH_NAME = "stat_img.png"
@@ -63,9 +63,6 @@ async def add_user(user_id: int | str, refer: str) -> None | dict:
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
-    except Exception as e:
-        raise UnknownError(e) from e
-
 
 async def add_user_server_name(user_id: int | str, server_name: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
@@ -93,9 +90,6 @@ async def add_user_server_name(user_id: int | str, server_name: str) -> str:
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
-    except Exception as e:
-        raise UnknownError(e) from e
-
 
 async def add_user_cookie(user_id: int | str, cookie: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
@@ -117,7 +111,7 @@ async def add_user_cookie(user_id: int | str, cookie: str) -> str:
             server_name = user.get("server_name")
 
             # Проверяем cookie пользователя
-            c_c = await check_cookie(cookie, server_name)
+            c_c = await parser.check_cookie(cookie, server_name)
             if c_c[0]:
                 # Записываем cookie в базу данных
                 user["cookie"] = cookie
@@ -133,9 +127,6 @@ async def add_user_cookie(user_id: int | str, cookie: str) -> str:
     # Обработчики ошибок
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
 
 
 async def get_cookie(user_id: str | int) -> None | str | dict:
@@ -161,9 +152,6 @@ async def get_cookie(user_id: str | int) -> None | str | dict:
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
-    except Exception as e:
-        raise UnknownError(e) from e
-
 
 async def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
     """Возвращает значение уведомлений."""
@@ -187,9 +175,6 @@ async def get_notify(user_id: str | int, index: str | None = None) -> str | dict
 
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
 
 
 async def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
@@ -226,9 +211,6 @@ async def swith_notify(user_id: str | int, index: str | None = None) -> None | d
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
-    except Exception as e:
-        raise UnknownError(e) from e
-
 
 async def get_graph() -> None:
     """Генерирует график для анализа прироста пользователей."""
@@ -253,9 +235,6 @@ async def get_graph() -> None:
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
 
-    except Exception as e:
-        raise UnknownError(e) from e
-
 
 async def get_marks(user_id: str | int) -> dict | str:
     """Возвращает оценки из базы данных (Если они прежде были записаны)."""
@@ -276,9 +255,6 @@ async def get_marks(user_id: str | int) -> dict | str:
     # Обработчики ошибок
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
 
 
 async def counter(user_id: str | int, counter_name: str) -> None:
@@ -313,9 +289,6 @@ async def counter(user_id: str | int, counter_name: str) -> None:
     # Обработчики ошибок
     except FileNotFoundError as e:
         raise DBFileNotFoundError(DB_NAME) from e
-
-    except Exception as e:
-        raise UnknownError(e) from e
 
 
 async def get_server_name(user_id: int | str) -> str:
@@ -408,9 +381,6 @@ class Stat:
         # Обработчики ошибок
         except FileNotFoundError as e:
             raise DBFileNotFoundError(DB_NAME) from e
-
-        except Exception as e:
-            raise UnknownError(e) from e
 
 
     async def str_refer(self: Self) -> str:

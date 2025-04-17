@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 from loguru import logger
 
 from .handlers import routers
-from .utils.config import TOKEN
+from .utils.config import TOKEN, parser
 from .utils.db import check_db
 
 
@@ -16,6 +16,9 @@ async def main() -> None:
 
     # Checking for the existence database
     await check_db()
+
+    # Initializing parser
+    await parser.init()
 
     # Initializating dp and bot
     dp = Dispatcher()
