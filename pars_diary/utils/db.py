@@ -10,10 +10,10 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
-from .config import parser
+from pars_diary.config import parser
+
 from .exceptions import (
     DBFileNotFoundError,
-    UnknownError,
     UserNotAuthorizatedError,
     UserNotFoundError,
 )

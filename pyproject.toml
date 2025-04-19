@@ -14,22 +14,21 @@ dependencies = [
     "loguru==0.7.3",
     "matplotlib==3.10.0",
     "python-dotenv==1.1.0",
+    "pydantic-settings==2.8.1",
 ]
 
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
     # Ошибки связанные с кирилицей
-    "RUF001",
-    "RUF002",
-    "RUF003",
-    # Закоментированный код
-    "ERA001",
+    "RUF001", "RUF002", "RUF003",
+
     # TODO
-    "TD003",
-    "FIX002",
+    "TD003", "FIX002",
+
     # Cравнение магических значений
     "PLR2004",
-    # ?
+
+    # Работа с датой
     "DTZ005",
 ]

@@ -11,8 +11,8 @@ from aiogram import Bot
 from loguru import logger
 from models import User
 
+from pars_diary.config import TOKEN, parser
 from pars_diary.utils import db
-from pars_diary.utils.config import TOKEN, parser
 from pars_diary.utils.db import DB_NAME
 from pars_diary.utils.exceptions import (
     DBFileNotFoundError,

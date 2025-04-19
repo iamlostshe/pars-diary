@@ -13,11 +13,11 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from loguru import logger
 
-from pars_diary.utils.config import parser
+from pars_diary.config import parser
 from pars_diary.utils.db import counter, get_cookie
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
-from pars_diary.utils.messages import error, not_auth
+from pars_diary.utils.messages import not_auth
 
 router = Router(name=__name__)
 

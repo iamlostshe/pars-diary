@@ -3,8 +3,8 @@
 from aiogram import Bot, Dispatcher
 from loguru import logger
 
+from .config import config, default, parser
 from .handlers import routers
-from .utils.config import TOKEN, parser
 from .utils.db import check_db
 
 
@@ -22,7 +22,7 @@ async def main() -> None:
 
     # Initializating dp and bot
     dp = Dispatcher()
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=config.token_tg, default=default)
 
     # Connect hendlers
     for r in routers:

@@ -3,15 +3,12 @@
 Использует API Hugging Face
 """
 
-import aiohttp
 from loguru import logger
-
-from .config import HF_TOKEN
 
 
 async def ask_gpt(prompt: str, firstname: str) -> str:
     logger.debug(f"[chatgpt] {prompt}")
-
+    """
     system_message = (
         'Тебя зовут "PARS-DIARY".\n'
         "Ты дружелюбный и эффективный помощник в учёбе.\n"
@@ -45,5 +42,5 @@ async def ask_gpt(prompt: str, firstname: str) -> str:
                 result = await response.json()
                 logger.debug(f"[chatgpt] {result}")
                 return result.get("generated_text", "Извините, произошла ошибка")
-
+    """
     return "К сожалению, данный функционал пока в разработке("

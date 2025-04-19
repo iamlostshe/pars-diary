@@ -12,7 +12,7 @@ from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
 from loguru import logger
 
-from pars_diary.utils.config import ADMINS_TG
+from pars_diary.config import config
 from pars_diary.utils.db import GRAPH_NAME, Stat, counter, get_graph
 
 router = Router(name=__name__)
@@ -30,7 +30,7 @@ async def new_msg(msg: Message) -> None:
     await counter(msg.from_user.id, msg.text.split()[0][1:])
 
     # Если пользователь - админ
-    if str(msg.from_user.id) in ADMINS_TG:
+    if str(msg.from_user.id) in config.admins_tg:
         # Обновляем график
         await get_graph()
 

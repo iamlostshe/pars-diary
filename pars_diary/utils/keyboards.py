@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from .config import parser
+from pars_diary.config import parser
 
 
 async def not_auth_keyboard(land_code: str | None = None) -> InlineKeyboardMarkup:

@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-from .config import GIT_URL
+from pars_diary.config import config
 
 
 async def _get_user_lang(lang_code: str | None) -> str:
@@ -19,7 +19,7 @@ async def _get_user_lang(lang_code: str | None) -> str:
     return "ru" if lang_code in [None, "ru"] else "en"
 
 
-async def start_old_user(first_name: int | str, lang_code: str | None = "ru") -> str:
+async def start_old_user(first_name: int | str, lang_code: str | None) -> str:
     """Начало для старых пользователей."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -38,7 +38,11 @@ async def start_old_user(first_name: int | str, lang_code: str | None = "ru") ->
     )
 
 
-async def error(e: str, lang_code: str | None = "ru", notify: bool | None = False) -> str:
+async def error(
+        e: str,
+        lang_code: str | None = "ru",
+        notify: bool | None = False,
+    ) -> str:
     """Сообщение об ошибке."""
     # "ru" if lang_code in [None, "ru"] else "en"
 
@@ -90,7 +94,7 @@ async def about(lang_code: None = "ru") -> str:
         "Для настройки уведомлений используйте /notify\n"
         "</blockquote>\n\n"
         "Что-то сломалось? - пиши админу @iamlostshe\n\n"
-        f"<b>Исходный код</b>: {GIT_URL}"
+        f"<b>Исходный код</b>: {config.git_url}"
     )
 
 
