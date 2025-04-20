@@ -39,7 +39,7 @@ async def command_start_handler(msg: Message) -> None:
         )
 
     # Получаем реферальные сведения
-    refer = msg.text[7:] if msg.text.startswith("/start ") else None
+    refer = msg.text[7:] if msg.text and msg.text.startswith("/start ") else None
 
     # Добавляем в базу данных пользователя или данные о его активности
     await add_user(msg.from_user.id, refer)
