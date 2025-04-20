@@ -19,27 +19,18 @@ async def ch_msg(msg: Message) -> None:
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
-    # Проверяем ошибки
-    try:
-        # Обновляем значение счётчика
-        await counter(msg.from_user.id, msg.text.split()[0][1:])
+    # Обновляем значение счётчика
+    await counter(msg.from_user.id, msg.text.split()[0][1:])
 
-        # Создаем ответ
-        answer = await ch()
+    # Создаем ответ
+    answer = await ch()
 
-        # Отвечаем пользователю
-        await msg.answer_photo(
-            answer[0],
-            answer[1],
-            "HTML",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="Подробнее", url=answer[2])],
-            ],
-        ))
-
-    except Exception as e:
-        # Отвечаем пользователю
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
-
-        # Выводим лог
-        logger.error(e)
+    # Отвечаем пользователю
+    await msg.answer_photo(
+        answer[0],
+        answer[1],
+        "HTML",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Подробнее", url=answer[2])],
+        ],
+    ))

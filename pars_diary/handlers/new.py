@@ -22,18 +22,14 @@ async def new_msg(msg: Message) -> None:
     await counter(msg.from_user.id, msg.text.split()[0][1:])
 
     # Проверяем ошибки
-    try:
-        if msg.text == "/new":
-            # Отвечаем пользователю
-            await msg.answer('Комманда работает так - "/new sessionid=xxx..."')
-        else:
-            # Добавляем cookie пользователя в дб и отвечаем пользователю
-            await msg.answer(
-                await add_user_cookie(
-                    msg.from_user.id,
-                    "".join("".join(msg.text[5:].split()).split("\n")),
-                ),
-            )
-
-    except Exception as e:
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
+    if msg.text == "/new":
+        # Отвечаем пользователю
+        await msg.answer('Комманда работает так - "/new sessionid=xxx..."')
+    else:
+        # Добавляем cookie пользователя в дб и отвечаем пользователю
+        await msg.answer(
+            await add_user_cookie(
+                msg.from_user.id,
+                "".join("".join(msg.text[5:].split()).split("\n")),
+            ),
+        )

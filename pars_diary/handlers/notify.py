@@ -26,85 +26,80 @@ async def notify_msg(msg: Message) -> None:
     # Обновляем значение счётчика
     await counter(msg.from_user.id, f"{msg.text.split()[0][1:]}-settings")
 
-    # Проверяем ошибки
-    try:
-        if await get_cookie(msg.from_user.id):
-            await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
+    if await get_cookie(msg.from_user.id):
+        await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
 
-            markup = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text="❌ Отключить"
-                            if await get_notify(msg.from_user.id)
-                            else "✅ Включить",
-                            callback_data="n_n",
-                        ),
-                    ],
+        markup = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="❌ Отключить"
+                        if await get_notify(msg.from_user.id)
+                        else "✅ Включить",
+                        callback_data="n_n",
+                    ),
                 ],
-            )
+            ],
+        )
 
-            await msg.answer(
-                "🔔 <b>Уведомления об изменении оценок</b>",
-                "HTML",
-                reply_markup=markup,
-            )
+        await msg.answer(
+            "🔔 <b>Уведомления об изменении оценок</b>",
+            "HTML",
+            reply_markup=markup,
+        )
 
-            markup = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text="❌ Отключить"
-                            if await get_notify(msg.from_user.id, index="s")
-                            else "✅ Включить",
-                            callback_data="n_s",
-                        ),
-                    ],
+        markup = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="❌ Отключить"
+                        if await get_notify(msg.from_user.id, index="s")
+                        else "✅ Включить",
+                        callback_data="n_s",
+                    ),
                 ],
-            )
+            ],
+        )
 
-            await msg.answer(
-                (
-                    "🔔 <b>Умные уведомления</b>* - [в разработке] "
-                    "уникальная функция для анализа оценок "
-                    "и простых уведомлений, например:\n\n"
-                    "<blockquote>Спорная оценка по математике,"
-                    "необходимо исправить, иначе может выйти 4!\n\n"
-                    "Для настройки уведомлений используйте /notify\n"
-                    "</blockquote>\n"
-                    "или\n\n"
-                    "<blockquote>Вам не хватает всего 0.25 балла "
-                    "до оценки 5, стоит постараться!\n"
-                    "Для настройки уведомлений используйте /notify\n"
-                    "</blockquote>"
-                ),
-                parse_mode="HTML",
-                reply_markup=markup,
-            )
+        await msg.answer(
+            (
+                "🔔 <b>Умные уведомления</b>* - [в разработке] "
+                "уникальная функция для анализа оценок "
+                "и простых уведомлений, например:\n\n"
+                "<blockquote>Спорная оценка по математике,"
+                "необходимо исправить, иначе может выйти 4!\n\n"
+                "Для настройки уведомлений используйте /notify\n"
+                "</blockquote>\n"
+                "или\n\n"
+                "<blockquote>Вам не хватает всего 0.25 балла "
+                "до оценки 5, стоит постараться!\n"
+                "Для настройки уведомлений используйте /notify\n"
+                "</blockquote>"
+            ),
+            parse_mode="HTML",
+            reply_markup=markup,
+        )
 
-            markup = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text="Перейти",
-                            url="https://t.me/mili_sp_bot",
-                        ),
-                    ],
+        markup = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="Перейти",
+                        url="https://t.me/mili_sp_bot",
+                    ),
                 ],
-            )
-            await msg.answer(
-                "🔔 <b>Уведомления об изменении расписания</b>",
-                "HTML",
-                reply_markup=markup,
-            )
+            ],
+        )
+        await msg.answer(
+            "🔔 <b>Уведомления об изменении расписания</b>",
+            "HTML",
+            reply_markup=markup,
+        )
 
-        else:
-            # Выводим сообщение о необходимости регестрации и клавиатуру
-            await msg.answer(
-                await not_auth(msg.from_user.language_code),
-                "HTML",
-                reply_markup=await not_auth_keyboard(msg.from_user.language_code),
-            )
-
-    except Exception as e:
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
+    else:
+        # Выводим сообщение о необходимости регестрации и клавиатуру
+        await msg.answer(
+            await not_auth(msg.from_user.language_code),
+            "HTML",
+            reply_markup=await not_auth_keyboard(msg.from_user.language_code),
+        )

@@ -26,13 +26,8 @@ async def lessons_msg(msg: Message) -> None:
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
-    # Проверяем ошибки
-    try:
-        # Обновляем значение счётчика
-        await counter(msg.from_user.id, msg.text.split()[0][1:])
+    # Обновляем значение счётчика
+    await counter(msg.from_user.id, msg.text.split()[0][1:])
 
-        # Отвечаем пользователю
-        await msg.answer(await about(msg.from_user.language_code), "HTML")
-
-    except Exception as e:
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
+    # Отвечаем пользователю
+    await msg.answer(await about(msg.from_user.language_code), "HTML")

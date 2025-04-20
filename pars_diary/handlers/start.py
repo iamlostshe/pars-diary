@@ -18,33 +18,28 @@ async def command_start_handler(msg: Message) -> None:
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
-    # Проверяем ошибки
-    try:
-        # Если пользователь зарегистрирован (если не пустой ответ)
-        if await get_cookie(msg.from_user.id):
-            # Отвечаем пользователю
-            await msg.answer(
-                await start_old_user(
-                    msg.from_user.first_name, msg.from_user.language_code,
-                ),
-                reply_markup=await not_auth_keyboard(),
-            )
+    # Если пользователь зарегистрирован (если не пустой ответ)
+    if await get_cookie(msg.from_user.id):
+        # Отвечаем пользователю
+        await msg.answer(
+            await start_old_user(
+                msg.from_user.first_name, msg.from_user.language_code,
+            ),
+            reply_markup=await not_auth_keyboard(),
+        )
 
-        # Если пользователь не зарегистрирован
-        else:
-            # Отвечаем пользователю
-            await msg.answer(
-                await registration_0(
-                    msg.from_user.first_name, msg.from_user.language_code,
-                ),
-                reply_markup=await reg_0(),
-            )
+    # Если пользователь не зарегистрирован
+    else:
+        # Отвечаем пользователю
+        await msg.answer(
+            await registration_0(
+                msg.from_user.first_name, msg.from_user.language_code,
+            ),
+            reply_markup=await reg_0(),
+        )
 
-        # Получаем реферальные сведения
-        refer = msg.text[7:] if msg.text.startswith("/start ") else None
+    # Получаем реферальные сведения
+    refer = msg.text[7:] if msg.text.startswith("/start ") else None
 
-        # Добавляем в базу данных пользователя или данные о его активности
-        await add_user(msg.from_user.id, refer)
-
-    except Exception as e:
-        await msg.answer(await error(e, msg.from_user.language_code), "HTML")
+    # Добавляем в базу данных пользователя или данные о его активности
+    await add_user(msg.from_user.id, refer)

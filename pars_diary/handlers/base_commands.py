@@ -33,7 +33,6 @@ async def simple_msg(msg: Message) -> None:
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
-    # Проверяем ошибки
     # Обновляем значение счётчика
     await counter(msg.from_user.id, msg.text.split()[0][1:])
 
