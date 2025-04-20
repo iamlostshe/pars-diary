@@ -11,7 +11,7 @@ from loguru import logger
 
 from pars_diary.utils.db import counter, get_cookie, get_notify
 from pars_diary.utils.keyboards import not_auth_keyboard
-from pars_diary.utils.messages import error, not_auth
+from pars_diary.utils.messages import not_auth
 
 router = Router(name=__name__)
 

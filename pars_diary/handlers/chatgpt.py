@@ -9,7 +9,6 @@ from loguru import logger
 
 from pars_diary.utils.ask_gpt import ask_gpt
 from pars_diary.utils.db import counter
-from pars_diary.utils.messages import error
 
 router = Router(name=__name__)
 

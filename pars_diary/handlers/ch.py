@@ -7,7 +7,6 @@ from loguru import logger
 
 from pars_diary.utils.ch import ch
 from pars_diary.utils.db import counter
-from pars_diary.utils.messages import error
 
 router = Router(name=__name__)
 

@@ -14,7 +14,7 @@ from aiogram.types import Message
 from loguru import logger
 
 from pars_diary.utils.db import counter
-from pars_diary.utils.messages import about, error
+from pars_diary.utils.messages import about
 
 router = Router(name=__name__)
 
