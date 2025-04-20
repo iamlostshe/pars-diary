@@ -49,16 +49,14 @@ class Parser:
         """Получаем все доступные регионы."""
         async with self.session.get(AGGREGATOR_URL) as r:
             # Проверяем какой статус-код вернул сервер
-            status = await r.status_code
-
-            if status != 200:
-                raise UnexpectedStatusCodeError(status)
+            if r.status != 200:
+                raise UnexpectedStatusCodeError(r.status)
 
             data = await r.json()
             result = {}
 
             if data.get("success") and data.get("data"):
-                for region in r.json()["data"]:
+                for region in (await r.json())["data"]:
                     name = region.get("name")
                     url = region.get("url")
                     if name and url:
@@ -104,13 +102,13 @@ class Parser:
             headers=headers,
         )
 
-        logger.debug(r.json())
+        logger.debug(await r.json())
 
-        if r.status_code == 200:
+        if r.status == 200:
             return True, "Пользователь успешно добавлен в базу данных."
         return False, (
             "Не правильно введены cookie, возможно они "
-            f"устарели (сервер выдает неверный ответ - {r.status_code})"
+            f"устарели (сервер выдает неверный ответ - {r.status})"
         )
 
     async def request(
@@ -152,7 +150,7 @@ class Parser:
 
             # Проверяем какой статус-код вернул сервер
             if r.status != 200:
-                raise UnexpectedStatusCodeError(r.status_code)
+                raise UnexpectedStatusCodeError(r.status)
 
             # Преобразуем в json
             data = json.loads(
