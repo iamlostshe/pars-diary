@@ -6,7 +6,7 @@ from loguru import logger
 
 from pars_diary.utils.db import add_user, get_cookie
 from pars_diary.utils.keyboards import not_auth_keyboard, reg_0
-from pars_diary.utils.messages import error, registration_0, start_old_user
+from pars_diary.utils.messages import registration_0, start_old_user
 
 router = Router(name=__name__)
 
@@ -18,8 +18,8 @@ async def command_start_handler(msg: Message) -> None:
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 
-    # Если пользователь зарегистрирован (если не пустой ответ)
-    if await get_cookie(msg.from_user.id):
+    # Если пользователь зарегистрирован
+    if await get_cookie(msg.from_user.id) not in ["demo", "демо", None]:
         # Отвечаем пользователю
         await msg.answer(
             await start_old_user(
