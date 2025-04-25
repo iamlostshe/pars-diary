@@ -14,7 +14,7 @@ from aiogram.types import Message
 from loguru import logger
 
 from pars_diary.config import parser
-from pars_diary.utils.db import counter, get_cookie
+from pars_diary.utils.db import counter, get_cookie, get_server_name
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
@@ -36,11 +36,14 @@ async def simple_msg(msg: Message) -> None:
     # Обновляем значение счётчика
     await counter(msg.from_user.id, msg.text.split()[0][1:])
 
-    # Получаем user_id пользователя
-    user_id = msg.from_user.id
+    user_cookie = await get_cookie(msg.from_user.id)
+    server_name = await get_server_name(msg.from_user.id)
 
     # Проверяем зарегестирован ли пользователь
-    if await get_cookie(user_id):
+    if user_cookie:
+        # Инициализируем пользователя
+        parser.init_user(user_cookie, server_name)
+
         # Выбираем функцию, в зависимости от комманды
         commands = {
             "/me": parser.me,
@@ -52,7 +55,7 @@ async def simple_msg(msg: Message) -> None:
         }
 
         # Создаем ответ
-        answer = await commands[msg.text](user_id)
+        answer = await commands[msg.text]()
 
         # Отвечаем пользователю
         if len(answer) == 2 and isinstance(answer, tuple):

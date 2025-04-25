@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from aiohttp import ClientSession
 from fake_useragent import UserAgent
@@ -13,6 +13,8 @@ from loguru import logger
 
 from pars_diary.utils import demo_data
 from pars_diary.utils.exceptions import (
+    GetRegionsListError,
+    NoRegionError,
     UnexpectedStatusCodeError,
     UserNotAuthenticatedError,
     ValidationError,
@@ -27,6 +29,9 @@ from .consts import (
     SPAN_CLEANER,
 )
 
+if TYPE_CHECKING:
+    from pydantic import SecretStr
+
 
 class Parser:
     """Парсинг."""
@@ -35,6 +40,19 @@ class Parser:
         """Инициализация парсера."""
         self.session = ClientSession()
         self.ua = UserAgent()
+
+    async def init_user(self: Self, cookie: SecretStr, server_name: str) -> None:
+        """Инициализация пользователя."""
+        if not server_name:
+            raise NoRegionError
+
+        self.session = ClientSession()
+        self.ua = UserAgent()
+
+        self.headers = {
+            "cookie": cookie,
+            "user-agent": self.ua.random,
+        }
 
     async def _get_space_len(self: Self, child: str, parent: dict) -> int:
         """Возвращает кол-во симовлов, для отступов."""
@@ -52,11 +70,11 @@ class Parser:
             if r.status != 200:
                 raise UnexpectedStatusCodeError(r.status)
 
-            data = await r.json()
+            data = json.loads(await r.text())
             result = {}
 
             if data.get("success") and data.get("data"):
-                for region in (await r.json())["data"]:
+                for region in data["data"]:
                     name = region.get("name")
                     url = region.get("url")
                     if name and url:
@@ -64,11 +82,9 @@ class Parser:
                             url = url[:-1]
                         result[name] = url
                     else:
-                        # TODO @iamlostshe: Сделать специальное исключение
-                        raise UnexpectedStatusCodeError(data.get("success"))
+                        raise GetRegionsListError
                 return result
-            # TODO @iamlostshe: Сделать специальное исключение
-            raise UnexpectedStatusCodeError(data.get("success"))
+            raise GetRegionsListError
 
     async def check_cookie(
             self: Self,
@@ -89,68 +105,44 @@ class Parser:
             return False, 'Ваши cookie должны содержать "sessionid="'
         if "sessionid=xxx..." in cookie:
             return False, "Нельзя использовать пример"
-        if not server_name:
-            return False, "Укажите ваш регион -> /start"
 
         # Тест путем запроса к серверу
-        headers = {
-            "cookie": cookie,
-            "user-agent": self.ua.random,
-        }
-        r = self.session.get(
-            f"{server_name}/api/ProfileService/GetPersonData",
-            headers=headers,
-        )
-
-        logger.debug(await r.json())
-
-        if r.status == 200:
-            return True, "Пользователь успешно добавлен в базу данных."
-        return False, (
-            "Не правильно введены cookie, возможно они "
-            f"устарели (сервер выдает неверный ответ - {r.status})"
-        )
+        try:
+            await self.request(
+                f"{server_name}/api/ProfileService/GetPersonData",
+                cookie,
+            )
+        except NoRegionError:
+            return False, "Укажите ваш регион -> /start"
+        except:  # noqa: E722
+            return False, (
+                "Не правильно введены cookie, при проверке сервер выдаёт ошибку."
+            )
+        return True, "Пользователь успешно добавлен в базу данных."
 
     async def request(
             self: Self,
             url: str,
-            user_id: str | int,
         ) -> dict | str:
         """Функция для осуществеления запроса по id пользователя и url."""
-        from pars_diary.utils import db
+        if self.headers["cookie"] in ["demo", "демо"]:
+            return demo_data(url)
 
-        # Получаем cookie из json базы данных
-        cookie = await db.get_cookie(user_id)
+        url = self.server_name + url
 
-        if cookie in ["demo", "демо"]:
-            return "demo"
-
-        # Получаем server_name из бд
-        server_name = await db.get_server_name(user_id)
-
-        # Преобразуем url
-        url = f"{server_name}{url}"
-
-        # Отпраляем запрос
-        headers = {
-            "cookie": cookie,
-            "user-agent": self.ua.random,
-        }
-
-        async with self.session.post(url, headers=headers) as r:
-            # Получаем текст ответа
+        async with self.session.post(url, headers=self.headers) as r:
             text = await r.text()
 
             # Проверяем ответ сервера на наличае ошибок в ответе
-            if "Server.UserNotAuthenticatedError" in text:
+            if "Server.UserNotAuthenticatedError" in text or r.status == 403:
                 raise UserNotAuthenticatedError
-
-            if "Client.ValidationError" in text:
-                raise ValidationError
 
             # Проверяем какой статус-код вернул сервер
             if r.status != 200:
                 raise UnexpectedStatusCodeError(r.status)
+
+            if "Client.ValidationError" in text:
+                raise ValidationError
 
             # Преобразуем в json
             data = json.loads(
@@ -163,13 +155,10 @@ class Parser:
 
             return data
 
-    async def me(self: Self, user_id: str | int) -> str:
+    async def me(self: Self) -> str:
         """Информация о пользователе."""
         url = "/api/ProfileService/GetPersonData"
-        data = await self.request(url, user_id)
-
-        if data == "demo":
-            return await demo_data.me()
+        data = await self.request(url)
 
         if not data.get("children_persons"):
             # Logged in on children account
@@ -208,39 +197,30 @@ class Parser:
 
         return msg_text
 
-    async def events(self: Self, user_id: str | int) -> str:
+    async def events(self: Self) -> str:
         """Информация о ивентах."""
         url = "/api/WidgetService/getEvents"
-        data = await self.request(url, user_id)
-
-        if data == "demo":
-            return await demo_data.events()
+        data = await self.request(url)
 
         if not data:
             return "Кажется, ивентов не намечается)"
 
         return f"{data}"
 
-    async def birthdays(self: Self, user_id: str | int) -> str:
+    async def birthdays(self: Self) -> str:
         """Информация о днях рождения."""
         url = "/api/WidgetService/getBirthdays"
-        data = await self.request(url, user_id)
-
-        if data == "demo":
-            return await demo_data.birthdays()
+        data = await self.request(url)
 
         if not data:
             return "Кажется, дней рождений не намечается)"
 
         return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
 
-    async def marks(self: Self, user_id: str | int) -> str:
+    async def marks(self: Self) -> str:
         """Информация об оценках."""
         url = f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
-        data = await self.request(url, user_id)
-
-        if data == "demo":
-            return await demo_data.marks()
+        data = await self.request(url)
 
         if not data.get("discipline_marks"):
             return (
@@ -297,13 +277,10 @@ class Parser:
 
         return f"Оценки:\n\n<pre>{msg_text}</pre>"
 
-    async def i_marks(self: Self, user_id: str | int) -> str:
+    async def i_marks(self: Self) -> str:
         """Информация об итоговых оценках."""
         url = "/api/MarkService/GetTotalMarks"
-        data = await self.request(url, user_id)
-
-        if data == "demo":
-            return await demo_data.i_marks()
+        data = await self.request(url)
 
         try:
             total_marks_data = data["total_marks_data"][0]

@@ -16,7 +16,6 @@ from pars_diary.utils import db
 from pars_diary.utils.db import DB_NAME
 from pars_diary.utils.exceptions import (
     DBFileNotFoundError,
-    UnknownError,
     UserNotFoundError,
 )
 
@@ -70,9 +69,6 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
 
     except FileNotFoundError as e:
         logger.error(DBFileNotFoundError(e))
-
-    except Exception as e:
-        logger.error(UnknownError(e))
 
     finally:
         await bot.session.close()

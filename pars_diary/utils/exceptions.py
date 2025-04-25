@@ -3,16 +3,6 @@
 from typing import Self
 
 
-# unknown error
-class UnknownError(Exception):
-    """Неизвестная ошибка."""
-
-    def __init__(self: Self, e: Exception) -> None:
-        """Неизвестная ошибка."""
-        self.text = f"Неизвестная ошибка ({e})"
-        super().__init__(self.text)
-
-
 # pars.py
 class UserNotAuthenticatedError(Exception):
     """Пользователь не найден."""
@@ -20,10 +10,9 @@ class UserNotAuthenticatedError(Exception):
     def __init__(self: Self) -> None:
         """Пользователь не найден."""
         self.text = (
-            "<b>Ошибка во время парсинга:</b> "
+            "<b>Ошибка во время парсинга:</b>\n\n"
             "Для выполнения этого действия необходимо авторизоваться в боте.\n\n"
-            "Инструкция по авторизации доступна по -> "
-            "/start (Server.UserNotAuthenticatedError)"
+            "Инструкция по авторизации доступна по -> /start"
         )
         super().__init__(self.text)
 
@@ -34,9 +23,8 @@ class ValidationError(Exception):
     def __init__(self: Self) -> None:
         """Ошибка валидации."""
         self.text = (
-            "<b>Ошибка во время парсинга:</b> "
-            "Для выполнения этого действия необходимо авторизоваться в боте.\n\n"
-            "Инструкция по авторизации доступна по -> /start (Client.ValidationError)"
+            "<b>Ошибка во время парсинга:</b>\n\n"
+            "Ошибка валидации (Client.ValidationError)"
         )
         super().__init__(self.text)
 
@@ -47,8 +35,32 @@ class UnexpectedStatusCodeError(Exception):
     def __init__(self: Self, status_code: int) -> None:
         """Неожиданный статус-код."""
         self.text = (
-            "<b>Ошибка во время парсинга:</b> Сервер вернул неожиданный статус-код "
+            "<b>Ошибка во время парсинга:</b>\n\nСервер вернул неожиданный статус-код "
             f"({status_code})"
+        )
+        super().__init__(self.text)
+
+
+class NoRegionError(Exception):
+    """Не указан регион."""
+
+    def __init__(self: Self) -> None:
+        """Неожиданный статус-код."""
+        self.text = (
+            "<b>Ошибка во время парсинга:</b>\n\n"
+            "Для выполнения этого действия вам необходимо указать регион."
+        )
+        super().__init__(self.text)
+
+
+class GetRegionsListError(Exception):
+    """Ошибка получения информации о регионе."""
+
+    def __init__(self: Self) -> None:
+        """Неожиданный статус-код."""
+        self.text = (
+            "<b>Ошибка во время парсинга:</b>\n\n"
+            "Ошибка получения информации о регионе."
         )
         super().__init__(self.text)
 
