@@ -13,7 +13,6 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pars_diary.config import parser
 from pars_diary.models import DayHomework, Homework, WeekHomework
 
-from . import demo_data
 from .ask_gpt import ask_gpt
 from .exceptions import DayIndexError
 from .pars.consts import MINIFY_LESSON_TITLE
@@ -35,7 +34,9 @@ DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 
 # Вспомогательные функции
-async def get_hw(data: list[dict]) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
+async def get_hw(
+        data: list[dict],
+    ) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
     week_data = WeekHomework()
     for day_data in data[:6]:
@@ -118,7 +119,9 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
 
 
 # Основная функция
-async def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboardMarkup] | str:
+async def hw(
+        data: dict, index: HomeworkIndex,
+    ) -> tuple[str, InlineKeyboardMarkup] | str:
     """Функция для парсинга Д/З.
 
     | index | функция                         |
@@ -127,23 +130,6 @@ async def hw(user_id: UserId, index: HomeworkIndex) -> tuple[str, InlineKeyboard
     | w     | Д/З на неделю                   |
     | 0-6   | Д/З на определенный день недели |
     """
-    # Подбираем следующий понедельник (специфика апи)
-    date = dt.now(tz=datetime.UTC)
-
-    if date.weekday() == 6:
-        date += datetime.timedelta(days=1)
-
-    while date.weekday() != 0:
-        date -= datetime.timedelta(days=1)
-
-    # Получаем данные из api
-    url = f"/api/HomeworkService/GetHomeworkFromRange?date={date.date()}"
-    data = await parser.request(url, user_id)
-
-    # Проверяем не включена ли демо-версия
-    if data == "demo":
-        return await demo_data.hw(index)
-
     # Д/З на неделю
     if index == "w":
         # Получем Д/З

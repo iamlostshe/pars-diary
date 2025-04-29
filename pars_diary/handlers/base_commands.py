@@ -42,20 +42,17 @@ async def simple_msg(msg: Message) -> None:
     # Проверяем зарегестирован ли пользователь
     if user_cookie:
         # Инициализируем пользователя
-        parser.init_user(user_cookie, server_name)
+        await parser.init_user(user_cookie, server_name)
 
         # Выбираем функцию, в зависимости от комманды
-        commands = {
-            "/me": parser.me,
-            "/events": parser.events,
-            "/birthdays": parser.birthdays,
-            "/i_marks": parser.i_marks,
-            "/marks": parser.marks,
-            "/hw": lambda user_id: hw(user_id, "t"),
-        }
-
-        # Создаем ответ
-        answer = await commands[msg.text]()
+        answer = {
+            "/me": await parser.me(),
+            "/events": await parser.events(),
+            "/birthdays": await parser.birthdays(),
+            "/i_marks": await parser.i_marks(),
+            "/marks": await parser.marks(),
+            "/hw": await hw(await parser.homework(), "t"),
+        }[msg.text]
 
         # Отвечаем пользователю
         if len(answer) == 2 and isinstance(answer, tuple):

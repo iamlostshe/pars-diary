@@ -11,7 +11,6 @@ from aiohttp import ClientSession
 from fake_useragent import UserAgent
 from loguru import logger
 
-from pars_diary.utils import demo_data
 from pars_diary.utils.exceptions import (
     GetRegionsListError,
     NoRegionError,
@@ -19,6 +18,7 @@ from pars_diary.utils.exceptions import (
     UserNotAuthenticatedError,
     ValidationError,
 )
+from pars_diary.utils.pars.demo_data import get_data
 
 from .consts import (
     AGGREGATOR_URL,
@@ -45,9 +45,6 @@ class Parser:
         """Инициализация пользователя."""
         if not server_name:
             raise NoRegionError
-
-        self.session = ClientSession()
-        self.ua = UserAgent()
 
         self.headers = {
             "cookie": cookie,
@@ -120,45 +117,43 @@ class Parser:
             )
         return True, "Пользователь успешно добавлен в базу данных."
 
-    async def request(
-            self: Self,
-            url: str,
-        ) -> dict | str:
+    async def request(self: Self) -> dict | str:
         """Функция для осуществеления запроса по id пользователя и url."""
         if self.headers["cookie"] in ["demo", "демо"]:
-            return demo_data(url)
+            text = get_data(self.url)
 
-        url = self.server_name + url
+        else:
+            url = f"{self.server_name}/api/{self.url}"
 
-        async with self.session.post(url, headers=self.headers) as r:
-            text = await r.text()
+            async with self.session.post(url, headers=self.headers) as r:
+                text = await r.text()
 
-            # Проверяем ответ сервера на наличае ошибок в ответе
-            if "Server.UserNotAuthenticatedError" in text or r.status == 403:
-                raise UserNotAuthenticatedError
+                # Проверяем ответ сервера на наличае ошибок в ответе
+                if "Server.UserNotAuthenticatedError" in text or r.status == 403:
+                    raise UserNotAuthenticatedError
 
-            # Проверяем какой статус-код вернул сервер
-            if r.status != 200:
-                raise UnexpectedStatusCodeError(r.status)
+                # Проверяем какой статус-код вернул сервер
+                if r.status != 200:
+                    raise UnexpectedStatusCodeError(r.status)
 
-            if "Client.ValidationError" in text:
-                raise ValidationError
+                if "Client.ValidationError" in text:
+                    raise ValidationError
 
-            # Преобразуем в json
-            data = json.loads(
-                # Фильруем ответ
-                re.sub(SPAN_CLEANER, r"\1", text.replace("\u200b", "")),
-            )
+        # Преобразуем в json
+        data = json.loads(
+            # Фильруем ответ
+            re.sub(SPAN_CLEANER, r"\1", text.replace("\u200b", "")),
+        )
 
-            # Выводим лог в консоль
-            logger.debug(data)
+        # Выводим лог в консоль
+        logger.debug(data)
 
-            return data
+        return data
 
     async def me(self: Self) -> str:
         """Информация о пользователе."""
-        url = "/api/ProfileService/GetPersonData"
-        data = await self.request(url)
+        self.url = "ProfileService/GetPersonData"
+        data = await self.request()
 
         if not data.get("children_persons"):
             # Logged in on children account
@@ -199,8 +194,8 @@ class Parser:
 
     async def events(self: Self) -> str:
         """Информация о ивентах."""
-        url = "/api/WidgetService/getEvents"
-        data = await self.request(url)
+        self.url = "WidgetService/getEvents"
+        data = await self.request()
 
         if not data:
             return "Кажется, ивентов не намечается)"
@@ -209,18 +204,20 @@ class Parser:
 
     async def birthdays(self: Self) -> str:
         """Информация о днях рождения."""
-        url = "/api/WidgetService/getBirthdays"
-        data = await self.request(url)
+        self.url = "WidgetService/getBirthdays"
+        data = await self.request()
 
         if not data:
             return "Кажется, дней рождений не намечается)"
 
-        return f"{data[0]['date'].replace('-', ' ')}\n{data[0]['short_name']}"
+        data = data[0]
+
+        return f"{data['date'].replace('-', ' ')}\n{data['short_name']}"
 
     async def marks(self: Self) -> str:
         """Информация об оценках."""
-        url = f"/api/MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
-        data = await self.request(url)
+        self.url = f"MarkService/GetSummaryMarks?date={dt.datetime.now().date()}"
+        data = await self.request()
 
         if not data.get("discipline_marks"):
             return (
@@ -279,8 +276,8 @@ class Parser:
 
     async def i_marks(self: Self) -> str:
         """Информация об итоговых оценках."""
-        url = "/api/MarkService/GetTotalMarks"
-        data = await self.request(url)
+        self.url = "MarkService/GetTotalMarks"
+        data = await self.request()
 
         try:
             total_marks_data = data["total_marks_data"][0]
@@ -336,3 +333,12 @@ class Parser:
             msg_text += " │\n"
 
         return f"{msg_text}</pre>"
+
+    async def homework(self: Self) -> dict:
+        """Домашнее задание."""
+        # Получаем данные из api
+        self.url = (
+            "/api/HomeworkService/GetHomeworkFromRange"
+            f"?date={dt.datetime.now().date()}"
+        )
+        return await self.request()
