@@ -46,8 +46,11 @@ class Parser:
         if not server_name:
             raise NoRegionError
 
+        self.server_name = server_name
+        self.cookie = cookie
+
         self.headers = {
-            "cookie": cookie,
+            "cookie": self.cookie,
             "user-agent": self.ua.random,
         }
 
@@ -83,14 +86,10 @@ class Parser:
                 return result
             raise GetRegionsListError
 
-    async def check_cookie(
-            self: Self,
-            cookie: str,
-            server_name: str | None = None,
-        ) -> tuple[bool, str]:
+    async def check_cookie(self: Self) -> tuple[bool, str]:
         """Функция для проверки cookie."""
         # Если используется демоверсия
-        if cookie in ["demo", "демо"]:
+        if self.cookie in ["demo", "демо"]:
             return True, (
                 "Пользователь успешно добавлен в базу данных, однако учтите, что "
                 "демонстрационный режим открывает не все функции, для "
@@ -98,22 +97,21 @@ class Parser:
             )
 
         # Простые тесты
-        if "sessionid=" not in cookie:
+        if "sessionid=" not in self.cookie:
             return False, 'Ваши cookie должны содержать "sessionid="'
-        if "sessionid=xxx..." in cookie:
+        if "sessionid=xxx..." in self.cookie:
             return False, "Нельзя использовать пример"
 
         # Тест путем запроса к серверу
         try:
-            await self.request(
-                f"{server_name}/api/ProfileService/GetPersonData",
-                cookie,
-            )
+            self.url = "ProfileService/GetPersonData"
+            await self.request()
         except NoRegionError:
             return False, "Укажите ваш регион -> /start"
-        except:  # noqa: E722
+        except Exception as e:  # noqa: BLE001
             return False, (
-                "Не правильно введены cookie, при проверке сервер выдаёт ошибку."
+                "Не правильно введены cookie, "
+                f"при проверке сервер выдаёт ошибку:\n\n{e}"
             )
         return True, "Пользователь успешно добавлен в базу данных."
 
@@ -124,6 +122,7 @@ class Parser:
 
         else:
             url = f"{self.server_name}/api/{self.url}"
+            print(url)
 
             async with self.session.post(url, headers=self.headers) as r:
                 text = await r.text()
@@ -338,7 +337,7 @@ class Parser:
         """Домашнее задание."""
         # Получаем данные из api
         self.url = (
-            "/api/HomeworkService/GetHomeworkFromRange"
+            "HomeworkService/GetHomeworkFromRange"
             f"?date={dt.datetime.now().date()}"
         )
         return await self.request()

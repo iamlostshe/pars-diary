@@ -105,13 +105,16 @@ async def add_user_cookie(user_id: int | str, cookie: str) -> str:
             # Проверяем есть ли пользователь в базе дланных
             user = data[user_id]
             if not user:
-                raise UserNotFoundError()
+                raise UserNotFoundError
 
-            # Получаем server_name
-            server_name = user.get("server_name")
+            # Инициализируем пользователя
+            await parser.init_user(
+                cookie=cookie,
+                server_name=user.get("server_name"),
+            )
 
             # Проверяем cookie пользователя
-            c_c = await parser.check_cookie(cookie, server_name)
+            c_c = await parser.check_cookie()
             if c_c[0]:
                 # Записываем cookie в базу данных
                 user["cookie"] = cookie

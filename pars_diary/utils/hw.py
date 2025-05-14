@@ -104,7 +104,7 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
     day = int(index.split("_")[1])
     subject_num = int(index.split("_")[2])
 
-    url = "/api/HomeworkService/GetHomeworkFromRange"
+    url = "HomeworkService/GetHomeworkFromRange"
     data = await parser.request(url, user_id)
 
     day_hw = data[day]["homeworks"]
