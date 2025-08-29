@@ -1,4 +1,4 @@
-"""Module to start telegram-bot."""
+"""Запуск бота."""
 
 import asyncio
 
