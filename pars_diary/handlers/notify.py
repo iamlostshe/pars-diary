@@ -76,7 +76,6 @@ async def notify_msg(msg: Message) -> None:
                 "Для настройки уведомлений используйте /notify\n"
                 "</blockquote>"
             ),
-            parse_mode="HTML",
             reply_markup=markup,
         )
 

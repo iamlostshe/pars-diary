@@ -11,7 +11,7 @@ from aiogram import Bot
 from loguru import logger
 from models import User
 
-from pars_diary.config import TOKEN, parser
+from pars_diary.config import parser, bot
 from pars_diary.utils import db
 from pars_diary.utils.db import DB_NAME
 from pars_diary.utils.exceptions import (
@@ -27,6 +27,7 @@ NOTIFY_DURATION = 1
 
 # Задержка между умными уведомлениями (в часах, целое число)
 SMART_NOTIFY_DURATION = 24
+
 
 async def send_notify(bot: Bot, smart: bool = False) -> None:
     """Асинхронная функция для обновления оценок."""
@@ -125,7 +126,7 @@ async def check_notify(user_id: UserId, new_data: dict, old_data: dict) -> None:
             "У Вас изменились оценки (управление уведомлениями - /notify):\n<pre>"
             f"{'\n'.join(msg_text)}</pre>"
         )
-        await bot.send_message(user_id, msg_text, parse_mode="HTML")
+        await bot.send_message(user_id, msg_text)
 
 
 async def check_smart_notify(user_id: UserId, new_data: dict) -> None:
@@ -170,11 +171,7 @@ async def check_smart_notify(user_id: UserId, new_data: dict) -> None:
         msg_text += "\nУправление уведомлениями -> /notify"
 
         # Отправляем ответ пользователю
-        await bot.send_message(user_id, msg_text, parse_mode="HTML")
-
-
-# Инициализируем бота
-bot = Bot(token=TOKEN)
+        await bot.send_message(user_id, msg_text)
 
 
 async def main() -> None:

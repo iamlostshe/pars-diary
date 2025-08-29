@@ -13,7 +13,6 @@ from pars_diary.utils.db import counter
 router = Router(name=__name__)
 
 
-# Нейронная сеть, для помощи в учебе
 @router.message(Command("chatgpt"))
 async def lessons_msg(msg: Message) -> None:
     """Отвечает за /chatgpt."""

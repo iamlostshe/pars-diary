@@ -18,7 +18,6 @@ from pars_diary.utils.db import GRAPH_NAME, Stat, counter, get_graph
 router = Router(name=__name__)
 
 
-# Комманда /admin
 @router.message(Command("admin"))
 async def new_msg(msg: Message) -> None:
     """Отвечает за /admin."""
@@ -30,7 +29,7 @@ async def new_msg(msg: Message) -> None:
     await counter(msg.from_user.id, msg.text.split()[0][1:])
 
     # Если пользователь - админ
-    if str(msg.from_user.id) in config.admins_tg:
+    if str(msg.from_user.id) in config.admin_ids:
         # Обновляем график
         await get_graph()
 
@@ -70,5 +69,4 @@ async def new_msg(msg: Message) -> None:
                 " (в порядке уменьшения выгоды):</b>\n\n"
                 f"{await stat.str_refer()}\n"
             ),
-            parse_mode="HTML",
         )

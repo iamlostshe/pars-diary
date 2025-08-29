@@ -11,10 +11,9 @@ from pars_diary.utils.messages import registration_0, start_old_user
 router = Router(name=__name__)
 
 
-# Команды /start, /help, любое другое сообщение, если предыдущие хендлеры не сработали
 @router.message()
 async def command_start_handler(msg: Message) -> None:
-    """Отвечает за обработку любых сообщений, кроме указанных ранее."""
+    """Обработка /start."""
     # Выводим лог в консоль
     logger.debug("[m] {}", msg.text)
 

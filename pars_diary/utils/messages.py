@@ -11,8 +11,6 @@
 
 from __future__ import annotations
 
-from pars_diary.config import config
-
 
 async def _get_user_lang(lang_code: str | None) -> str:
     """Определение языка пользователя."""
@@ -94,7 +92,7 @@ async def about(lang_code: None = "ru") -> str:
         "Для настройки уведомлений используйте /notify\n"
         "</blockquote>\n\n"
         "Что-то сломалось? - пиши админу @iamlostshe\n\n"
-        f"<b>Исходный код</b>: {config.git_url}"
+        "<b>Исходный код</b>: https://github.com/iamlostshe/pars-diary"
     )
 
 
