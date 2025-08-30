@@ -5,10 +5,8 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
-from aiohttp import ClientSession
-from fake_useragent import UserAgent
 from loguru import logger
 
 from pars_diary.utils.exceptions import (
@@ -29,30 +27,9 @@ from .consts import (
     SPAN_CLEANER,
 )
 
-if TYPE_CHECKING:
-    from pydantic import SecretStr
-
 
 class Parser:
     """Парсинг."""
-
-    async def init(self: Self) -> None:
-        """Инициализация парсера."""
-        self.session = ClientSession()
-        self.ua = UserAgent()
-
-    async def init_user(self: Self, cookie: SecretStr, server_name: str) -> None:
-        """Инициализация пользователя."""
-        if not server_name:
-            raise NoRegionError
-
-        self.server_name = server_name
-        self.cookie = cookie
-
-        self.headers = {
-            "cookie": self.cookie,
-            "user-agent": self.ua.random,
-        }
 
     async def _get_space_len(self: Self, child: str, parent: dict) -> int:
         """Возвращает кол-во симовлов, для отступов."""
@@ -122,7 +99,6 @@ class Parser:
 
         else:
             url = f"{self.server_name}/api/{self.url}"
-            print(url)
 
             async with self.session.post(url, headers=self.headers) as r:
                 text = await r.text()
