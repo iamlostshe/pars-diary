@@ -6,9 +6,10 @@ from zoneinfo import ZoneInfo
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
+from cait_api import CAIParser
 from pydantic_settings import BaseSettings
 
-from .utils.pars import Parser
+from pars_diary.utils.db import check_db
 
 TIMEZONE = ZoneInfo("Europe/Moscow")
 
@@ -18,7 +19,7 @@ class Config(BaseSettings):
 
     Подгружаются один раз при запуске бота из .env файла.
 
-    - bot_token: От какого бота будут происходить действия.
+    - bot_token: От имени какого бота будут происходить действия.
     - admin_ids: Список ID администраторов бота.
     """
 
@@ -28,7 +29,12 @@ class Config(BaseSettings):
 config: Config = Config(_env_file=".env")
 config.admin_ids: list[int] = [int(i) for i in config.admin_ids.split(",")]
 
-parser = Parser()
-
-# Инициализируем бот
+# Инициализируем бота
 bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode="html"))
+
+# Проверяем наличае базы данных
+# TODO(): Перейти на postgreSQL
+check_db()
+
+# Инициализируем парсер разговоров о важном
+parser = CAIParser()
