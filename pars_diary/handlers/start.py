@@ -2,21 +2,20 @@
 
 from aiogram import Router
 from aiogram.types import Message
-from loguru import logger
 
-from pars_diary.utils.db import add_user, get_cookie
+from pars_diary.types import User
+from pars_diary.utils.db import add_user
 from pars_diary.utils.keyboards import not_auth_keyboard, reg_0
 from pars_diary.utils.messages import registration_0, start_old_user
-from 
 
 router = Router(name=__name__)
 
 
 @router.message()
-async def command_start_handler(msg: Message, user: ) -> None:
+async def command_start_handler(msg: Message, user: User) -> None:
     """Обработка /start."""
     # Если пользователь зарегистрирован
-    if 
+    if user.isauth:
         await msg.answer(
             await start_old_user(
                 msg.from_user.first_name, msg.from_user.language_code,
@@ -32,6 +31,3 @@ async def command_start_handler(msg: Message, user: ) -> None:
             ),
             reply_markup=await reg_0(),
         )
-
-    refer = msg.text[7:] if msg.text and msg.text.startswith("/start ") else None
-    await add_user(msg.from_user.id, refer)

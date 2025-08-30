@@ -58,7 +58,6 @@ def add_user_server_name(user_id: int | str, server_name: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     try:
-        # Открываем файл для чтения и записи
         with db_path.open("r+", encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
@@ -80,7 +79,6 @@ async def add_user_cookie(user_id: int | str, cookie: str) -> str:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    # Открываем файл для чтения и записи
     with db_path.open("r+", encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
@@ -111,7 +109,6 @@ def get_cookie(user_id: str | int) -> None | str | dict:
     user_id = str(user_id)
 
     try:
-        # Открываем файл для чтения
         with db_path.open(encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
@@ -131,7 +128,6 @@ def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
     user_id = str(user_id)
 
     try:
-        # Открываем файл для чтения
         with db_path.open(encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
@@ -151,7 +147,6 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
     user_id = str(user_id)
 
     try:
-        # Открываем файл для чтения
         with db_path.open("r+", encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
@@ -162,7 +157,6 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
             else:
                 data[user_id]["notify"] = not data[user_id]["notify"]
 
-            # Сохраняем изменения в json базе данных
             f.seek(0)
             f.truncate()
             json.dump(data, f, indent=4, ensure_ascii=False)
@@ -215,7 +209,6 @@ def counter(user_id: str | int, counter_name: str) -> None:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    # Открываем файл для чтения
     with db_path.open("r+", encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
@@ -233,7 +226,6 @@ def counter(user_id: str | int, counter_name: str) -> None:
         else:
             raise UserNotFoundError
 
-        # Сохраняем изменения в json базе данных
         f.seek(0)
         f.truncate()
         json.dump(data, f, indent=4, ensure_ascii=False)
@@ -244,7 +236,6 @@ def get_server_name(user_id: int | str) -> str:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    # Открываем файл для чтения
     with db_path.open(encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
