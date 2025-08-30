@@ -8,6 +8,8 @@ readme = "README.md"
 
 dependencies = [
     "aiogram==3.22.0",
+    "bars-api",
+    "cait-api",
     "conversations-about-important-api==0.1.0",
     "fake-useragent==2.2.0",
     "gradio_client==1.3.0",
@@ -31,3 +33,7 @@ ignore = [
     # Работа с датой
     "DTZ005",
 ]
+
+[tool.uv.sources]
+cait-api = { git = "https://github.com/iamlostshe/cait-api" }
+bars-api = { git = "https://github.com/iamlostshe/bars-api" }

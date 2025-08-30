@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
-from cait_api import CAIParser
+from cait_api import CAITParser
 from pydantic_settings import BaseSettings
 
 from pars_diary.utils.db import check_db
@@ -37,4 +37,4 @@ bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode="html"
 check_db()
 
 # Инициализируем парсер разговоров о важном
-parser = CAIParser()
+cait_parser = CAITParser()

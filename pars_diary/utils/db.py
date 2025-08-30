@@ -10,8 +10,6 @@ from typing import Self
 
 import matplotlib.pyplot as plt
 
-from pars_diary.config import parser
-
 from .exceptions import (
     UserNotAuthorizatedError,
     UserNotFoundError,

@@ -2,4 +2,4 @@
 
 from .pars import Parser
 
-__all__ = ["Parser"]
+__all__ = ("Parser", )

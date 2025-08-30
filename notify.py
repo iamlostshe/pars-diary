@@ -4,22 +4,22 @@ from __future__ import annotations
 
 import asyncio
 import json
-from pathlib import Path
 from typing import TYPE_CHECKING
 
-from aiogram import Bot
 from loguru import logger
 from models import User
 
-from pars_diary.config import parser, bot
+from pars_diary.config import bot, parser
 from pars_diary.utils import db
-from pars_diary.utils.db import DB_NAME
+from pars_diary.utils.db import db_path
 from pars_diary.utils.exceptions import (
     DBFileNotFoundError,
     UserNotFoundError,
 )
 
 if TYPE_CHECKING:
+    from aiogram import Bot
+
     from .utils.typing import UserId
 
 # Задержка между обычными уведомлениями (в часах, целое число)
@@ -33,7 +33,7 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
     """Асинхронная функция для обновления оценок."""
     try:
         # Открываем файл для чтения и записи
-        with Path.open(DB_NAME, "r+", encoding="UTF-8") as f:
+        with db_path.open("r+", encoding="UTF-8") as f:
             data = json.load(f)
 
             # Проходимся по всем пользователям

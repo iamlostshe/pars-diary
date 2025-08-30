@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
-from bars_api import BarsAPI
+from bars_api import BarsAPI, 
 from loguru import logger
 
 from pars_diary.config import config, db

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import datetime as dt
 
-from bars_api import NoDataForThisDayError
-
 from pars_diary.config import cait_parser
 
 

@@ -10,12 +10,11 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pars_diary.config import parser
 from pars_diary.models import DayHomework, Homework, WeekHomework
+from pars_diary.parser.consts import MINIFY_LESSON_TITLE
 
 from .ask_gpt import ask_gpt
 from .exceptions import DayIndexError
-from .pars.consts import MINIFY_LESSON_TITLE
 
 if TYPE_CHECKING:
     from .typing import HomeworkIndex, UserId

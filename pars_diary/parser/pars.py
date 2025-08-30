@@ -16,7 +16,6 @@ from pars_diary.utils.exceptions import (
     UserNotAuthenticatedError,
     ValidationError,
 )
-from pars_diary.utils.pars.demo_data import get_data
 
 from .consts import (
     AGGREGATOR_URL,

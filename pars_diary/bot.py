@@ -3,7 +3,7 @@
 from aiogram import Dispatcher
 from loguru import logger
 
-from .config import bot, parser
+from .config import bot
 from .handlers import routers
 
 
@@ -11,10 +11,6 @@ async def main() -> None:
     """Основная функция запуска бота."""
     # Подключаем файл для сбора логов
     logger.add("log.log")
-
-    # Инициализация парсера
-    # TODO(): Перейти на bars-api
-    await parser.init()
 
     dp = Dispatcher()
 
