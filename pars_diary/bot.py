@@ -5,17 +5,12 @@ from loguru import logger
 
 from .config import bot, parser
 from .handlers import routers
-from .utils.db import check_db
 
 
 async def main() -> None:
     """Основная функция запуска бота."""
     # Подключаем файл для сбора логов
     logger.add("log.log")
-
-    # Проверка наличия файлов бд
-    # TODO(): Перейти на postgreSQL
-    await check_db()
 
     # Инициализация парсера
     # TODO(): Перейти на bars-api
