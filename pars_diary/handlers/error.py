@@ -4,12 +4,14 @@ from aiogram import Router
 from aiogram.types import ErrorEvent
 from loguru import logger
 
+from pars_diary.types import User
+
 from .utils.messages import error
 
 router = Router(name=__name__)
 
 @router.errors()
-async def catch_errors(event: ErrorEvent) -> None:
+async def catch_errors(event: ErrorEvent, user: User) -> None:
     """Простой обработчик для ошибок."""
     message = None
 

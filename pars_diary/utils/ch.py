@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import datetime as dt
 
+from cait_api.exceptions import NoDataForThisDayError
+
 from pars_diary.config import cait_parser
 
 

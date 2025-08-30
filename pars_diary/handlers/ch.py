@@ -3,24 +3,17 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from loguru import logger
 
+from pars_diary.types import User
 from pars_diary.utils.ch import ch
-from pars_diary.utils.db import counter
 
 router = Router(name=__name__)
 
 
 # Базовые комманы (парсинг + небольшое изменение)
 @router.message(Command("ch"))
-async def ch_msg(msg: Message) -> None:
+async def ch_msg(msg: Message, user: User) -> None:
     """Отвечает за /ch."""
-    # Выводим лог в консоль
-    logger.debug("[m] {}", msg.text)
-
-    # Обновляем значение счётчика
-    await counter(msg.from_user.id, msg.text.split()[0][1:])
-
     # Создаем ответ
     answer = await ch()
 

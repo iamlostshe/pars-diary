@@ -12,6 +12,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from pars_diary.types import User
 from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
@@ -24,21 +25,18 @@ router = Router(name=__name__)
         commands=["marks", "i_marks", "hw", "me", "events", "birthdays"],
     ),
 )
-async def simple_msg(msg: Message) -> None:
+async def simple_msg(msg: Message, user: User) -> None:
     """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
-    # Проверяем зарегестирован ли пользователь
-    if user_cookie:
-        # Выбираем функцию, в зависимости от комманды
+    if user.isauth:
         answer = {
-            "/me": await parser.me(),
-            "/events": await parser.events(),
-            "/birthdays": await parser.birthdays(),
-            "/i_marks": await parser.i_marks(),
-            "/marks": await parser.marks(),
-            "/hw": await hw(await parser.homework(), "t"),
+            "/me": await user.parser.me(),
+            "/events": await user.parser.events(),
+            "/birthdays": await user.parser.birthdays(),
+            "/i_marks": await user.parser.i_marks(),
+            "/marks": await user.parser.marks(),
+            "/hw": await hw(await user.parser.homework(), "t"),
         }[msg.text]
 
-        # Отвечаем пользователю
         if len(answer) == 2 and isinstance(answer, tuple):
             await msg.answer(answer[0], "HTML", reply_markup=answer[1])
         else:

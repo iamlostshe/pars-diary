@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+INSTRUCTION_URL = "https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25"
+
 not_auth_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(
                 text="Инструкция",
-                url="https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25",
+                url=INSTRUCTION_URL,
             ),
         ],
     ],
@@ -22,7 +24,7 @@ reg_2 = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(
                 text="Инструкция",
-                url="https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25",
+                url=INSTRUCTION_URL,
             ),
         ],
     ],

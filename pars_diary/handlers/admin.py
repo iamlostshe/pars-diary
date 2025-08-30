@@ -10,26 +10,17 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
-from loguru import logger
 
-from pars_diary.config import config
-from pars_diary.utils.db import GRAPH_NAME, Stat, counter, get_graph
+from pars_diary.types import User
+from pars_diary.utils.db import GRAPH_NAME, Stat, get_graph
 
 router = Router(name=__name__)
 
 
 @router.message(Command("admin"))
-async def new_msg(msg: Message) -> None:
+async def new_msg(msg: Message, user: User) -> None:
     """Отвечает за /admin."""
-    # Выводим лог в консоль
-    logger.debug("[m] {}", msg.text)
-
-    # Проверяем ошибки
-    # Обновляем значение счётчика
-    await counter(msg.from_user.id, msg.text.split()[0][1:])
-
-    # Если пользователь - админ
-    if str(msg.from_user.id) in config.admin_ids:
+    if user.isadmin:
         # Обновляем график
         await get_graph()
 

@@ -7,9 +7,9 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from loguru import logger
 
-from pars_diary.utils.db import counter, get_cookie, get_notify
+from pars_diary.types import User
+from pars_diary.utils.db import get_cookie, get_notify
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
 
@@ -18,14 +18,8 @@ router = Router(name=__name__)
 
 # Настройки для уведомлений
 @router.message(Command("notify"))
-async def notify_msg(msg: Message) -> None:
+async def notify_msg(msg: Message, user: User) -> None:
     """Отвечает за /notify."""
-    # Выводим лог в консоль
-    logger.debug("[m] {}", msg.text)
-
-    # Обновляем значение счётчика
-    await counter(msg.from_user.id, f"{msg.text.split()[0][1:]}-settings")
-
     if await get_cookie(msg.from_user.id):
         await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
 

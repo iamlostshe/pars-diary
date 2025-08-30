@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from aiogram.types import Message, TelegramObject
 
 
-class SomeMiddleware(BaseMiddleware):
+class DataBaseMiddleware(BaseMiddleware):
     """Промежуточный слой для проброса данных пользователя из бд."""
 
     async def __call__(

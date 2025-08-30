@@ -3,23 +3,17 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from loguru import logger
 
-from pars_diary.utils.db import add_user_cookie, counter
+from pars_diary.types import User
+from pars_diary.utils.db import add_user_cookie
 
 router = Router(name=__name__)
 
 
 # Вход в новую учебную запись
 @router.message(Command("new"))
-async def new_msg(msg: Message) -> None:
+async def new_msg(msg: Message, user: User) -> None:
     """Отвечает за /new."""
-    # Выводим лог в консоль
-    logger.debug("[m] {}", msg.text)
-
-    # Обновляем значение счётчика
-    await counter(msg.from_user.id, msg.text.split()[0][1:])
-
     # Проверяем ошибки
     if msg.text == "/new":
         # Отвечаем пользователю

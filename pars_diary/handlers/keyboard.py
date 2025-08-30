@@ -12,6 +12,7 @@ from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
+from pars_diary.types import User
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
 from pars_diary.utils.keyboards import reg_1, reg_2
@@ -22,7 +23,7 @@ router = Router(name=__name__)
 
 # Хендлеры для кнопок
 @router.callback_query()
-async def callback(call: CallbackQuery) -> None:
+async def callback(call: CallbackQuery, user: User) -> None:
     """Отвечает за все callback-хендлеры (кнопки)."""
     # Выводим лог в консоль
     logger.debug("[c] {}", call.data)

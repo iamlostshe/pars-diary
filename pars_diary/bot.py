@@ -5,11 +5,11 @@ from loguru import logger
 
 from .config import bot
 from .handlers import routers
+from .middlewares import mv
 
 
 async def main() -> None:
     """Основная функция запуска бота."""
-    # Подключаем файл для сбора логов
     logger.add("log.log")
 
     dp = Dispatcher()
@@ -17,6 +17,10 @@ async def main() -> None:
     for r in routers:
         logger.debug("Include router: {} ...", r.name)
         dp.include_router(r)
+
+    for m in mv:
+        logger.debug("Include middleware: {} ...", m.name)
+        dp.message.middleware(m())
 
     await bot.delete_webhook(drop_pending_updates=True)
 
