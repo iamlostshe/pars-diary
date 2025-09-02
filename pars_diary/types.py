@@ -1,12 +1,14 @@
 """Typing."""
 
-# TODO(@): Тут цикличный импорт будет, если стили пробрасывать
-#from bars_api import BarsAPI  # noqa: ERA001
+from dataclasses import dataclass
+
+from bars_api import BarsAPI
 
 
+@dataclass
 class User:
     """Пользователь."""
 
     is_auth: bool
     is_admin: bool
-    parser: any
+    parser: BarsAPI

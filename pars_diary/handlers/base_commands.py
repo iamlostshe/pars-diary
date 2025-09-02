@@ -45,7 +45,7 @@ async def simple_msg(msg: Message, user: User) -> None:
     else:
         # Выводим сообщение о необходимости регестрации и клавиатуру
         await msg.answer(
-            await not_auth(msg.from_user.language_code),
+            not_auth,
             "HTML",
-            reply_markup=await not_auth_keyboard(msg.from_user.language_code),
+            reply_markup=not_auth_keyboard,
         )

@@ -42,7 +42,7 @@ about = (
 )
 
 
-async def registration_0(first_name: int | str) -> str:
+def registration_0(first_name: int | str) -> str:
     """Начало для новых пользоватлей."""
     return (
         f"👾 Добро пожаловать, {first_name}!\n\n"
@@ -50,7 +50,7 @@ async def registration_0(first_name: int | str) -> str:
     )
 
 
-async def start_old_user(first_name: int | str) -> str:
+def start_old_user(first_name: int | str) -> str:
     """Начало для старых пользователей."""
     return (
         f"👾 Здравствуйте, {first_name}!\n\n"
@@ -67,7 +67,7 @@ async def start_old_user(first_name: int | str) -> str:
     )
 
 
-async def error(
+def error(
     e: str,
     notify: bool | None = False,  # noqa: FBT001, FBT002
 ) -> str:

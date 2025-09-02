@@ -14,10 +14,10 @@ router = Router(name=__name__)
 async def command_start_handler(msg: Message, user: User) -> None:
     """Обработка /start."""
     # Если пользователь зарегистрирован
-    if user.isauth:
+    if user.is_auth:
         await msg.answer(
-            await start_old_user(
-                msg.from_user.first_name, msg.from_user.language_code,
+            start_old_user(
+                msg.from_user.first_name,
             ),
             reply_markup=await not_auth_keyboard(),
         )
@@ -25,8 +25,6 @@ async def command_start_handler(msg: Message, user: User) -> None:
     # Если пользователь не зарегистрирован
     else:
         await msg.answer(
-            await registration_0(
-                msg.from_user.first_name, msg.from_user.language_code,
-            ),
-            reply_markup=await reg_0(),
+            registration_0(msg.from_user.first_name),
+            reply_markup=reg_0,
         )

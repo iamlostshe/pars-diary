@@ -56,8 +56,11 @@ class AuthMiddleware(BaseMiddleware):
                 cookie,
             )
 
-        return await handler(event, data), User(
-            is_auth=bool(cookie),
-            is_admin=_event.from_user.id in config.admin_ids,
-            parser=parser,
-        )
+        # Пробрасываем объект пользователя
+        data["user"] = User(
+                is_auth=bool(cookie),
+                is_admin=_event.from_user.id in config.admin_ids,
+                parser=parser,
+            )
+
+        return await handler(event, data)

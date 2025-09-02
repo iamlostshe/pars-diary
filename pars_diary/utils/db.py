@@ -206,25 +206,16 @@ async def get_marks(user_id: str | int) -> dict | str:
 
 def counter(user_id: str | int, counter_name: str) -> None:
     """Счётчик для аналитики."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
     with db_path.open("r+", encoding="UTF-8") as f:
-        # Загрузка и десериализация данных из файла
         data = json.load(f)
 
-        # TODO @iamlostshe: Оптимизировать эту функцию
-        # (смотри ниже для примера)
-
-        # Работа со счётчиками
-        user = data.get(user_id)
+        user = data.get(str(user_id))
         if user:
+            # Обновление счётчика
             if user.get(counter_name):
                 user[counter_name].append(time.time())
             else:
                 user[counter_name] = [time.time()]
-        else:
-            raise UserNotFoundError
 
         f.seek(0)
         f.truncate()
@@ -233,26 +224,8 @@ def counter(user_id: str | int, counter_name: str) -> None:
 
 def get_server_name(user_id: int | str) -> str:
     """Возвращает server_name по user_id."""
-    # Конвертируем id пользователя в строку
-    user_id = str(user_id)
-
     with db_path.open(encoding="UTF-8") as f:
-        # Загрузка и десериализация данных из файла
-        data = json.load(f)
-
-        # Возвращаем server_name
-        user = data.get(user_id)
-
-        if user:
-            server_name = data[user_id].get("server_name")
-
-            if server_name:
-                return server_name
-
-            # TODO @iamlostshe: Сделать специальное исключение
-            msg = "Не указан регион."
-            raise FileNotFoundError(msg)
-        raise UserNotFoundError
+        return json.load(f).get(str(user_id), {}).get("server_name")
 
 
 class Stat:
