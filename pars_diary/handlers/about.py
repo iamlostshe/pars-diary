@@ -12,7 +12,6 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from pars_diary.types import User
 from pars_diary.utils.messages import about
 
 router = Router(name=__name__)
@@ -20,7 +19,7 @@ router = Router(name=__name__)
 
 # О проекте
 @router.message(Command("about"))
-async def lessons_msg(msg: Message, user: User) -> None:
+async def lessons_msg(msg: Message) -> None:
     """Отвечает за /about."""
     # Отвечаем пользователю
-    await msg.answer(about, "HTML")
+    await msg.answer(about)

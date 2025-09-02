@@ -1,8 +1,11 @@
 """Typing."""
+from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from bars_api import BarsAPI
+if TYPE_CHECKING:
+    from bars_api import BarsAPI
 
 
 @dataclass
@@ -11,4 +14,4 @@ class User:
 
     is_auth: bool
     is_admin: bool
-    parser: BarsAPI
+    parser: BarsAPI | None

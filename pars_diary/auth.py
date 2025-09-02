@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from aiogram import BaseMiddleware
-from aiogram.types import CallbackQuery
 from bars_api import BarsAPI
 from loguru import logger
 
@@ -25,29 +24,26 @@ class AuthMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: callable[[TelegramObject, dict[str, any]], Awaitable[any]],
-        event: Message | CallbackQuery,
+        event: Message,
         data: dict[str, any],
-    ) -> tuple[Message | CallbackQuery, User]:
+    ) -> tuple[Message, User]:
         """Обработка и проброс данных о пользователе из бд."""
-        # Приводим TelegramObject к единому виду (Message)
-        _event = event.message if isinstance(event, CallbackQuery) else event
-
         # Выводим лог в консоль
-        logger.debug("[m] {}", _event.text)
+        logger.debug("[m] {}", event.text)
 
         # Записываем пользователя в бд, если его еще там нет
         refer = (
-            _event.text[7:]
-            if _event.text and _event.text.startswith("/start ")
+            event.text[7:]
+            if event.text and event.text.startswith("/start ")
             else None
         )
-        db.add_user(_event.from_user.id, refer)
+        db.add_user(event.from_user.id, refer)
 
         # Обновляем значение счётчика
-        db.counter(_event.from_user.id, _event.text.split()[0][1:])
+        db.counter(event.from_user.id, event.text.split()[0][1:])
 
-        server_name = db.get_server_name(_event.from_user.id)
-        cookie = db.get_cookie(_event.from_user.id)
+        server_name = db.get_server_name(event.from_user.id)
+        cookie = db.get_cookie(event.from_user.id)
 
         parser = None
         if server_name and cookie:
@@ -58,9 +54,9 @@ class AuthMiddleware(BaseMiddleware):
 
         # Пробрасываем объект пользователя
         data["user"] = User(
-                is_auth=bool(cookie),
-                is_admin=_event.from_user.id in config.admin_ids,
-                parser=parser,
-            )
+            is_auth=server_name and cookie,
+            is_admin=event.from_user.id in config.admin_ids,
+            parser=parser,
+        )
 
         return await handler(event, data)

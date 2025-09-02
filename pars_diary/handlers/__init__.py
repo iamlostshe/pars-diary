@@ -20,6 +20,7 @@ from . import (
     base_commands,
     ch,
     chatgpt,
+    error,
     keyboard,
     new,
     notify,
@@ -28,13 +29,14 @@ from . import (
 
 routers = (
     about.router,
-    notify.router,
+    admin.router,
     base_commands.router,
     ch.router,
     chatgpt.router,
-    admin.router,
-    new.router,
+    error.router,
     keyboard.router,
+    new.router,
+    notify.router,
     start.router,
 )
 

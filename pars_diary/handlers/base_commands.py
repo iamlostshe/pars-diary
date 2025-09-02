@@ -27,7 +27,7 @@ router = Router(name=__name__)
 )
 async def simple_msg(msg: Message, user: User) -> None:
     """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
-    if user.isauth:
+    if user.is_auth:
         answer = {
             "/me": await user.parser.me(),
             "/events": await user.parser.events(),
@@ -38,14 +38,13 @@ async def simple_msg(msg: Message, user: User) -> None:
         }[msg.text]
 
         if len(answer) == 2 and isinstance(answer, tuple):
-            await msg.answer(answer[0], "HTML", reply_markup=answer[1])
+            await msg.answer(answer[0], reply_markup=answer[1])
         else:
-            await msg.answer(answer, "HTML")
+            await msg.answer(answer)
 
     else:
         # Выводим сообщение о необходимости регестрации и клавиатуру
         await msg.answer(
             not_auth,
-            "HTML",
             reply_markup=not_auth_keyboard,
         )

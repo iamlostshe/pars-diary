@@ -12,7 +12,6 @@ from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
-from pars_diary.types import User
 from pars_diary.utils import db
 from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
 from pars_diary.utils.keyboards import reg_1, reg_2
@@ -23,7 +22,7 @@ router = Router(name=__name__)
 
 # Хендлеры для кнопок
 @router.callback_query()
-async def callback(call: CallbackQuery, user: User) -> None:
+async def callback(call: CallbackQuery) -> None:
     """Отвечает за все callback-хендлеры (кнопки)."""
     # Выводим лог в консоль
     logger.debug("[c] {}", call.data)
@@ -116,10 +115,8 @@ async def callback(call: CallbackQuery, user: User) -> None:
     # Регистрация в боте
     elif call.data == "reg_0":
         await call.message.edit_text(
-            await registration_1(
-                call.from_user.language_code,
-            ),
-            reply_markup=await reg_1(),
+            registration_1,
+            reply_markup=reg_1,
         )
 
     elif "reg_1_" in call.data:
@@ -128,8 +125,6 @@ async def callback(call: CallbackQuery, user: User) -> None:
         await db.add_user_server_name(call.from_user.id, server_name)
 
         await call.message.edit_text(
-            await registration_2(
-                call.from_user.language_code,
-            ),
-            reply_markup=await reg_2(),
+            registration_2,
+            reply_markup=reg_2,
         )

@@ -8,7 +8,6 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from pars_diary.types import User
 from pars_diary.utils.db import get_cookie, get_notify
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
@@ -18,10 +17,10 @@ router = Router(name=__name__)
 
 # Настройки для уведомлений
 @router.message(Command("notify"))
-async def notify_msg(msg: Message, user: User) -> None:
+async def notify_msg(msg: Message) -> None:
     """Отвечает за /notify."""
     if await get_cookie(msg.from_user.id):
-        await msg.answer("⚙️ <b>Настройки уведомлений:</b>", "HTML")
+        await msg.answer("⚙️ <b>Настройки уведомлений:</b>")
 
         markup = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -38,7 +37,6 @@ async def notify_msg(msg: Message, user: User) -> None:
 
         await msg.answer(
             "🔔 <b>Уведомления об изменении оценок</b>",
-            "HTML",
             reply_markup=markup,
         )
 
@@ -85,14 +83,12 @@ async def notify_msg(msg: Message, user: User) -> None:
         )
         await msg.answer(
             "🔔 <b>Уведомления об изменении расписания</b>",
-            "HTML",
             reply_markup=markup,
         )
 
     else:
         # Выводим сообщение о необходимости регестрации и клавиатуру
         await msg.answer(
-            await not_auth(msg.from_user.language_code),
-            "HTML",
-            reply_markup=await not_auth_keyboard(msg.from_user.language_code),
+            not_auth,
+            reply_markup=not_auth_keyboard,
         )

@@ -6,14 +6,13 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from pars_diary.types import User
 from pars_diary.utils.ask_gpt import ask_gpt
 
 router = Router(name=__name__)
 
 
 @router.message(Command("chatgpt"))
-async def lessons_msg(msg: Message, user: User) -> None:
+async def lessons_msg(msg: Message) -> None:
     """Отвечает за /chatgpt."""
     examples = [
         "Напиши сочинение по роману Отцы и дети",
@@ -32,7 +31,6 @@ async def lessons_msg(msg: Message, user: User) -> None:
     if msg.text == "/chatgpt":
         await msg.answer(
             f'Комманда работает так - <b>"/chatgpt {choice(examples)}"</b>',
-            "HTML",
         )
     else:
         # TODO @iamlostshe: answer_msg = await msg.answer('ChatGPT думает...')
