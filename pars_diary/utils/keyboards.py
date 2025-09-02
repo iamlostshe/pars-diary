@@ -5,6 +5,18 @@ from __future__ import annotations
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 INSTRUCTION_URL = "https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25"
+CHECK_SUB_CHANNEL = "https://t.me/+Bgus_b4EFSZiYmQy"
+
+not_sub_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Подписаться",
+                url=CHECK_SUB_CHANNEL,
+            ),
+        ],
+    ],
+)
 
 not_auth_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
