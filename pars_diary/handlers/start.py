@@ -1,6 +1,7 @@
 """Приветственное сообщение."""
 
 from aiogram import Router
+from aiogram.filters import CommandStart
 from aiogram.types import Message
 
 from pars_diary.types import User
@@ -10,7 +11,7 @@ from pars_diary.utils.messages import registration_0, start_old_user
 router = Router(name=__name__)
 
 
-@router.message()
+@router.message(CommandStart())
 async def command_start_handler(msg: Message, user: User) -> None:
     """Обработка /start."""
     # Если пользователь зарегистрирован

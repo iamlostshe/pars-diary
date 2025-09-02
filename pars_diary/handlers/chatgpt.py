@@ -12,8 +12,9 @@ router = Router(name=__name__)
 
 
 @router.message(Command("chatgpt"))
-async def lessons_msg(msg: Message) -> None:
-    """Отвечает за /chatgpt."""
+@router.message(Command("gpt"))
+async def lessons_message(message: Message) -> None:
+    """Отвечает за /gpt."""
     examples = [
         "Напиши сочинение по роману Отцы и дети",
         "Расскажи о теореме пифагора",
@@ -28,17 +29,10 @@ async def lessons_msg(msg: Message) -> None:
         "Что такое функциональная грамотность?",
     ]
 
-    if msg.text == "/chatgpt":
-        await msg.answer(
-            f'Комманда работает так - <b>"/chatgpt {choice(examples)}"</b>',
+    if message.text in ["/chatgpt", "/gpt"]:
+        await message.answer(
+            f'Комманда работает так - <b>"/gpt {choice(examples)}"</b>',
         )
     else:
-        # TODO @iamlostshe: answer_msg = await msg.answer('ChatGPT думает...')
-        send_text = await ask_gpt(
-            " ".join(msg.text.split()[1:]),
-            msg.from_user.first_name,
-        )
-        # TODO @iamlostshe: await msg.edit_text(send_text)
-
-        # ВРЕМЕННОЕ РЕШЕНИЕ
-        await msg.answer(send_text)
+        answer_message = await message.answer("Нейросеть думает...")
+        await answer_message.edit_text(await ask_gpt(message.text.split(" ", 1)[1]))
