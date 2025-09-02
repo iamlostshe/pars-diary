@@ -9,8 +9,9 @@ from aiogram.types import CallbackQuery
 from bars_api import BarsAPI
 from loguru import logger
 
-from pars_diary.config import config, db
+from pars_diary.config import config
 from pars_diary.types import User
+from pars_diary.utils import db
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from aiogram.types import Message, TelegramObject
 
 
-class DataBaseMiddleware(BaseMiddleware):
+class AuthMiddleware(BaseMiddleware):
     """Промежуточный слой для проброса данных пользователя из бд."""
 
     async def __call__(
@@ -40,13 +41,13 @@ class DataBaseMiddleware(BaseMiddleware):
             if _event.text and _event.text.startswith("/start ")
             else None
         )
-        await db.add_user(_event.from_user.id, refer)
+        db.add_user(_event.from_user.id, refer)
 
         # Обновляем значение счётчика
-        await db.counter(_event.from_user.id, _event.text.split()[0][1:])
+        db.counter(_event.from_user.id, _event.text.split()[0][1:])
 
-        server_name = await db.get_server_name(_event.from_user.id)
-        cookie = await db.get_cookie(_event.from_user.id)
+        server_name = db.get_server_name(_event.from_user.id)
+        cookie = db.get_cookie(_event.from_user.id)
 
         parser = None
         if server_name and cookie:

@@ -3,9 +3,9 @@
 from aiogram import Dispatcher
 from loguru import logger
 
+from .auth import AuthMiddleware
 from .config import bot
 from .handlers import routers
-from .middlewares import mv
 
 
 async def main() -> None:
@@ -18,9 +18,7 @@ async def main() -> None:
         logger.debug("Include router: {} ...", r.name)
         dp.include_router(r)
 
-    for m in mv:
-        logger.debug("Include middleware: {} ...", m.name)
-        dp.message.middleware(m())
+    dp.message.middleware(AuthMiddleware())
 
     await bot.delete_webhook(drop_pending_updates=True)
 
