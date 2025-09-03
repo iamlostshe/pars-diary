@@ -1,7 +1,8 @@
 """Некоторые постоянные значения для парсера."""
 
 # Ссылка на страницу со ссылками на все сервера дневников в разных регионах
-AGGREGATOR_URL = "http://aggregator-obr.bars-open.ru/my_diary"
+# old_url: http://aggregator-obr.bars-open.ru/my_diary
+AGGREGATOR_URL = "https://aggregator.edu.bars.group/my_diary"
 
 # Регулярное выражение для удаления тегов <span>
 SPAN_CLEANER = r"<span[^>]*>(.*?)</span>"
