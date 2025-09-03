@@ -34,8 +34,8 @@ DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 # Вспомогательные функции
 async def get_hw(
-        data: list[dict],
-    ) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
+    data: list[dict],
+) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
     week_data = WeekHomework()
     for day_data in data[:6]:
@@ -45,7 +45,8 @@ async def get_hw(
                 Homework(
                     discipline=html.escape(hw["discipline"]),
                     homework=html.escape(hw["homework"]),
-                ) for hw in day_data["homeworks"]
+                )
+                for hw in day_data["homeworks"]
             ],
         )
         week_data.days.append(day)
@@ -58,16 +59,24 @@ async def get_hw(
         inline_keyboard = []
 
         try:
-            space_len = max(len(MINIFY_LESSON_TITLE.get(
-                hw.discipline, hw.discipline,
-            )) for hw in day.homeworks if day.homeworks)
+            space_len = max(
+                len(
+                    MINIFY_LESSON_TITLE.get(
+                        hw.discipline,
+                        hw.discipline,
+                    )
+                )
+                for hw in day.homeworks
+                if day.homeworks
+            )
         except ValueError:
             space_len = 0
 
         if day.homeworks:
             for count, hw in enumerate(day.homeworks):
                 subject = MINIFY_LESSON_TITLE.get(
-                    hw.discipline, hw.discipline,
+                    hw.discipline,
+                    hw.discipline,
                 ).ljust(space_len)
                 msg_text += f"{count + 1}. {subject} │ {hw.homework}\n"
 
@@ -119,8 +128,9 @@ async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
 
 # Основная функция
 async def hw(
-        data: dict, index: HomeworkIndex,
-    ) -> tuple[str, InlineKeyboardMarkup] | str:
+    data: dict,
+    index: HomeworkIndex,
+) -> tuple[str, InlineKeyboardMarkup] | str:
     """Функция для парсинга Д/З.
 
     | index | функция                         |
@@ -136,9 +146,11 @@ async def hw(
         msg_text = "\n\n".join(homework[0])
 
         # Редактируем клавиатуру
-        inline_keyboard = [[
+        inline_keyboard = [
+            [
                 InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
-            ]]
+            ]
+        ]
 
     # Д/З на завтра
     elif index == "t":

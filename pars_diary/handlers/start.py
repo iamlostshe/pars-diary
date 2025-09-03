@@ -20,7 +20,7 @@ async def command_start_handler(msg: Message, user: User) -> None:
             start_old_user(
                 msg.from_user.first_name,
             ),
-            reply_markup=await not_auth_keyboard(),
+            reply_markup=not_auth_keyboard,
         )
 
     # Если пользователь не зарегистрирован

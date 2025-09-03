@@ -116,13 +116,13 @@ async def callback(call: CallbackQuery) -> None:
     elif call.data == "reg_0":
         await call.message.edit_text(
             registration_1,
-            reply_markup=reg_1,
+            reply_markup=await reg_1(),
         )
 
     elif "reg_1_" in call.data:
-        # Записываем server_name в бд
-        server_name = "".join(call.data.split("_")[2:])
-        await db.add_user_server_name(call.from_user.id, server_name)
+        # Записываем provider в бд
+        provider = "".join(call.data.split("_")[2:])
+        db.add_user_provider(call.from_user.id, provider)
 
         await call.message.edit_text(
             registration_2,

@@ -52,20 +52,21 @@ class AuthMiddleware(BaseMiddleware):
         if user_channel_status.status == "left":
             return await event.answer(not_sub, reply_markup=not_sub_keyboard)
 
-        server_name = db.get_server_name(event.from_user.id)
+        provider = db.get_provider(event.from_user.id)
         cookie = db.get_cookie(event.from_user.id)
 
         parser = None
-        if server_name and cookie:
+        if provider and cookie:
             parser = BarsAPI(
-                server_name,
+                provider,
                 cookie,
             )
 
         # Пробрасываем объект пользователя
         data["user"] = User(
-            is_auth=server_name and cookie,
+            is_auth=provider and cookie,
             is_admin=event.from_user.id in config.admin_ids,
+            provider=provider,
             parser=parser,
         )
 

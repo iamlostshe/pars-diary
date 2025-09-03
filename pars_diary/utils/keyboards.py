@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from bars_api import BarsAPI
 
 INSTRUCTION_URL = "https://telegra.ph/Instrukciya-po-registracii-v-bote-04-25"
 CHECK_SUB_CHANNEL = "https://t.me/+Bgus_b4EFSZiYmQy"
@@ -45,17 +46,17 @@ reg_2 = InlineKeyboardMarkup(
 
 async def reg_1() -> InlineKeyboardMarkup:
     """Нулевая стадия регистрации."""
-    result = []
-    regions = await parser.get_regions()
+    async with BarsAPI() as parser:
+        regions = await parser.get_regions()
 
-    for r, u in regions.items():
-        result.append(
+    return InlineKeyboardMarkup(
+        inline_keyboard=(
             [
                 InlineKeyboardButton(
                     text=r,
                     callback_data=f"reg_1_{u}",
                 ),
-            ],
-        )
-
-    return InlineKeyboardMarkup(inline_keyboard=result)
+            ]
+            for r, u in regions.items()
+        ),
+    )

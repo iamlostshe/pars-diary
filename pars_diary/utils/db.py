@@ -6,7 +6,6 @@ import json
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Self
 
 import matplotlib.pyplot as plt
 
@@ -54,7 +53,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
-def add_user_server_name(user_id: int | str, server_name: str) -> str:
+def add_user_provider(user_id: int | str, provider: str) -> str:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     try:
@@ -63,7 +62,7 @@ def add_user_server_name(user_id: int | str, server_name: str) -> str:
             data = json.load(f)
 
             # Запись cookie в json базу данных
-            data[str(user_id)]["server_name"] = server_name
+            data[str(user_id)]["provider"] = provider
 
             # Сохраняем изменения в json базе данных
             f.seek(0)
@@ -74,7 +73,7 @@ def add_user_server_name(user_id: int | str, server_name: str) -> str:
         raise UserNotFoundError from e
 
 
-async def add_user_cookie(user_id: int | str, cookie: str) -> str:
+def add_user_cookie(user_id: int | str, cookie: str) -> None:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -88,19 +87,12 @@ async def add_user_cookie(user_id: int | str, cookie: str) -> str:
         if not user:
             raise UserNotFoundError
 
-        # Проверяем cookie пользователя
-        c_c = await parser.check_cookie()
-        if c_c[0]:
-            # Записываем cookie в базу данных
-            user["cookie"] = cookie
+        user["cookie"] = cookie
 
-            # Сохраняем изменения в json базе данных
-            f.seek(0)
-            f.truncate()
-            json.dump(data, f, indent=4, ensure_ascii=False)
-
-    # В любом случае возвращаем ответ
-    return c_c[1]
+        # Сохраняем изменения в json базе данных
+        f.seek(0)
+        f.truncate()
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def get_cookie(user_id: str | int) -> None | str | dict:
@@ -222,16 +214,16 @@ def counter(user_id: str | int, counter_name: str) -> None:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
-def get_server_name(user_id: int | str) -> str:
-    """Возвращает server_name по user_id."""
+def get_provider(user_id: int | str) -> str | None:
+    """Возвращает provider по user_id."""
     with db_path.open(encoding="UTF-8") as f:
-        return json.load(f).get(str(user_id), {}).get("server_name")
+        return json.load(f).get(str(user_id), {}).get("provider")
 
 
 class Stat:
     """Возвращает статистику для (сис-) админов."""
 
-    def get_stat(self: Self) -> tuple[int, str]:
+    def get_stat(self) -> tuple[int, str]:
         """Возвращает статистику для (сис-) админов."""
         # Инициализируем переменные для хранения статистики
         self.refer = []
@@ -284,7 +276,7 @@ class Stat:
             self.command_notify_settings += len(data_u.get("notify-settings", []))
             self.command_start += len(data_u.get("start", []))
 
-    def str_refer(self: Self) -> str:
+    def str_refer(self) -> str:
         """Создаёт строковое представление источников прихода аудитории."""
         # Создаем Counter для подсчета вхождений каждого элемента
         count_dict = Counter(item for item in self.refer if item is not None)

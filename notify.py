@@ -40,30 +40,29 @@ async def send_notify(bot: Bot, smart: bool = False) -> None:
             for user_id in data:
                 user = User(**data[user_id])
                 # Проверяем указаны ли у пользователя cookie
-                if user.cookie not in [None, "demo"]:
-                    new_data = await parser.marks(user_id).split("\n")[3:-1]
+                new_data = await parser.marks(user_id).split("\n")[3:-1]
 
-                    # Получаем старые оценки
-                    old_data = await db.get_marks(user_id)
+                # Получаем старые оценки
+                old_data = await db.get_marks(user_id)
 
-                    # Регестрируем изменения
-                    user.notify_marks = new_data
-                    data[user]["notify_marks"] = new_data
+                # Регестрируем изменения
+                user.notify_marks = new_data
+                data[user]["notify_marks"] = new_data
 
-                    # Записываем изменения в файл
-                    f.seek(0)
-                    f.truncate()
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+                # Записываем изменения в файл
+                f.seek(0)
+                f.truncate()
+                json.dump(data, f, indent=4, ensure_ascii=False)
 
-                    # Если у пользователя включены уведомления
-                    if user.notify:
-                        # Проверяем уведомления
-                        await check_notify(user_id, new_data, old_data)
+                # Если у пользователя включены уведомления
+                if user.notify:
+                    # Проверяем уведомления
+                    await check_notify(user_id, new_data, old_data)
 
-                    # Если нужно отправить умное уведомление
-                    # и у пользователя включены умные уведомления
-                    if smart and user.smart_notify:
-                        await check_smart_notify(user_id, new_data)
+                # Если нужно отправить умное уведомление
+                # и у пользователя включены умные уведомления
+                if smart and user.smart_notify:
+                    await check_smart_notify(user_id, new_data)
 
     except KeyError as e:
         logger.error(UserNotFoundError(e))

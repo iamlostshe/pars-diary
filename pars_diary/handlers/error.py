@@ -8,6 +8,7 @@ from pars_diary.utils.messages import error
 
 router = Router(name=__name__)
 
+
 @router.errors()
 async def catch_errors(event: ErrorEvent) -> None:
     """Простой обработчик для ошибок."""

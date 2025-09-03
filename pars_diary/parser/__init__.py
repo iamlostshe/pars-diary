@@ -1,5 +1,19 @@
-"""Just init file."""
+"""Инициализация директории как модуля."""
 
-from .pars import Parser
+from .pars import (
+    birthdays,
+    events,
+    homework,
+    i_marks,
+    marks,
+    me,
+)
 
-__all__ = ("Parser", )
+__all__ = (
+    "birthdays",
+    "events",
+    "homework",
+    "i_marks",
+    "marks",
+    "me",
+)

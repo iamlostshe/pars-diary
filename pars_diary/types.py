@@ -1,4 +1,5 @@
 """Typing."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -14,4 +15,5 @@ class User:
 
     is_auth: bool
     is_admin: bool
+    provider: str | None
     parser: BarsAPI | None

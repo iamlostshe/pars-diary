@@ -10,7 +10,6 @@ dependencies = [
     "aiogram==3.22.0",
     "bars-api",
     "cait-api",
-    "conversations-about-important-api==0.1.0",
     "fake-useragent==2.2.0",
     "g4f>=0.6.1.6",
     "loguru==0.7.3",

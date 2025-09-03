@@ -20,7 +20,9 @@ async def ch_msg(msg: Message) -> None:
     await msg.answer_photo(
         answer[0],
         answer[1],
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Подробнее", url=answer[2])],
-        ],
-    ))
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="Подробнее", url=answer[2])],
+            ],
+        ),
+    )

@@ -27,6 +27,7 @@ class Config(BaseSettings):
     bot_token: str
     admin_ids: str
 
+
 config: Config = Config(_env_file=".env")
 config.admin_ids: list[int] = [int(i) for i in config.admin_ids.split(",")]
 
