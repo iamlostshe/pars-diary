@@ -36,10 +36,10 @@ routers = (
     chatgpt.router,
     error.router,
     hw.router,
-    keyboard.router,
     new.router,
     notify.router,
     start.router,
+    keyboard.router,
 )
 
 __all__ = ("routers",)
