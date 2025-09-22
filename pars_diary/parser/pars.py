@@ -15,15 +15,15 @@ if TYPE_CHECKING:
     from bars_api import BarsAPI
 
 
-def _get_space_len(child: str, parent: dict) -> int:
+def _get_space_len(parent: dict) -> int:
     """Возвращает кол-во симовлов, для отступов."""
     try:
         return (
             max(
                 len(
                     MINIFY_LESSON_TITLE.get(
-                        s[child],
-                        s[child],
+                        s.discipline,
+                        s.discipline,
                     ),
                 )
                 for s in parent
@@ -102,7 +102,7 @@ async def marks(parser: BarsAPI) -> str:
     msg_text = ""
     for_midle_marks = []
 
-    space_len = _get_space_len("discipline", data.discipline_marks)
+    space_len = _get_space_len(data.discipline_marks)
 
     for subject in data.discipline_marks:
         # Получаем название предмета
@@ -149,20 +149,14 @@ async def marks(parser: BarsAPI) -> str:
 
 async def i_marks(parser: BarsAPI) -> str:
     """Информация об итоговых оценках."""
-    data = parser.get_total_marks()
+    data = await parser.get_total_marks()
 
-    try:
-        total_marks_data = data.total_marks_data[0]
-
-        subperiods_data = total_marks_data.subperiods
-        discipline_marks_data = total_marks_data.discipline_marks
-    except KeyError:
-        return NO_I_MARKS_DATA
+    discipline_marks_data = data.discipline_marks
 
     if not discipline_marks_data:
         return NO_I_MARKS_DATA
 
-    subperiods = {i.code: i.name for i in subperiods_data}
+    subperiods = {i.code: i.name for i in data.subperiod}
 
     subperiods_names = list(subperiods.values())
     len_subperiods_names = len(subperiods_names)
@@ -174,7 +168,7 @@ async def i_marks(parser: BarsAPI) -> str:
         for i, _ in enumerate(subperiods_names)
     ]
 
-    space_len = _get_space_len("discipline", discipline_marks_data)
+    space_len = _get_space_len(discipline_marks_data)
 
     msg_text = (
         f"Итоговые оценки:\n\n{'\n'.join(explanation)}\n\n<pre>\n"
@@ -210,5 +204,4 @@ async def i_marks(parser: BarsAPI) -> str:
 
 async def homework(parser: BarsAPI) -> dict:
     """Домашнее задание."""
-    # TODO(@iamlostshe): Доделать
-    return None
+    return parser.get_total_marks()
