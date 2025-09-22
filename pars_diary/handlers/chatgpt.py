@@ -6,7 +6,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from pars_diary.utils.ask_gpt import ask_gpt
+from pars_diary.utils.gpt import ask_gpt
 
 router = Router(name=__name__)
 
@@ -15,7 +15,7 @@ router = Router(name=__name__)
 @router.message(Command("gpt"))
 async def lessons_message(message: Message) -> None:
     """Отвечает за /gpt."""
-    examples = [
+    examples = (
         "Напиши сочинение по роману Отцы и дети",
         "Расскажи о теореме пифагора",
         "Что такое диактелизмы?",
@@ -27,9 +27,9 @@ async def lessons_message(message: Message) -> None:
         "Как рассчитать вероятность события?",
         "Напиши вступление проекта о создании telegram бота",
         "Что такое функциональная грамотность?",
-    ]
+    )
 
-    if message.text in ["/chatgpt", "/gpt"]:
+    if message.text in ("/chatgpt", "/gpt"):
         await message.answer(
             f'Комманда работает так - <b>"/gpt {choice(examples)}"</b>',
         )
