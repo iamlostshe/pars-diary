@@ -201,6 +201,9 @@ def counter(user_id: str | int, counter_name: str) -> None:
     with db_path.open("r+", encoding="UTF-8") as f:
         data = json.load(f)
 
+        if counter_name == "notify":
+            counter_name = "notify_settings"
+
         user = data.get(str(user_id))
         if user:
             # Обновление счётчика

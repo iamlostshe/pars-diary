@@ -19,7 +19,7 @@ router = Router(name=__name__)
 @router.message(Command("notify"))
 async def notify_msg(msg: Message) -> None:
     """Отвечает за /notify."""
-    if await get_cookie(msg.from_user.id):
+    if get_cookie(msg.from_user.id):
         await msg.answer("⚙️ <b>Настройки уведомлений:</b>")
 
         markup = InlineKeyboardMarkup(
@@ -27,7 +27,7 @@ async def notify_msg(msg: Message) -> None:
                 [
                     InlineKeyboardButton(
                         text="❌ Отключить"
-                        if await get_notify(msg.from_user.id)
+                        if get_notify(msg.from_user.id)
                         else "✅ Включить",
                         callback_data="n_n",
                     ),
@@ -45,7 +45,7 @@ async def notify_msg(msg: Message) -> None:
                 [
                     InlineKeyboardButton(
                         text="❌ Отключить"
-                        if await get_notify(msg.from_user.id, index="s")
+                        if get_notify(msg.from_user.id, index="s")
                         else "✅ Включить",
                         callback_data="n_s",
                     ),

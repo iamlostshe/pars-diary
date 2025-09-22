@@ -12,15 +12,15 @@ from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
+from pars_diary.parser.consts import DAYS_SHORT
+from pars_diary.parser.hw import chatgpt, hw
 from pars_diary.utils import db
-from pars_diary.utils.hw import DAYS_SHORT, chatgpt, hw
 from pars_diary.utils.keyboards import reg_1, reg_2
 from pars_diary.utils.messages import registration_1, registration_2
 
 router = Router(name=__name__)
 
 
-# Хендлеры для кнопок
 @router.callback_query()
 async def callback(call: CallbackQuery) -> None:
     """Отвечает за все callback-хендлеры (кнопки)."""
@@ -35,7 +35,7 @@ async def callback(call: CallbackQuery) -> None:
                 [
                     InlineKeyboardButton(
                         text="❌ Отключить"
-                        if await db.swith_notify(call.from_user.id)
+                        if db.swith_notify(call.from_user.id)
                         else "✅ Включить",
                         callback_data="n_n",
                     ),
@@ -57,7 +57,7 @@ async def callback(call: CallbackQuery) -> None:
                 [
                     InlineKeyboardButton(
                         text="❌ Отключить"
-                        if await db.swith_notify(call.from_user.id, index="s")
+                        if db.swith_notify(call.from_user.id, index="s")
                         else "✅ Включить",
                         callback_data="n_s",
                     ),
