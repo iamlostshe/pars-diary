@@ -30,25 +30,26 @@ router = Router(name=__name__)
         commands=["marks", "i_marks", "me", "events", "birthdays"],
     ),
 )
-async def simple_msg(msg: Message, user: User) -> None:
+async def simple_msg(message: Message, user: User) -> None:
     """Отвечает за /marks, /i_marks, /me, /events, /birthdays."""
     if user.is_auth:
-        answer = await {
-            "/birthdays": birthdays,
-            "/events": events,
-            "/i_marks": i_marks,
-            "/marks": marks,
-            "/me": me,
-        }[msg.text.split()[0]](user.parser)
+        async with user.parser as parser:
+            answer = await {
+                "/birthdays": birthdays,
+                "/events": events,
+                "/i_marks": i_marks,
+                "/marks": marks,
+                "/me": me,
+            }[message.text.split()[0]](parser)
 
         if len(answer) == 2 and isinstance(answer, tuple):
-            await msg.answer(answer[0], reply_markup=answer[1])
+            await message.answer(answer[0], reply_markup=answer[1])
         else:
-            await msg.answer(answer)
+            await message.answer(answer)
 
     else:
         # Выводим сообщение о необходимости регестрации и клавиатуру
-        await msg.answer(
+        await message.answer(
             not_auth,
             reply_markup=not_auth_keyboard,
         )

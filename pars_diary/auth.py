@@ -55,19 +55,12 @@ class AuthMiddleware(BaseMiddleware):
         provider = db.get_provider(event.from_user.id)
         cookie = db.get_cookie(event.from_user.id)
 
-        parser = None
-        if provider and cookie:
-            parser = BarsAPI(
-                provider,
-                cookie,
-            )
-
         # Пробрасываем объект пользователя
         data["user"] = User(
             is_auth=provider and cookie,
             is_admin=event.from_user.id in config.admin_ids,
             provider=provider,
-            parser=parser,
+            parser=BarsAPI(provider, cookie) if provider and cookie else None,
         )
 
         return await handler(event, data)
