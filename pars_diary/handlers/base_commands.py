@@ -2,7 +2,6 @@
 
 - /marks - Оценки
 - /i_marks - Итоговые оценки
-- /hw - Домашнее задание
 - /me - Данные о пользователе
 - /events - Ивенты
 - /birthdays - Дни рождения
@@ -20,8 +19,6 @@ from pars_diary.parser import (
     me,
 )
 from pars_diary.types import User
-
-# "from pars_diary.utils.hw import hw
 from pars_diary.utils.keyboards import not_auth_keyboard
 from pars_diary.utils.messages import not_auth
 
@@ -30,16 +27,15 @@ router = Router(name=__name__)
 
 @router.message(
     Command(
-        commands=["marks", "i_marks", "hw", "me", "events", "birthdays"],
+        commands=["marks", "i_marks", "me", "events", "birthdays"],
     ),
 )
 async def simple_msg(msg: Message, user: User) -> None:
-    """Отвечает за /marks, /i_marks, /hw, /me, /events, /birthdays."""
+    """Отвечает за /marks, /i_marks, /me, /events, /birthdays."""
     if user.is_auth:
         answer = await {
             "/birthdays": birthdays,
             "/events": events,
-            # "/hw": await hw(await user.parser.homework(), "t"),
             "/i_marks": i_marks,
             "/marks": marks,
             "/me": me,

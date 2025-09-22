@@ -1,9 +1,9 @@
 """Инициализация директории как модуля."""
 
+from .hw import hw
 from .pars import (
     birthdays,
     events,
-    homework,
     i_marks,
     marks,
     me,
@@ -12,7 +12,7 @@ from .pars import (
 __all__ = (
     "birthdays",
     "events",
-    "homework",
+    "hw",
     "i_marks",
     "marks",
     "me",

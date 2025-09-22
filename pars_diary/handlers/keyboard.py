@@ -12,8 +12,8 @@ from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
+from pars_diary.parser import hw
 from pars_diary.parser.consts import DAYS_SHORT
-from pars_diary.parser.hw import chatgpt, hw
 from pars_diary.utils import db
 from pars_diary.utils.keyboards import reg_1, reg_2
 from pars_diary.utils.messages import registration_1, registration_2
@@ -105,12 +105,6 @@ async def callback(call: CallbackQuery) -> None:
                 answer[0],
                 reply_markup=answer[1],
             )
-
-    # Нейросеть для помощи в учебе
-    elif "chatgpt" in call.data:
-        await call.message.edit_text("Chatgpt думает...")
-        send_text = chatgpt(call.from_user.id, call.data, call.from_user.first_name)
-        await call.message.edit_text(send_text)
 
     # Регистрация в боте
     elif call.data == "reg_0":

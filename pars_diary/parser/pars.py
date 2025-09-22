@@ -200,8 +200,3 @@ async def i_marks(parser: BarsAPI) -> str:
         msg_text += " │\n"
 
     return f"{msg_text}</pre>"
-
-
-async def homework(parser: BarsAPI) -> dict:
-    """Домашнее задание."""
-    return parser.get_total_marks()

@@ -5,35 +5,18 @@ from __future__ import annotations
 import datetime
 import html
 from datetime import datetime as dt
-from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from pars_diary.models import DayHomework, Homework, WeekHomework
 from pars_diary.parser.consts import MINIFY_LESSON_TITLE
+from pars_diary.utils.exceptions import DayIndexError
 
-from .ask_gpt import ask_gpt
-from .exceptions import DayIndexError
-
-if TYPE_CHECKING:
-    from .typing import HomeworkIndex, UserId
-
-DAYS = [
-    "понедельник",
-    "вторник",
-    "среду",
-    "четверг",
-    "пятницу",
-    "субботу",
-    "воскресень",
-]
-
-DAYS_SHORT = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+from .consts import DAYS, DAYS_SHORT
 
 
-# Вспомогательные функции
-async def get_hw(
+def get_hw(
     data: list[dict],
 ) -> tuple[list[str], list[list[InlineKeyboardButton]]]:
     """Функция для получения Д/З по дню недели."""
@@ -64,7 +47,7 @@ async def get_hw(
                     MINIFY_LESSON_TITLE.get(
                         hw.discipline,
                         hw.discipline,
-                    )
+                    ),
                 )
                 for hw in day.homeworks
                 if day.homeworks
@@ -107,30 +90,10 @@ async def get_hw(
     return result, inline_keyboards
 
 
-async def chatgpt(user_id: UserId, index: str, firstname: str) -> str:
-    """Функция для формирования запроса к GPT."""
-    day = int(index.split("_")[1])
-    subject_num = int(index.split("_")[2])
-
-    url = "HomeworkService/GetHomeworkFromRange"
-    data = await parser.request(url, user_id)
-
-    day_hw = data[day]["homeworks"]
-
-    hwhw = day_hw[subject_num]["homework"]
-    subject_name = day_hw[subject_num]["discipline"]
-
-    return await ask_gpt(
-        f"Помоги мне с решением домашнего задания по {subject_name}: {hwhw}",
-        firstname,
-    )
-
-
-# Основная функция
-async def hw(
+def hw(
     data: dict,
-    index: HomeworkIndex,
-) -> tuple[str, InlineKeyboardMarkup] | str:
+    index: str,
+) -> tuple[str, InlineKeyboardMarkup]:
     """Функция для парсинга Д/З.
 
     | index | функция                         |
@@ -142,14 +105,14 @@ async def hw(
     # Д/З на неделю
     if index == "w":
         # Получем Д/З
-        homework = await get_hw(data)
+        homework = get_hw(data)
         msg_text = "\n\n".join(homework[0])
 
         # Редактируем клавиатуру
         inline_keyboard = [
             [
                 InlineKeyboardButton(text="На завтра", callback_data="hw_t"),
-            ]
+            ],
         ]
 
     # Д/З на завтра
@@ -161,7 +124,7 @@ async def hw(
             day = 0
 
         # Получем Д/З
-        homework = await get_hw(data)
+        homework = get_hw(data)
 
         msg_text = homework[0][day]
         inline_keyboard = homework[1][day]
@@ -176,7 +139,7 @@ async def hw(
     # Д/З на определённый день недели
     elif index in range(6):
         # Получем Д/З
-        homework = await get_hw(data)
+        homework = get_hw(data)
 
         msg_text = homework[0][int(index)]
         inline_keyboard = homework[1][int(index)]
@@ -200,16 +163,9 @@ async def hw(
         ],
     )
 
-    # Редактируем сообщение
-    msg_text = (
+    return (
         f"<pre>{msg_text}</pre>\n\n<b>Д/З МОЖЕТ БЫТЬ НЕ АКТУАЛЬНЫМ!!!</b>\n\nЕ"
         "го указывают (зачастую не указывают) учителя и мы никак не можем повл"
         "иять на этот процесс.\n\n<b>Для получения актуального Д/З попросите в"
         "ашего учителя указывать его в дневнике)</b>"
-    )
-
-    # Создаём клавиатуру
-    markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-
-    # Возвращаем тект сообщения и клавиатуру
-    return msg_text, markup
+    ), InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
