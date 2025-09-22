@@ -1,12 +1,14 @@
 """Авторизация в боте."""
 
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from bars_api import BarsAPI
 
 from pars_diary.types import User
 from pars_diary.utils import db
+from pars_diary.utils.keyboards import reg_1
+from pars_diary.utils.messages import registration_1
 
 router = Router(name=__name__)
 
@@ -45,3 +47,12 @@ async def new_msg(msg: Message, user: User) -> None:
                 msg.text[5:].replace("\n", ""),
             ),
         )
+
+
+@router.callback_query(F.data == "reg_0")
+async def callback_reg_0(callback_query: CallbackQuery) -> None:
+    """Начальный этап авторизации."""
+    await callback_query.message.edit_text(
+        registration_1,
+        reply_markup=await reg_1(),
+    )

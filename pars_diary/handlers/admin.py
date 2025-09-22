@@ -20,7 +20,7 @@ router = Router(name=__name__)
 @router.message(Command("admin"))
 async def new_msg(msg: Message, user: User) -> None:
     """Отвечает за /admin."""
-    if user.isadmin:
+    if user.is_admin:
         # Обновляем график
         await get_graph()
 

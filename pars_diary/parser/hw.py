@@ -137,7 +137,7 @@ def hw(
         )
 
     # Д/З на определённый день недели
-    elif index in range(6):
+    elif -1 < int(index) < 6:
         # Получем Д/З
         homework = get_hw(data)
 

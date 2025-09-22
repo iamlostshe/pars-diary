@@ -19,11 +19,6 @@ cd PARS-DIARY
 
 3. **Устанавливаем зависимости и запускаем бота:**
 
-<details>
-<summary>
-Через uv (рекомендуется)
-</summary>
-
 **Устанавливаем `uv` (если еще не установлен):**
 
 Linux:
@@ -43,42 +38,3 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```bash
 uv run -m pars_diary
 ```
-
-</details>
-
-<details>
-<summary>
-Через `requirements.txt`
-</summary>
-
-**Создаём виртуальное окружение:**
-
-``` bash
-python3 -m venv venv
-```
-
-**Активируем виртуальное окружение:**
-
-``` bash
-. venv/bin/activate
-```
-
-> Последняя команда для Windows:
->
-> ``` bash
-> venv\Scripts\activate
-> ```
-
-**Устанавливаем зависимости:**
-
-``` bash
-pip3 install -r requirements.txt
-```
-
-**Запускаем бота:**
-
-``` bash
-python3 -m pars_diary
-```
-
-</details>

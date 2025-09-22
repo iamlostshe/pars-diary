@@ -16,6 +16,7 @@ async def main() -> None:
 
     dp = Dispatcher()
     dp.message.middleware(AuthMiddleware())
+    dp.callback_query.middleware(AuthMiddleware())
 
     for r in routers:
         logger.debug("Include router: {} ...", r.name)
