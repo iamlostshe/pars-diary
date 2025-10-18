@@ -44,7 +44,8 @@ class AuthMiddleware(BaseMiddleware):
         # Записываем пользователя в бд, если его еще там нет
         refer = (
             _event.text[7:]
-            if _event.text and _event.text.startswith("/start ") else None
+            if _event.text and _event.text.startswith("/start ")
+            else None
         )
         db.add_user(_event.from_user.id, refer)
 

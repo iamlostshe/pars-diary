@@ -43,9 +43,11 @@ async def callback_hw_days(callback_query: CallbackQuery) -> None:
     await callback_query.message.edit_text(
         "Выбери день недели:",
         reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[
-                InlineKeyboardButton(text=day, callback_data=f"hw_{n}")
-                for n, day in enumerate(DAYS_SHORT)
-            ]],
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(text=day, callback_data=f"hw_{n}")
+                    for n, day in enumerate(DAYS_SHORT)
+                ],
+            ],
         ),
     )

@@ -98,18 +98,19 @@ async def callback_n_n(callback_query: CallbackQuery) -> None:
     await callback_query.message.edit_text(
         "🔔 <b>Уведомления об изменении оценок</b>",
         reply_markup=InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="❌ Отключить"
-                    if db.swith_notify(callback_query.from_user.id)
-                    else "✅ Включить",
-                    callback_data="n_n",
-                ),
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="❌ Отключить"
+                        if db.swith_notify(callback_query.from_user.id)
+                        else "✅ Включить",
+                        callback_data="n_n",
+                    ),
+                ],
             ],
-        ],
-    ),
+        ),
     )
+
 
 @router.callback_query(F.data == "n_s")
 async def callback_n_s(callback_query: CallbackQuery) -> None:
