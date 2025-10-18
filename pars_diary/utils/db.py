@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from pydantic import SecretStr
 
 from .exceptions import (
     UserNotAuthorizatedError,
@@ -95,20 +96,18 @@ def add_user_cookie(user_id: int | str, cookie: str) -> None:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
-def get_cookie(user_id: str | int) -> None | str | dict:
+def get_cookie(user_id: str | int) -> SecretStr:
     """Возвращает куки из базы данных (Если они прежде были записаны)."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
     try:
         with db_path.open(encoding="UTF-8") as f:
-            # Загрузка и десериализация данных из файла
             data = json.load(f)
 
-            # Возвращаем cookie пользователя
             if data.get(user_id):
-                return data[user_id].get("cookie")
-            return None
+                return SecretStr(data[user_id].get("cookie"))
+            return SecretStr("")
 
     except KeyError as e:
         raise UserNotAuthorizatedError from e
@@ -205,12 +204,13 @@ def counter(user_id: str | int, counter_name: str) -> None:
             counter_name = "notify_settings"
 
         user = data.get(str(user_id))
+        tm = int(time.time())
         if user:
             # Обновление счётчика
             if user.get(counter_name):
-                user[counter_name].append(time.time())
+                user[counter_name].append(tm)
             else:
-                user[counter_name] = [time.time()]
+                user[counter_name] = [tm]
 
         f.seek(0)
         f.truncate()

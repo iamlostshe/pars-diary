@@ -38,7 +38,8 @@ class AuthMiddleware(BaseMiddleware):
             logger.debug("[c] {}", event.data)
             _event = event.message
         else:
-            logger.debug("[m] {}", event.text)
+            if "/new " not in event.text:
+                logger.debug("[m] {}", event.text)
             _event = event
 
         # Записываем пользователя в бд, если его еще там нет
@@ -65,10 +66,12 @@ class AuthMiddleware(BaseMiddleware):
 
         # Пробрасываем объект пользователя
         data["user"] = User(
-            is_auth=provider and cookie,
+            is_auth=provider and cookie.get_secret_value(),
             is_admin=event.from_user.id in config.admin_ids,
             provider=provider,
-            parser=BarsAPI(provider, cookie) if provider and cookie else None,
+            parser=BarsAPI(provider, cookie.get_secret_value())
+            if provider and cookie.get_secret_value()
+            else None,
         )
 
         return await handler(event, data)

@@ -15,6 +15,10 @@ router = Router(name=__name__)
 
 async def add_user_cookie(user_id: str, provider: str, cookie: str) -> str:
     """Функция для проверки и обновления значения cookie."""
+    if not provider:
+        return (
+            "Пожалуйста, укажите ваш регион -> /start, а затем повторно укажите cookie"
+        )
     if "sessionid=" not in cookie:
         return 'Ваши cookie должны содержать "sessionid="'
     if "sessionid=xxx..." in cookie:
