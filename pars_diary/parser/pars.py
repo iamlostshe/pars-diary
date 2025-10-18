@@ -99,7 +99,7 @@ async def marks(parser: BarsAPI) -> str:
             "Кажется, вам пока не поставили ни одной("
         )
 
-    msg_text = ""
+    marks_list = []
     for_midle_marks = []
 
     space_len = _get_space_len(data.discipline_marks)
@@ -137,14 +137,15 @@ async def marks(parser: BarsAPI) -> str:
         color_mark = COLOR_MARKERS[round(float_average_mark)]
 
         # Формируем сообщение
-        msg_text += f"{color_mark} {g}│ {average_mark} │ {' '.join(str_marks)}\n"
+        marks_list.append(f"{color_mark} {g}│ {average_mark} │ {' '.join(str_marks)}")
 
-    msg_text += (
+    return (
+        "Оценки:\n\n<pre>"
+        f"{"\n".join(sorted(marks_list, key=lambda x: float(x.split(' │ ', 2)[1])))}\n"
         "\nОбщий средний балл (рассичитан): "
         f"{sum(for_midle_marks) / len(for_midle_marks):.2f}"
+        "</pre>"
     )
-
-    return f"Оценки:\n\n<pre>{msg_text}</pre>"
 
 
 async def i_marks(parser: BarsAPI) -> str:
