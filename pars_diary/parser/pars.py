@@ -141,7 +141,7 @@ async def marks(parser: BarsAPI) -> str:
 
     return (
         "Оценки:\n\n<pre>"
-        f"{"\n".join(sorted(marks_list, key=lambda x: float(x.split(' │ ', 2)[1])))}\n"
+        f"{'\n'.join(sorted(marks_list, key=lambda x: float(x.split(' │ ', 2)[1])))}\n"
         "\nОбщий средний балл (рассичитан): "
         f"{sum(for_midle_marks) / len(for_midle_marks):.2f}"
         "</pre>"
