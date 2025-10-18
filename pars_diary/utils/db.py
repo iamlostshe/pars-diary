@@ -26,7 +26,7 @@ def check_db() -> None:
             f.write("{}\n")
 
 
-def add_user(user_id: int | str, refer: str) -> None | dict:
+def add_user(user_id: int | str, refer: str) -> None:
     """Добавляет пользователя в json базу данных."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
@@ -54,7 +54,7 @@ def add_user(user_id: int | str, refer: str) -> None | dict:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
-def add_user_provider(user_id: int | str, provider: str) -> str:
+def add_user_provider(user_id: int | str, provider: str) -> None:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     try:
@@ -161,9 +161,9 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
         raise UserNotFoundError from e
 
 
-async def get_graph() -> None:
+def get_graph() -> None:
     """Генерирует график для анализа прироста пользователей."""
-    with db_path(encoding="UTF-8") as file:
+    with db_path.open(encoding="UTF-8") as file:
         data = json.load(file)
 
     times = []
@@ -180,12 +180,12 @@ async def get_graph() -> None:
     plt.savefig(GRAPH_NAME)
 
 
-async def get_marks(user_id: str | int) -> dict | str:
+def get_marks(user_id: str | int) -> dict | str:
     """Возвращает оценки из базы данных (Если они прежде были записаны)."""
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    with db_path(encoding="UTF-8") as f:
+    with db_path.open(encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
 
@@ -226,7 +226,7 @@ def get_provider(user_id: int | str) -> str | None:
 class Stat:
     """Возвращает статистику для (сис-) админов."""
 
-    def get_stat(self) -> tuple[int, str]:
+    def get_stat(self) -> None:
         """Возвращает статистику для (сис-) админов."""
         # Инициализируем переменные для хранения статистики
         self.refer = []
