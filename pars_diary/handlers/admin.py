@@ -52,6 +52,6 @@ async def new_msg(msg: Message, user: User) -> None:
                 f"Использований комманды /start: {stat.command_start}\n\n"
                 "<b>Источники прихода аудитории (рефералы)"
                 " (в порядке уменьшения выгоды):</b>\n\n"
-                f"{stat.str_refer()}\n"
+                f"{stat.str_refer()}"
             ),
         )

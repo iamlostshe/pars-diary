@@ -15,14 +15,14 @@ from .exceptions import (
     UserNotFoundError,
 )
 
-GRAPH_NAME = "stat_img.png"
-db_path = Path("users.json")
+_GRAPH_NAME = "stat_img.png"
+DB_PATH = Path("users.json")
 
 
 def check_db() -> None:
     """Проверяет наличие базы данных."""
-    if not Path.is_file(db_path):
-        with db_path.open("a+", encoding="UTF-8") as f:
+    if not Path.is_file(DB_PATH):
+        with DB_PATH.open("a+", encoding="UTF-8") as f:
             f.write("{}\n")
 
 
@@ -31,7 +31,7 @@ def add_user(user_id: int | str, refer: str) -> None:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    with db_path.open("r+", encoding="UTF-8") as f:
+    with DB_PATH.open("r+", encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
 
@@ -58,7 +58,7 @@ def add_user_provider(user_id: int | str, provider: str) -> None:
     """Добавляет пользователю cookie в json базе данных."""
     # Конвертируем id пользователя в строку
     try:
-        with db_path.open("r+", encoding="UTF-8") as f:
+        with DB_PATH.open("r+", encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
 
@@ -79,7 +79,7 @@ def add_user_cookie(user_id: int | str, cookie: str) -> None:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    with db_path.open("r+", encoding="UTF-8") as f:
+    with DB_PATH.open("r+", encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
 
@@ -102,7 +102,7 @@ def get_cookie(user_id: str | int) -> SecretStr:
     user_id = str(user_id)
 
     try:
-        with db_path.open(encoding="UTF-8") as f:
+        with DB_PATH.open(encoding="UTF-8") as f:
             data = json.load(f)
 
             if data.get(user_id):
@@ -119,7 +119,7 @@ def get_notify(user_id: str | int, index: str | None = None) -> str | dict:
     user_id = str(user_id)
 
     try:
-        with db_path.open(encoding="UTF-8") as f:
+        with DB_PATH.open(encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
 
@@ -138,7 +138,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
     user_id = str(user_id)
 
     try:
-        with db_path.open("r+", encoding="UTF-8") as f:
+        with DB_PATH.open("r+", encoding="UTF-8") as f:
             # Загрузка и десериализация данных из файла
             data = json.load(f)
 
@@ -163,7 +163,7 @@ def swith_notify(user_id: str | int, index: str | None = None) -> None | dict:
 
 def get_graph() -> None:
     """Генерирует график для анализа прироста пользователей."""
-    with db_path.open(encoding="UTF-8") as file:
+    with DB_PATH.open(encoding="UTF-8") as file:
         data = json.load(file)
 
     times = []
@@ -177,7 +177,7 @@ def get_graph() -> None:
     plt.ylabel("Пользователи")
     plt.xlabel("Время входа")
     plt.title("График времени входа пользователей")
-    plt.savefig(GRAPH_NAME)
+    plt.savefig(_GRAPH_NAME)
 
 
 def get_marks(user_id: str | int) -> dict | str:
@@ -185,7 +185,7 @@ def get_marks(user_id: str | int) -> dict | str:
     # Конвертируем id пользователя в строку
     user_id = str(user_id)
 
-    with db_path.open(encoding="UTF-8") as f:
+    with DB_PATH.open(encoding="UTF-8") as f:
         # Загрузка и десериализация данных из файла
         data = json.load(f)
 
@@ -197,7 +197,7 @@ def get_marks(user_id: str | int) -> dict | str:
 
 def counter(user_id: str | int, counter_name: str) -> None:
     """Счётчик для аналитики."""
-    with db_path.open("r+", encoding="UTF-8") as f:
+    with DB_PATH.open("r+", encoding="UTF-8") as f:
         data = json.load(f)
 
         if counter_name == "notify":
@@ -219,7 +219,7 @@ def counter(user_id: str | int, counter_name: str) -> None:
 
 def get_provider(user_id: int | str) -> str | None:
     """Возвращает provider по user_id."""
-    with db_path.open(encoding="UTF-8") as f:
+    with DB_PATH.open(encoding="UTF-8") as f:
         return json.load(f).get(str(user_id), {}).get("provider")
 
 
@@ -250,7 +250,7 @@ class Stat:
         self.command_notify_settings = 0
         self.command_start = 0
 
-        with db_path.open(encoding="UTF-8") as f:
+        with DB_PATH.open(encoding="UTF-8") as f:
             data = json.load(f)
 
         self.users_count = len(data)

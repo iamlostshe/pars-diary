@@ -9,8 +9,8 @@ from urllib.parse import quote
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from pars_diary.models import DayHomework, Homework, WeekHomework
 from pars_diary.parser.consts import MINIFY_LESSON_TITLE
+from pars_diary.types import DayHomework, Homework, WeekHomework
 from pars_diary.utils.exceptions import DayIndexError
 
 from .consts import DAYS, DAYS_SHORT

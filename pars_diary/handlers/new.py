@@ -26,10 +26,9 @@ async def add_user_cookie(user_id: str, provider: str, cookie: str) -> str:
 
     # Тест путем запроса к серверу
     try:
-        parser = BarsAPI(provider, cookie)
-        await parser.get_person_data()
-
-        db.add_user_cookie(user_id, cookie)
+        async with BarsAPI(provider, cookie) as parser:
+            await parser.get_person_data()
+            db.add_user_cookie(user_id, cookie)
 
     except Exception as e:  # noqa: BLE001
         return f"Не правильно введены cookie, при проверке сервер выдаёт ошибку:\n\n{e}"

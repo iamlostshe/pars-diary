@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from zoneinfo import ZoneInfo
-
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from cait_api import CAITParser
@@ -11,8 +9,6 @@ from g4f.client import AsyncClient
 from pydantic_settings import BaseSettings
 
 from pars_diary.utils.db import check_db
-
-TIMEZONE = ZoneInfo("Europe/Moscow")
 
 
 class Config(BaseSettings):

@@ -50,7 +50,7 @@ async def reg_1() -> InlineKeyboardMarkup:
         regions = await parser.get_regions()
 
     return InlineKeyboardMarkup(
-        inline_keyboard=(
+        inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text=r,
@@ -58,5 +58,5 @@ async def reg_1() -> InlineKeyboardMarkup:
                 ),
             ]
             for r, u in regions.items()
-        ),
+        ],
     )

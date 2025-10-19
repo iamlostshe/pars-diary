@@ -38,7 +38,7 @@ class AuthMiddleware(BaseMiddleware):
             logger.debug("[c] {}", event.data)
             _event = event.message
         else:
-            if "/new " not in event.text:
+            if event.text and "/new " not in event.text:
                 logger.debug("[m] {}", event.text)
             _event = event
 
