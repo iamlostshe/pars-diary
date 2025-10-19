@@ -35,7 +35,6 @@ async def main() -> None:
         # Запускаем скрипт отправки уведомлений
         await send_notify(smart)
 
-
         # Задержка (час в секундах)
         await asyncio.sleep(NOTIFY_DURATION * 3600)
 

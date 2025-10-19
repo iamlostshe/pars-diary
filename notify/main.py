@@ -44,7 +44,11 @@ async def send_notify(smart: bool = False) -> None:  # noqa: FBT001, FBT002
                     user.provider,
                     user.cookie.get_secret_value(),
                 ) as parser:
-                    new_data = [i.replace("<pre>", "") for i in (await marks(parser)).split("\n") if " │ " in i]
+                    new_data = [
+                        i.replace("<pre>", "")
+                        for i in (await marks(parser)).split("\n")
+                        if " │ " in i
+                    ]
 
                 is_notify = old_data != new_data
 

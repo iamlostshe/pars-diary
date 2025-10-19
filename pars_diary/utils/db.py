@@ -15,7 +15,7 @@ from .exceptions import (
     UserNotFoundError,
 )
 
-_GRAPH_NAME = "stat_img.png"
+GRAPH_NAME = "stat_img.png"
 DB_PATH = Path("users.json")
 
 
@@ -177,7 +177,7 @@ def get_graph() -> None:
     plt.ylabel("Пользователи")
     plt.xlabel("Время входа")
     plt.title("График времени входа пользователей")
-    plt.savefig(_GRAPH_NAME)
+    plt.savefig(GRAPH_NAME)
 
 
 def get_marks(user_id: str | int) -> dict | str:
