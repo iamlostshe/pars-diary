@@ -24,20 +24,19 @@ async def new_msg(msg: Message, user: User) -> None:
         # Обновляем график
         get_graph()
 
-        s = Stat()
-        stat = s.get_stat()
+        stat = Stat()
+        stat.get_stat()
 
         await msg.answer_photo(
             FSInputFile(GRAPH_NAME),
-            (
+            caption=(
                 f"<b>Всего пользователей: {stat.users_count}</b>\n\n"
-                f"Авторизованных пользователей: {stat.cookie}\n\n"
-
+                f"Авторизованных пользователей: {stat.cookie}"
+                f" ({stat.cookie / stat.users_count * 100}%)\n\n"
                 f"Уведомления: {stat.notify} / {stat.users_count}"
                 f" ({stat.notify / stat.users_count * 100}%)\n"
                 f"Умные уведомления: {stat.smart_notify} / {stat.users_count}"
                 f" ({stat.smart_notify / stat.users_count * 100}%)\n\n"
-
                 f"Использований комманды /about: {stat.command_about}\n"
                 f"Использований комманды /admin: {stat.command_admin}\n"
                 f"Использований комманды /birthdays: {stat.command_birthdays}\n"
@@ -51,9 +50,8 @@ async def new_msg(msg: Message, user: User) -> None:
                 f"Использований комманды /new: {stat.command_new}\n"
                 f"Использований комманды /notify: {stat.command_notify_settings}\n"
                 f"Использований комманды /start: {stat.command_start}\n\n"
-
                 "<b>Источники прихода аудитории (рефералы)"
                 " (в порядке уменьшения выгоды):</b>\n\n"
-                f"{await stat.str_refer()}\n"
+                f"{stat.str_refer()}\n"
             ),
         )
