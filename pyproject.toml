@@ -13,7 +13,7 @@ dependencies = [
     "fake-useragent==2.2.0",
     "g4f>=0.6.1.6",
     "loguru==0.7.3",
-    "matplotlib==3.10.0",
+    "matplotlib==3.10.7",
     "pydantic-settings==2.10.1",
 ]
 
