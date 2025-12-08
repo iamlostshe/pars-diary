@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 dependencies = [
-    "aiogram==3.22.0",
+    "aiogram==3.23.0",
     "bars-api",
     "cait-api",
     "fake-useragent==2.2.0",
